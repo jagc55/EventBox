@@ -3,7 +3,7 @@ name: Build Vue Project
 on:
   push:
     branches:
-      - main # Ejecutar solo cuando se suba a la rama 'main'
+      - master # Ejecutar solo cuando se suba a la rama 'main'
 
 jobs:
   build:
