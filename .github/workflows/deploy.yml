@@ -1,0 +1,29 @@
+name: Build Vue Project
+
+on:
+  push:
+    branches:
+      - main # Ejecutar solo cuando se suba a la rama 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        run: npm run build
+
+      # Opcional: correr tests si tienes configurado npm run test
+      # - name: Run tests
+      #   run: npm run test
