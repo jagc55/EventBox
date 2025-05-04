@@ -1,0 +1,1 @@
+<template>Establishments</template>
