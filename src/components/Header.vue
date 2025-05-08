@@ -1,36 +1,44 @@
 <template>
-  <header class="bg-darknav text-white relative z-10">
+  <header class="bg-dark-primary text-white relative z-10">
     <div class="h-16 flex items-center justify-between px-4">
       <!-- Logo + texto -->
-      <router-link
+      <RouterLink
         to="/"
-        class="flex-shrink-0 flex items-center h-full space-x-2 hover:opacity-80 transition"
+        class="flex-shrink-0 flex items-center h-full space-x-2 hover:opacity-70 transition"
       >
-        <Logo class="w-[64px] h-[64px]" />
+        <Logo class="size-16" />
         <span class="text-xl font-semibold tracking-wide">EVENTBOX</span>
-      </router-link>
+      </RouterLink>
 
       <!-- Botón hamburguesa solo en móvil -->
       <button class="sm:hidden" @click="menuOpen = !menuOpen">☰</button>
 
       <!-- Enlaces a la derecha -->
       <nav class="hidden sm:flex items-center space-x-4">
-        <router-link to="/login" class="hover:underline">
+        <RouterLink :to="{ name: 'login' }" class="hover:underline">
           Iniciar sesión
-        </router-link>
-        <div class="h-5 border-r border-white"></div>
-        <router-link to="/register" class="hover:underline">
+        </RouterLink>
+        <hr class="h-5 border-r border-white-bg" />
+        <RouterLink :to="{ name: 'register' }" class="hover:underline">
           Registrarse
-        </router-link>
+        </RouterLink>
       </nav>
     </div>
+    <hr class="h-1 bg-blue-header border-none" />
 
-    <div v-if="menuOpen" class="sm:hidden px-4 pb-3 space-y-2">
-      <a href="#" class="block hover:underline">Iniciar sesión</a>
-      <a href="#" class="block hover:underline">Registrarse</a>
+    <!-- Menú desplegable móvil como capa superpuesta -->
+    <div
+      v-show="menuOpen"
+      class="w-full bg-dark-primary px-4 py-2 sm:hidden shadow-md flex flex-col gap-2"
+    >
+      <RouterLink :to="{ name: 'login' }" class="block hover:underline">
+        Iniciar sesión
+      </RouterLink>
+      <hr class="w-full border-t border-white-bg" />
+      <RouterLink :to="{ name: 'register' }" class="block hover:underline">
+        Registrarse
+      </RouterLink>
     </div>
-    <!-- Barra inferior -->
-    <div class="h-1 bg-blue-300"></div>
   </header>
 </template>
 

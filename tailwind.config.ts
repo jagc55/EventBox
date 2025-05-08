@@ -8,8 +8,11 @@ const config: Config = {
         lato: ['"Lato"', "sans-serif"],
       },
       colors: {
-        darknav: "#1E1E22",
-        mainBlue: "#D8E8F2",
+        "dark-primary": "#1E1E22",
+        "blue-secundary": "#4A628A",
+        "blue-header": "#7AB2D3",
+        "blue-primary": "#D8E8F2",
+        "white-bg": "#FFFFFF",
       },
     },
   },

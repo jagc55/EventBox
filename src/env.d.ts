@@ -13,7 +13,6 @@ declare module "*.png" {
   export default src;
 }
 
-// Ya existente para SVG como componentes
 declare module "*.svg" {
   import type { DefineComponent } from "vue";
   const component: DefineComponent<{}, {}, any>;

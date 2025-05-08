@@ -1,48 +1,47 @@
 <template>
-  <div class="relative w-screen h-screen overflow-hidden">
-    <!-- Blur -->
-    <div
-      class="absolute inset-0 bg-cover bg-[center_10%] scale-110"
-      :style="{ backgroundImage: `url(${bg})` }"
-    ></div>
-
-    <!-- Capa oscura suave -->
-    <div class="fixed inset-0 bg-black/40"></div>
-
-    <!-- Contenido centrado -->
-    <div class="relative z-10 flex items-center justify-center h-full">
-      <!-- Cuadro del formulario -->
-      <div class="bg-mainBlue/100 p-8 rounded-lg shadow-lg w-full max-w-lg">
-        <!-- Aquí va tu formulario -->
-        <div>
-          <h2 class="text-2xl font-semibold text-center text-gray-800 mb-4">
-            Iniciar sesión
-          </h2>
-          <!-- Ejemplo de campos -->
-          <form>
+  <div
+    class="h-full bg-cover bg-[center_10%] scale-105 bg-[url(@/assets/images/bg.png)]"
+  >
+    <div class="flex items-center justify-center size-full bg-black/30">
+      <!-- backdrop-blur-sm-->
+      <div class="bg-blue-primary rounded-lg shadow-xl w-full max-w-lg p-10">
+        <h2 class="text-2xl font-bold text-dark-primary mb-4">
+          Iniciar sesión
+        </h2>
+        <form class="flex flex-col gap-5">
+          <div
+            class="flex border border-dark-primary rounded overflow-hidden bg-white-bg"
+          >
+            <div class="flex shrink-0 justify-center items-center size-12">
+              <User class="size-9 text-dark-primary" />
+            </div>
             <input
-              type="email"
-              placeholder="Correo electrónico"
-              class="w-full mb-4 p-3 rounded border border-gray-300"
+              type="text"
+              placeholder="Usuario"
+              class="w-full pl-3 border-l border-dark-primary"
             />
+          </div>
+          <div
+            class="flex border border-dark-primary rounded overflow-hidden bg-white-bg"
+          >
+            <div class="flex shrink-0 justify-center items-center size-12">
+              <Lock class="size-7 text-dark-primary" />
+            </div>
             <input
               type="password"
               placeholder="Contraseña"
-              class="w-full mb-4 p-3 rounded border border-gray-300"
+              class="w-full pl-3 border-l border-dark-primary"
             />
-            <button
-              type="submit"
-              class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            >
-              Entrar
-            </button>
-          </form>
-        </div>
+            <div class="flex shrink-0 justify-center items-center size-12">
+              <Eye class="size-7 text-dark-primary" />
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import bg from "@/assets/images/bg2.png";
+import { User, Lock, Eye, EyeOff } from "lucide-vue-next";
 </script>
