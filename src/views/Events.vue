@@ -1,46 +1,45 @@
 <template>
-  <div class="bg-gray-300">
-    <h1 class="text-2xl font-bold text-gray-800">Eventos</h1>
-    <div class="me-4 p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div
-        v-for="event in events"
-        :key="event.id"
-        class="bg-blue-primary border border-dark-primary rounded shadow-xl"
-      >
-        <img
-          :src="event.image"
-          alt="Imagen del event"
-          class="w-full h-48 object-cover"
-        />
-        <div class="p-4">
-          <h2 class="text-2xl font-bold text-dark-primary">
-            {{ event.title }}
-          </h2>
-          <p class="text-sm text-dark-primary">
-            Organizador: {{ event.organizer }}
-          </p>
-          <hr class="my-2 border border-dark-primary" />
-          <p class="text-gray-700">
-            Establecimiento: {{ event.establishment }}
-          </p>
-          <p class="text-gray-700">Fecha: {{ event.date }} {{ event.time }}</p>
-          <hr class="my-2 border border-dark-primary" />
+  <div class="bg-gray-300 min-h-screen">
+    <h1 class="text-2xl font-bold text-gray-800 px-4 pt-4">Eventos</h1>
 
-          <div class="flex gap-3">
-            <span
-              v-for="(tag, index) in event.tags"
-              :key="index"
-              class="mt-2 font-bold bg-blue-secundary text-white px-3 py-1 border border-dark-primary"
-            >
-              #{{ tag }}
-            </span>
+    <!-- Contenedor central -->
+    <div class="max-w-screen-xl mx-auto px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          v-for="event in events"
+          :key="event.id"
+          class="bg-blue-primary border border-dark-primary rounded shadow-xl flex flex-col transition duration-300 hover:scale-105"
+        >
+          <img
+            :src="event.image"
+            alt="Imagen del evento"
+            class="w-full h-48 object-cover border-b border-dark-primary"
+          />
+          <div class="p-4 flex flex-col flex-grow">
+            <h2 class="text-2xl font-bold text-dark-primary truncate">
+              {{ event.title }}
+            </h2>
+            <p class="text-sm text-dark-primary">
+              Organizador: {{ event.organizer }}
+            </p>
+            <hr class="my-3 border border-dark-primary" />
+            <p class="text-gray-700">
+              Establecimiento: {{ event.establishment }}
+            </p>
+            <p class="text-gray-700">
+              Fecha: {{ event.date }} {{ event.time }}
+            </p>
+            <hr class="my-3 border border-dark-primary" />
 
-            <button
-              class="ml-auto border border-dark-primary p-2 bg-blue-secundary"
-              @click="toggleLike(event.id)"
-            >
-              <Star :fill="likedEvents.has(event.id) ? 'yellow' : 'none'" />
-            </button>
+            <div class="flex items-center gap-2 sm:gap-3 mt-auto flex-wrap">
+              <span
+                v-for="(tag, index) in event.tags"
+                :key="index"
+                class="font-bold bg-blue-secundary text-white px-3 py-1 border border-dark-primary text-sm"
+              >
+                #{{ tag }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -50,17 +49,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Star } from "lucide-vue-next";
 
-const likedEvents = ref(new Set());
-
-function toggleLike(id: string) {
-  if (likedEvents.value.has(id)) {
-    likedEvents.value.delete(id);
-  } else {
-    likedEvents.value.add(id);
-  }
-}
 const events = ref([
   {
     id: "1",
