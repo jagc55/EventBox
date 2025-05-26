@@ -13,6 +13,7 @@ const config: Config = {
         "blue-header": "#7AB2D3",
         "blue-primary": "#D8E8F2",
         "white-bg": "#FFFFFF",
+        "red-primary": "#FF8383",
       },
     },
   },

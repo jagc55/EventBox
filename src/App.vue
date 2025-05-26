@@ -1,6 +1,5 @@
 <template>
-  <Header />
-  <RouterView />
+  <div class="flex flex-col h-full"><Header /> <RouterView class="grow" /></div>
 </template>
 
 <script setup lang="ts">

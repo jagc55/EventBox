@@ -44,7 +44,7 @@
             </button>
           </div>
           <div class="flex items-center place-content-evenly">
-            <div class="flex">
+            <div class="flex max-md:flex-col">
               <h2>¿No tienes una cuenta?</h2>
               <RouterLink :to="{ name: 'register' }" class="ml-1 text-blue-900"
                 >Clica aquí</RouterLink

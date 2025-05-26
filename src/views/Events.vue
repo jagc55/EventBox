@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-gray-300 min-h-screen">
-    <h1 class="text-2xl font-bold text-gray-800 px-4 pt-4">Eventos</h1>
+  <div class="bg-gray-300">
+    <h1 class="text-2xl font-bold text-dark-primary px-4 pt-4">Eventos</h1>
 
     <!-- Contenedor central -->
     <div class="max-w-screen-xl mx-auto px-6 lg:px-8">

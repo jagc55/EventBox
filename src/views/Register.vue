@@ -69,7 +69,7 @@
             {{ errors.confirmPassword }}
           </p>
           <div class="flex items-center place-content-evenly">
-            <div class="flex">
+            <div class="flex max-md:flex-col">
               <h2>¿Ya tienes una cuenta?</h2>
               <RouterLink :to="{ name: 'login' }" class="ml-1 text-blue-900"
                 >Clica aquí</RouterLink

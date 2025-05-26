@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-300 min-h-screen py-5">
+  <div class="bg-gray-300 py-5">
     <div
       class="mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-dark-primary rounded bg-blue-primary"
     >
@@ -16,14 +16,22 @@
           {{ events[0].date }} a las {{ events[0].hour }}
         </p>
         <hr class="my-3 border border-dark-primary" />
-        <p class="text-lg">Organizador: {{ events[0].organizer }}</p>
-        <p class="text-lg">Local: {{ establishments[0].name }}</p>
-        <p class="text-lg">Dirección: {{ establishments[0].adress }}</p>
         <p class="text-lg">
-          Ciudad: {{ establishments[0].city }}, {{ establishments[0].province }}
+          <span class="font-bold">Organizador:</span> {{ events[0].organizer }}
         </p>
         <p class="text-lg">
-          Edad mínima:
+          <span class="font-bold">Local:</span> {{ establishments[0].name }}
+        </p>
+        <p class="text-lg">
+          <span class="font-bold">Dirección:</span>
+          {{ establishments[0].adress }}
+        </p>
+        <p class="text-lg">
+          <span class="font-bold"> Ciudad: </span>{{ establishments[0].city }},
+          {{ establishments[0].province }}
+        </p>
+        <p class="text-lg">
+          <span class="font-bold"> Edad mínima:</span>
           {{
             events[0].minimumAge === "0"
               ? "Sin restricciones"
@@ -31,7 +39,7 @@
           }}
         </p>
         <p class="text-lg">
-          Precio:
+          <span class="font-bold"> Precio:</span>
           {{ events[0].price === "0" ? "Gratuito" : events[0].price + " €" }}
         </p>
         <hr class="my-3 border border-dark-primary" />
@@ -90,7 +98,7 @@
       <div
         v-for="comment in comments"
         :key="comment.id"
-        class="px-5 my-3 bg-white border-y border-dark-primary rounded py-3"
+        class="px-5 py-3 mx-5 my-3 bg-white border border-dark-primary rounded"
       >
         <div class="flex items-center">
           <p class="text-lg font-semibold">@{{ comment.username }}</p>
