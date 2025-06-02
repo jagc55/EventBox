@@ -9,6 +9,8 @@ const config: Config = {
       },
       colors: {
         "dark-primary": "#1E1E22",
+        "black-primary": "#282424",
+        "black-secundary": "#383434",
         "blue-secundary": "#4A628A",
         "blue-header": "#7AB2D3",
         "blue-primary": "#D8E8F2",

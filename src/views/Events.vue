@@ -4,6 +4,28 @@
 
     <!-- Contenedor central -->
     <div class="max-w-screen-xl mx-auto px-6 lg:px-8">
+      <div
+        class="border border-dark-primary rounded mb-5 p-4 bg-blue-100 flex flex-wrap gap-4 justify-center items-center shadow-xl"
+      >
+        <!-- Input de búsqueda -->
+        <input
+          type="text"
+          placeholder="Buscador por título o palabras clave"
+          class="border p-2 w-64"
+          v-model="searchQuery"
+        />
+
+        <!-- Selector de fechas -->
+        <input type="date" class="border p-2" v-model="selectedDate" />
+
+        <!-- Selector de provincia -->
+        <select class="border p-2" v-model="selectedProvince">
+          <option disabled value="">Selector Provincia</option>
+          <option v-for="prov in provinces" :key="prov" :value="prov">
+            {{ prov }}
+          </option>
+        </select>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
           v-for="event in events"
@@ -15,7 +37,7 @@
             alt="Imagen del evento"
             class="w-full h-48 object-cover border-b border-dark-primary"
           />
-          <div class="p-4 flex flex-col flex-grow">
+          <div class="p-4 flex flex-col flex-grow space-y-2">
             <h2 class="text-2xl font-bold text-dark-primary truncate">
               {{ event.title }}
             </h2>
@@ -31,11 +53,15 @@
             </p>
             <hr class="my-3 border border-dark-primary" />
 
-            <div class="flex items-center gap-2 sm:gap-3 mt-auto flex-wrap">
+            <!-- Tags con truncamiento -->
+            <div
+              class="overflow-hidden whitespace-nowrap text-ellipsis"
+              :title="event.tags.map((tag) => '#' + tag).join(' ')"
+            >
               <span
                 v-for="(tag, index) in event.tags"
                 :key="index"
-                class="font-bold bg-blue-secundary text-white px-3 py-1 border border-dark-primary text-sm"
+                class="inline-block font-bold bg-blue-secundary text-white px-3 py-1 border border-dark-primary text-sm mr-1"
               >
                 #{{ tag }}
               </span>
@@ -92,4 +118,61 @@ const events = ref([
     image: "/images/4.jpg",
   },
 ]);
+
+const searchQuery = ref("");
+const selectedDate = ref("");
+const selectedProvince = ref("");
+
+const provinces = [
+  "Álava",
+  "Albacete",
+  "Alicante",
+  "Almería",
+  "Asturias",
+  "Ávila",
+  "Badajoz",
+  "Barcelona",
+  "Burgos",
+  "Cáceres",
+  "Cádiz",
+  "Cantabria",
+  "Castellón",
+  "Ciudad Real",
+  "Córdoba",
+  "Cuenca",
+  "Gerona",
+  "Granada",
+  "Guadalajara",
+  "Guipúzcoa",
+  "Huelva",
+  "Huesca",
+  "Islas Baleares",
+  "Jaén",
+  "La Coruña",
+  "La Rioja",
+  "Las Palmas",
+  "León",
+  "Lérida",
+  "Lugo",
+  "Madrid",
+  "Málaga",
+  "Murcia",
+  "Navarra",
+  "Orense",
+  "Palencia",
+  "Pontevedra",
+  "Salamanca",
+  "Santa Cruz de Tenerife",
+  "Segovia",
+  "Sevilla",
+  "Soria",
+  "Tarragona",
+  "Teruel",
+  "Toledo",
+  "Valencia",
+  "Valladolid",
+  "Vizcaya",
+  "Zamora",
+  "Zaragoza",
+];
 </script>

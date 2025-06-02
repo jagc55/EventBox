@@ -11,12 +11,35 @@
       Eventos en {{ establishment }}
     </h1>
 
+    <div
+      class="border border-dark-primary mx-5 rounded mb-5 p-4 bg-blue-100 flex flex-wrap gap-4 justify-center items-center shadow-xl"
+    >
+      <!-- Input de búsqueda -->
+      <input
+        type="text"
+        placeholder="Buscador por título o palabras clave"
+        class="border p-2 w-64"
+        v-model="searchQuery"
+      />
+
+      <!-- Selector de fechas -->
+      <input type="date" class="border p-2" v-model="selectedDate" />
+
+      <!-- Selector de provincia -->
+      <select class="border p-2" v-model="selectedProvince">
+        <option disabled value="">Selector Provincia</option>
+        <option v-for="prov in provinces" :key="prov" :value="prov">
+          {{ prov }}
+        </option>
+      </select>
+    </div>
+
     <!-- Events grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-5">
       <div
         v-for="event in events"
         :key="event.id"
-        class="flex flex-col border border-dark-primary rounded overflow-hidden bg-blue-primary"
+        class="flex flex-col border border-dark-primary rounded overflow-hidden bg-blue-primary shadow-xl"
       >
         <div class="p-4 w-full space-y-2">
           <h2 class="font-bold text-2xl">{{ event.title }}</h2>
@@ -159,7 +182,7 @@
             type="submit"
             class="bg-blue-secundary text-white font-bold py-2 px-4 mt-2 border border-dark-primary self-end"
           >
-            Guardar evento
+            Añadir evento
           </button>
         </form>
       </div>
@@ -173,6 +196,10 @@ import { Pencil, Trash2, X } from "lucide-vue-next";
 
 const showModal = ref(false);
 const establishment = ref("Hotel Witiñon");
+
+const searchQuery = ref("");
+const selectedDate = ref("");
+const selectedProvince = ref("");
 
 const events = ref([
   {
@@ -301,4 +328,57 @@ watch(showModal, (newVal) => {
     errors.value = {};
   }
 });
+
+const provinces = [
+  "Álava",
+  "Albacete",
+  "Alicante",
+  "Almería",
+  "Asturias",
+  "Ávila",
+  "Badajoz",
+  "Barcelona",
+  "Burgos",
+  "Cáceres",
+  "Cádiz",
+  "Cantabria",
+  "Castellón",
+  "Ciudad Real",
+  "Córdoba",
+  "Cuenca",
+  "Gerona",
+  "Granada",
+  "Guadalajara",
+  "Guipúzcoa",
+  "Huelva",
+  "Huesca",
+  "Islas Baleares",
+  "Jaén",
+  "La Coruña",
+  "La Rioja",
+  "Las Palmas",
+  "León",
+  "Lérida",
+  "Lugo",
+  "Madrid",
+  "Málaga",
+  "Murcia",
+  "Navarra",
+  "Orense",
+  "Palencia",
+  "Pontevedra",
+  "Salamanca",
+  "Santa Cruz de Tenerife",
+  "Segovia",
+  "Sevilla",
+  "Soria",
+  "Tarragona",
+  "Teruel",
+  "Toledo",
+  "Valencia",
+  "Valladolid",
+  "Vizcaya",
+  "Zamora",
+  "Zaragoza",
+];
 </script>
