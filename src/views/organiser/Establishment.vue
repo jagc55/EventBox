@@ -1,7 +1,7 @@
 <template>
   <div class="bg-black-secundary">
     <button
-      @click="showModal = true"
+      @click="openModal()"
       class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold"
     >
       Añadir evento
@@ -105,7 +105,7 @@
     </h1>
 
     <!-- Events grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-5 mb-5">
       <div
         v-for="event in events"
         :key="event.id"
@@ -131,7 +131,7 @@
               </span>
             </div>
             <div class="flex-shrink-0 flex gap-2 ml-2">
-              <button @click="openEditModal(event)">
+              <button @click="openModal(event)">
                 <Pencil class="size-9 bg-blue-secundary" />
               </button>
               <button>
@@ -143,135 +143,7 @@
       </div>
     </div>
 
-    <!-- Edit Event Modal -->
-    <div
-      v-show="showEditModal"
-      class="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur"
-    >
-      <div
-        class="w-[80%] md:w-[50%] lg:w-[35%] border border-white-bg bg-dark-primary p-4"
-      >
-        <div class="flex justify-end mb-2">
-          <button
-            @click="showEditModal = false"
-            class="border border-dark-primary size-7 bg-red-primary text-white flex items-center justify-center rounded"
-          >
-            <X />
-          </button>
-        </div>
-
-        <!-- Edit Event Form -->
-        <form class="flex flex-col gap-2" @submit.prevent="submitEditForm">
-          <input
-            v-model="editForm.title"
-            type="text"
-            placeholder="Título"
-            class="p-2 border border-dark-primary"
-          />
-          <p v-if="editErrors.title" class="text-red-600 text-sm">
-            {{ editErrors.title }}
-          </p>
-
-          <select
-            v-model="editForm.category"
-            class="w-full border border-dark-primary p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-secundary"
-          >
-            <option disabled value="">Selecciona una categoría</option>
-            <option
-              v-for="category in eventCategories"
-              :key="category"
-              :value="category"
-            >
-              {{ category }}
-            </option>
-          </select>
-          <p v-if="editErrors.category" class="text-red-600 text-sm">
-            {{ editErrors.category }}
-          </p>
-          <p v-if="errors.category" class="text-red-600 text-sm">
-            {{ errors.category }}
-          </p>
-
-          <input
-            v-model="editForm.date"
-            type="date"
-            :min="minDate"
-            class="p-2 border border-dark-primary"
-          />
-          <p v-if="editErrors.date" class="text-red-600 text-sm">
-            {{ editErrors.date }}
-          </p>
-
-          <input
-            v-model="editForm.hour"
-            type="time"
-            class="p-2 border border-dark-primary"
-          />
-          <p v-if="editErrors.hour" class="text-red-600 text-sm">
-            {{ editErrors.hour }}
-          </p>
-
-          <input
-            v-model="editForm.tags"
-            type="text"
-            placeholder="Etiquetas (separadas por comas)"
-            class="p-2 border border-dark-primary"
-          />
-          <p v-if="editErrors.tags" class="text-red-600 text-sm">
-            {{ editErrors.tags }}
-          </p>
-
-          <input
-            v-model="editForm.minimumAge"
-            type="number"
-            placeholder="Edad mínima"
-            class="p-2 border border-dark-primary"
-          />
-          <p v-if="editErrors.minimumAge" class="text-red-600 text-sm">
-            {{ editErrors.minimumAge }}
-          </p>
-
-          <input
-            v-model="editForm.price"
-            type="number"
-            step="0.01"
-            placeholder="Precio (€)"
-            class="p-2 border border-dark-primary"
-          />
-          <p v-if="editErrors.price" class="text-red-600 text-sm">
-            {{ editErrors.price }}
-          </p>
-
-          <input
-            v-model="editForm.image"
-            type="text"
-            placeholder="URL de imagen"
-            class="p-2 border border-dark-primary"
-          />
-          <p v-if="editErrors.image" class="text-red-600 text-sm">
-            {{ editErrors.image }}
-          </p>
-
-          <textarea
-            v-model="editForm.description"
-            placeholder="Descripción"
-            class="p-2 border border-dark-primary"
-          ></textarea>
-          <p v-if="editErrors.description" class="text-red-600 text-sm">
-            {{ editErrors.description }}
-          </p>
-
-          <button
-            type="submit"
-            class="bg-blue-secundary text-white font-bold py-2 px-4 mt-2 self-end"
-          >
-            Modificar evento
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <!-- Modal -->
+    <!-- Create/Modify Event Modal-->
     <div
       v-show="showModal"
       class="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur"
@@ -289,8 +161,7 @@
           </button>
         </div>
 
-        <!-- Event form -->
-        <form class="flex flex-col gap-2" @submit.prevent="submitForm">
+        <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
           <input
             v-model="form.title"
             type="text"
@@ -300,10 +171,10 @@
           <p v-if="errors.title" class="text-red-600 text-sm">
             {{ errors.title }}
           </p>
+
           <select
-            id="category"
             v-model="form.category"
-            class="w-full border border-dark-primary p-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-secundary"
+            class="w-full border border-dark-primary p-2 rounded"
           >
             <option disabled value="">Selecciona una categoría</option>
             <option
@@ -317,6 +188,7 @@
           <p v-if="errors.category" class="text-red-600 text-sm">
             {{ errors.category }}
           </p>
+
           <input
             v-model="form.date"
             type="date"
@@ -390,7 +262,7 @@
             type="submit"
             class="bg-purple-primary text-white font-bold py-2 px-4 mt-2 self-end"
           >
-            Añadir evento
+            {{ editingEventId ? "Modificar evento" : "Añadir evento" }}
           </button>
         </form>
       </div>
@@ -403,6 +275,7 @@ import { ref, watch, computed } from "vue";
 import { Pencil, Trash2, X } from "lucide-vue-next";
 
 const showModal = ref(false);
+const editingEventId = ref<string | null>(null);
 const establishment = ref("Hotel Witiñon");
 
 const events = ref([
@@ -448,59 +321,6 @@ const events = ref([
   },
 ]);
 
-const establishmentOriginal = ref({
-  name: "Hotel Witiñon",
-  location: "Calle Falsa 123",
-  city: "Witicity",
-  province: "Madrid",
-  tfn: "123456789",
-  email: "hotel@witinon.com",
-});
-
-const establishmentForm = ref({ ...establishmentOriginal.value });
-
-const establishmentErrors = ref<Record<string, string>>({});
-const establishmentModified = computed(
-  () =>
-    JSON.stringify(establishmentForm.value) !==
-    JSON.stringify(establishmentOriginal.value)
-);
-
-function submitEstablishmentForm() {
-  establishmentErrors.value = {};
-
-  if (!establishmentForm.value.name)
-    establishmentErrors.value.name = "El nombre es obligatorio";
-  if (!establishmentForm.value.location)
-    establishmentErrors.value.location = "La dirección es obligatoria";
-  if (!establishmentForm.value.city)
-    establishmentErrors.value.city = "La ciudad es obligatoria";
-  if (!establishmentForm.value.province)
-    establishmentErrors.value.province = "Selecciona una provincia";
-  if (!establishmentForm.value.tfn) {
-    establishmentErrors.value.tfn = "El teléfono es obligatorio";
-  } else if (!/^\d+$/.test(establishmentForm.value.tfn)) {
-    establishmentErrors.value.tfn = "El teléfono solo puede contener números";
-  }
-  if (
-    !establishmentForm.value.email ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(establishmentForm.value.email)
-  )
-    establishmentErrors.value.email = "Email no válido";
-
-  if (Object.keys(establishmentErrors.value).length === 0) {
-    establishmentOriginal.value = { ...establishmentForm.value };
-    alert("Cambios guardados correctamente");
-  }
-}
-
-function deleteEstablishment() {
-  if (confirm("¿Estás seguro de que quieres eliminar el establecimiento?")) {
-    alert("Establecimiento eliminado (simulado)");
-    // Aquí podrías poner lógica real: redireccionar, quitar de lista, etc.
-  }
-}
-
 const form = ref({
   title: "",
   date: "",
@@ -514,8 +334,8 @@ const form = ref({
 });
 
 const errors = ref<Record<string, string>>({});
-const editErrors = ref<Record<string, string>>({});
 
+// --- Event Validator ---
 function isValidURL(url: string) {
   try {
     new URL(url);
@@ -553,12 +373,13 @@ function validateEventForm(values: typeof form.value) {
   return validationErrors;
 }
 
-function submitForm() {
+// --- Envío Evento ---
+function handleSubmit() {
   errors.value = validateEventForm(form.value);
   if (Object.keys(errors.value).length > 0) return;
 
-  events.value.push({
-    id: String(events.value.length + 1),
+  const newEvent = {
+    id: editingEventId.value ?? String(events.value.length + 1),
     title: form.value.title,
     organizer: "Organizador X",
     establishment: establishment.value,
@@ -566,32 +387,115 @@ function submitForm() {
     time: form.value.hour,
     tags: form.value.tags.split(",").map((tag) => tag.trim()),
     image: form.value.image,
-  });
+  };
+
+  if (editingEventId.value) {
+    const idx = events.value.findIndex((e) => e.id === editingEventId.value);
+    if (idx !== -1) events.value[idx] = newEvent;
+  } else {
+    events.value.push(newEvent);
+  }
 
   showModal.value = false;
 }
 
-function submitEditForm() {
-  editErrors.value = validateEventForm(editForm.value);
-  if (Object.keys(editErrors.value).length > 0) return;
-
-  const index = events.value.findIndex((e) => e.id === editingEventId.value);
-  if (index !== -1) {
-    events.value[index] = {
-      ...events.value[index],
-      title: editForm.value.title,
-      date: editForm.value.date,
-      time: editForm.value.hour,
-      tags: editForm.value.tags.split(",").map((tag) => tag.trim()),
-      image: editForm.value.image,
+// --- Abrir/Cerrar Modal Evento ---
+function openModal(eventToEdit: any = null) {
+  if (eventToEdit) {
+    editingEventId.value = eventToEdit.id;
+    form.value = {
+      title: eventToEdit.title,
+      date: eventToEdit.date,
+      hour: eventToEdit.time,
+      tags: eventToEdit.tags.join(", "),
+      image: eventToEdit.image,
+      minimumAge: 18,
+      price: 10,
+      description: "Descripción simulada",
+      category: "Entretenimiento",
     };
+  } else {
+    resetForm();
+    editingEventId.value = null;
+  }
+  showModal.value = true;
+}
+
+function resetForm() {
+  form.value = {
+    title: "",
+    date: "",
+    hour: "",
+    tags: "",
+    image: "",
+    minimumAge: null,
+    price: null,
+    description: "",
+    category: "",
+  };
+  errors.value = {};
+}
+
+watch(showModal, (visible) => {
+  if (!visible) {
+    resetForm();
+  }
+});
+
+const establishmentOriginal = ref({
+  name: "Hotel Witiñon",
+  location: "Calle Falsa 123",
+  city: "Witicity",
+  province: "Madrid",
+  tfn: "123456789",
+  email: "hotel@witinon.com",
+});
+
+const establishmentForm = ref({ ...establishmentOriginal.value });
+const establishmentErrors = ref<Record<string, string>>({});
+
+const establishmentModified = computed(
+  () =>
+    JSON.stringify(establishmentForm.value) !==
+    JSON.stringify(establishmentOriginal.value)
+);
+
+function submitEstablishmentForm() {
+  establishmentErrors.value = {};
+
+  if (!establishmentForm.value.name)
+    establishmentErrors.value.name = "El nombre es obligatorio";
+  if (!establishmentForm.value.location)
+    establishmentErrors.value.location = "La dirección es obligatoria";
+  if (!establishmentForm.value.city)
+    establishmentErrors.value.city = "La ciudad es obligatoria";
+  if (!establishmentForm.value.province)
+    establishmentErrors.value.province = "Selecciona una provincia";
+  if (!establishmentForm.value.tfn) {
+    establishmentErrors.value.tfn = "El teléfono es obligatorio";
+  } else if (!/^\d+$/.test(establishmentForm.value.tfn)) {
+    establishmentErrors.value.tfn = "El teléfono solo puede contener números";
+  }
+  if (
+    !establishmentForm.value.email ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(establishmentForm.value.email)
+  ) {
+    establishmentErrors.value.email = "Email no válido";
   }
 
-  showEditModal.value = false;
+  if (Object.keys(establishmentErrors.value).length === 0) {
+    establishmentOriginal.value = { ...establishmentForm.value };
+    alert("Cambios guardados correctamente");
+  }
+}
+
+function deleteEstablishment() {
+  if (confirm("¿Estás seguro de que quieres eliminar el establecimiento?")) {
+    alert("Establecimiento eliminado (simulado)");
+  }
 }
 
 const minDate = ref("");
-
 function getTomorrowDate() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -600,25 +504,7 @@ function getTomorrowDate() {
   const day = String(tomorrow.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
-
 minDate.value = getTomorrowDate();
-
-watch(showModal, (newVal) => {
-  if (!newVal) {
-    form.value = {
-      title: "",
-      date: "",
-      hour: "",
-      tags: "",
-      image: "",
-      minimumAge: null,
-      price: null,
-      description: "",
-      category: "",
-    };
-    errors.value = {};
-  }
-});
 
 const eventCategories = [
   "Cultural",
@@ -685,32 +571,4 @@ const provinces = [
   "Zamora",
   "Zaragoza",
 ];
-
-const showEditModal = ref(false);
-const editingEventId = ref<string | null>(null);
-const editForm = ref({ ...form.value });
-const originalEditForm = ref({ ...form.value });
-
-function openEditModal(eventToEdit: any) {
-  editForm.value = {
-    title: eventToEdit.title,
-    date: eventToEdit.date,
-    hour: eventToEdit.time,
-    tags: eventToEdit.tags.join(", "),
-    image: eventToEdit.image,
-    minimumAge: 18,
-    price: 10,
-    description: "Descripción simulada",
-    category: "Entretenimiento",
-  };
-  originalEditForm.value = { ...editForm.value };
-  editingEventId.value = eventToEdit.id;
-  showEditModal.value = true;
-}
-
-const editFormModified = computed(() => {
-  return (
-    JSON.stringify(editForm.value) !== JSON.stringify(originalEditForm.value)
-  );
-});
 </script>
