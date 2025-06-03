@@ -1,36 +1,39 @@
 <template>
-  <div class="bg-gray-300 py-5">
+  <div class="bg-black-secundary py-5">
     <div
-      class="mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-dark-primary rounded bg-blue-primary"
+      class="mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary"
     >
       <img
         :src="events[0].image"
         alt="Imagen del evento"
-        class="w-full h-[450px] object-cover border-b border-dark-primary"
+        class="w-full h-[450px] object-cover border-b border-white-bg"
       />
       <div class="mt-3 px-5">
-        <h1 class="text-2xl font-bold text-dark-primary">
+        <h1 class="text-2xl font-bold text-white-bg">
           {{ events[0].title }}
         </h1>
-        <p class="text-xl font-semibold">
+        <p class="text-xl font-semibold text-white-bg">
           {{ events[0].date }} a las {{ events[0].hour }}
         </p>
-        <hr class="my-3 border border-dark-primary" />
-        <p class="text-lg">
+        <hr class="my-3 border border-white-bg" />
+        <p class="text-lg text-white-bg">
           <span class="font-bold">Organizador:</span> {{ events[0].organizer }}
         </p>
-        <p class="text-lg">
+        <p class="text-lg text-white-bg">
+          <span class="font-bold">Tipo:</span> {{ events[0].tipe }}
+        </p>
+        <p class="text-lg text-white-bg">
           <span class="font-bold">Local:</span> {{ establishments[0].name }}
         </p>
-        <p class="text-lg">
+        <p class="text-lg text-white-bg">
           <span class="font-bold">Dirección:</span>
           {{ establishments[0].adress }}
         </p>
-        <p class="text-lg">
+        <p class="text-lg text-white-bg">
           <span class="font-bold"> Ciudad: </span>{{ establishments[0].city }},
           {{ establishments[0].province }}
         </p>
-        <p class="text-lg">
+        <p class="text-lg text-white-bg">
           <span class="font-bold"> Edad mínima:</span>
           {{
             events[0].minimumAge === "0"
@@ -38,23 +41,23 @@
               : events[0].minimumAge + " año(s)"
           }}
         </p>
-        <p class="text-lg">
+        <p class="text-lg text-white-bg">
           <span class="font-bold"> Precio:</span>
           {{ events[0].price === "0" ? "Gratuito" : events[0].price + " €" }}
         </p>
-        <hr class="my-3 border border-dark-primary" />
-        <p class="text-lg">{{ events[0].description }}</p>
-        <hr class="my-3 border border-dark-primary" />
+        <hr class="my-3 border border-white-bg" />
+        <p class="text-lg text-white-bg">{{ events[0].description }}</p>
+        <hr class="my-3 border border-white-bg" />
         <div class="flex gap-3 mb-3">
           <span
             v-for="(tag, index) in events[0].tags"
             :key="index"
-            class="font-bold bg-blue-secundary text-white px-3 py-1 border border-dark-primary"
+            class="font-bold bg-purple-primary rounded text-white px-3 py-1 border border-white-bg"
           >
             #{{ tag }}
           </span>
           <button
-            class="ml-auto border border-dark-primary p-2 bg-blue-secundary flex shrink-0 items-center size-9"
+            class="ml-auto border border-white-bg p-2 bg-purple-primary rounded flex shrink-0 items-center size-9"
             @click="likedEvents = !likedEvents"
           >
             <Star :fill="likedEvents ? 'yellow' : 'none'" />
@@ -65,21 +68,21 @@
 
     <!--Coments-->
     <div
-      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-dark-primary rounded bg-blue-primary"
+      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary"
     >
       <div class="mt-3 px-5">
-        <label for="comentario" class="block text-dark-primary font-bold mb-2">
+        <label for="comentario" class="block text-white-bg font-bold mb-2">
           Publicar un comentario:
         </label>
         <textarea
           id="comentario"
           rows="4"
-          class="w-full p-3 border border-dark-primary rounded"
+          class="w-full p-3 border border-white-bg rounded"
           placeholder="Escribe tu comentario aquí..."
         ></textarea>
         <div class="flex">
           <button
-            class="ml-auto my-3 p-2 bg-blue-secundary border border-dark-primary text-white font-bold"
+            class="ml-auto my-3 p-2 bg-purple-primary border border-white-bg text-white font-bold"
           >
             Publicar
           </button>
@@ -89,22 +92,22 @@
 
     <!--Comments section-->
     <div
-      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-dark-primary rounded bg-blue-primary"
+      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary"
     >
-      <p class="text-lg font-semibold px-5 mt-3">
+      <p class="text-lg font-semibold px-5 mt-3 text-white-bg">
         Comentarios: {{ comments.length }}
       </p>
 
       <div
         v-for="comment in comments"
         :key="comment.id"
-        class="px-5 py-3 mx-5 my-3 bg-white border border-dark-primary rounded"
+        class="px-5 py-3 mx-5 my-3 bg-white border border-white-bg rounded"
       >
         <div class="flex items-center">
           <p class="text-lg font-semibold">@{{ comment.username }}</p>
           <p class="ml-auto text-lg font-semibold">{{ comment.date }}</p>
         </div>
-        <hr class="my-3 border border-dark-primary" />
+        <hr class="my-3 border border-white-bg" />
         <p class="text-lg">{{ comment.text }}</p>
       </div>
     </div>
@@ -120,6 +123,7 @@ const events = ref([
   {
     id: "1",
     title: "Caza del witi amarillo",
+    tipe: "Otros",
     organizer: "Witi Witiñon",
     establishment: "Hotel Witiñon",
     date: "10/06/2025",

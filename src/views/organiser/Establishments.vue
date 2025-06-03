@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-gray-300">
+  <div class="bg-black-secundary">
     <button
       @click="showModal = true"
-      class="bg-blue-secundary text-white border border-dark-primary p-1 mt-3 ml-4 font-bold"
+      class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold"
     >
       Añadir establecimiento
     </button>
 
-    <h1 class="text-2xl font-bold text-dark-primary px-4 py-2">
+    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">
       Mis establecimientos
     </h1>
 
@@ -16,44 +16,34 @@
       <div
         v-for="establishment in establishments"
         :key="establishment.id"
-        class="flex border border-dark-primary rounded overflow-hidden bg-blue-primary"
+        class="flex border border-white-bg rounded overflow-hidden bg-dark-primary"
       >
         <div class="flex flex-col justify-between p-4 w-full">
           <div>
-            <h2 class="font-bold text-2xl">{{ establishment.name }}</h2>
-            <p class="text-lg">
+            <h2 class="font-bold text-2xl text-white-bg">
+              {{ establishment.name }}
+            </h2>
+            <p class="text-lg text-white-bg">
               <span class="font-bold">Dirección:</span>
               {{ establishment.location }}
             </p>
-            <p class="text-lg">
+            <p class="text-lg text-white-bg">
               <span class="font-bold">Ciudad:</span> {{ establishment.city }}
             </p>
-            <p class="text-lg">
+            <p class="text-lg text-white-bg">
               <span class="font-bold">Provincia:</span>
               {{ establishment.province }}
             </p>
-            <p class="text-lg">
+            <p class="text-lg text-white-bg">
               <span class="font-bold">Teléfono:</span> {{ establishment.tfn }}
             </p>
-            <p class="text-lg">
+            <p class="text-lg text-white-bg">
               <span class="font-bold">Email:</span> {{ establishment.email }}
             </p>
-            <p class="text-lg">
+            <p class="text-lg text-white-bg">
               <span class="font-bold">Eventos pendientes:</span>
             </p>
           </div>
-        </div>
-        <div class="flex ml-auto mt-auto">
-          <button>
-            <Pencil
-              class="mb-3 mr-3 border border-dark-primary size-9 shrink-0 bg-blue-secundary"
-            />
-          </button>
-          <button>
-            <Trash2
-              class="mb-3 mr-3 border border-dark-primary size-9 shrink-0 bg-red-primary"
-            />
-          </button>
         </div>
       </div>
     </div>
@@ -61,11 +51,11 @@
     <!-- Modal -->
     <div
       v-show="showModal"
-      class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur"
+      class="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur"
       @click.self="showModal = false"
     >
       <div
-        class="w-[80%] md:w-[50%] lg:w-[35%] border border-dark-primary bg-blue-primary p-4"
+        class="w-[80%] md:w-[50%] lg:w-[35%] border border-white-bg bg-dark-primary p-4"
       >
         <div class="flex justify-end mb-2">
           <button
@@ -142,7 +132,7 @@
 
           <button
             type="submit"
-            class="mt-2 bg-blue-secundary border border-dark-primary text-white font-bold px-4 py-2 ml-auto"
+            class="mt-2 bg-purple-primary text-white font-bold px-4 py-2 ml-auto"
           >
             Añadir
           </button>
@@ -154,7 +144,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { Pencil, Trash2, X } from "lucide-vue-next";
+import { X } from "lucide-vue-next";
 
 const showModal = ref(false);
 

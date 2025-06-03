@@ -24,7 +24,7 @@
         </RouterLink>
       </nav>
     </div>
-    <hr class="h-1 bg-blue-header border-none" />
+    <hr class="h-1 bg-purple-primary border-none" />
 
     <!-- Menú desplegable móvil como capa superpuesta -->
     <div

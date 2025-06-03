@@ -1,11 +1,9 @@
 <template>
-  <div class="bg-gray-300">
-    <h1 class="text-2xl font-bold text-dark-primary px-4 pt-4">Eventos</h1>
-
+  <div class="bg-black-secundary">
     <!-- Contenedor central -->
-    <div class="max-w-screen-xl mx-auto px-6 lg:px-8">
+    <div class="max-w-screen-xl mx-auto px-6 lg:px-8 pt-4">
       <div
-        class="border border-dark-primary rounded mb-5 p-4 bg-blue-100 flex flex-wrap gap-4 justify-center items-center shadow-xl"
+        class="border border-white-bg rounded mb-5 p-4 bg-dark-primary flex flex-wrap gap-4 justify-center items-center shadow-xl"
       >
         <!-- Input de búsqueda -->
         <input
@@ -30,28 +28,30 @@
         <div
           v-for="event in events"
           :key="event.id"
-          class="bg-blue-primary border border-dark-primary rounded shadow-xl flex flex-col transition duration-300 hover:scale-105"
+          class="bg-dark-primary border border-white-bg rounded shadow-xl flex flex-col transition duration-300 hover:scale-105"
         >
           <img
             :src="event.image"
             alt="Imagen del evento"
-            class="w-full h-48 object-cover border-b border-dark-primary"
+            class="w-full h-48 object-cover border-b border-white-bg"
           />
           <div class="p-4 flex flex-col flex-grow space-y-2">
-            <h2 class="text-2xl font-bold text-dark-primary truncate">
+            <h2 class="text-2xl font-bold text-white-bg truncate">
               {{ event.title }}
             </h2>
-            <p class="text-sm text-dark-primary">
+            <p class="text-sm text-white-bg">
               Organizador: {{ event.organizer }}
             </p>
-            <hr class="my-3 border border-dark-primary" />
-            <p class="text-gray-700">
+            <hr class="my-3 border border-white-bg" />
+            <p class="text-white-bg">
               Establecimiento: {{ event.establishment }}
             </p>
-            <p class="text-gray-700">
+            <p class="text-white-bg">
               Fecha: {{ event.date }} {{ event.time }}
             </p>
-            <hr class="my-3 border border-dark-primary" />
+            <p class="text-white-bg">Tipo: {{ event.tipe }}</p>
+
+            <hr class="my-3 border border-white-bg" />
 
             <!-- Tags con truncamiento -->
             <div
@@ -61,7 +61,7 @@
               <span
                 v-for="(tag, index) in event.tags"
                 :key="index"
-                class="inline-block font-bold bg-blue-secundary text-white px-3 py-1 border border-dark-primary text-sm mr-1"
+                class="inline-block font-bold bg-purple-primary text-white px-3 py-1 border border-white-bg text-sm mr-1 rounded"
               >
                 #{{ tag }}
               </span>
@@ -80,6 +80,7 @@ const events = ref([
   {
     id: "1",
     title: "Caza del pitulin",
+    tipe: "Deportivo",
     organizer: "Carlitos Superstar",
     establishment: "Casa Carlos",
     date: "2025-06-10",
@@ -90,6 +91,7 @@ const events = ref([
   {
     id: "2",
     title: "Concurso malos programadores",
+    tipe: "Tecnológico",
     organizer: "Bob Anton",
     establishment: "Teatro Municipal",
     date: "2025-06-11",
@@ -100,6 +102,7 @@ const events = ref([
   {
     id: "3",
     title: "Baile del tulikitaka",
+    tipe: "Musical",
     organizer: "Anton Bailon",
     establishment: "Plaza de toros",
     date: "2025-06-11",
@@ -110,6 +113,7 @@ const events = ref([
   {
     id: "4",
     title: "Cariño perdoname solo quiero ver a los niños",
+    tipe: "Otros",
     organizer: "Divorciado32",
     establishment: "Carcel Puerto 2",
     date: "2025-06-11",
