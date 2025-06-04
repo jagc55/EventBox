@@ -3,7 +3,7 @@
     <!-- Contenedor central -->
     <div class="max-w-screen-xl mx-auto px-6 lg:px-8 pt-4">
       <div
-        class="border border-white-bg rounded mb-5 p-4 bg-dark-primary flex flex-wrap gap-4 justify-center items-center shadow-xl"
+        class="border border-white-bg rounded-xl mb-5 p-4 bg-dark-primary flex flex-wrap gap-4 justify-center items-center shadow-xl"
       >
         <!-- Input de búsqueda -->
         <input
@@ -33,22 +33,16 @@
           <img
             :src="event.image"
             alt="Imagen del evento"
-            class="w-full h-48 object-cover border-b border-white-bg"
+            class="w-full h-48 object-cover border-b border-white-bg rounded"
           />
           <div class="p-4 flex flex-col flex-grow space-y-2">
             <h2 class="text-2xl font-bold text-white-bg truncate">
               {{ event.title }}
             </h2>
-            <p class="text-sm text-white-bg">
-              Organizador: {{ event.organizer }}
-            </p>
+            <p class="text-sm text-white-bg">Organizador: {{ event.organizer }}</p>
             <hr class="my-3 border border-white-bg" />
-            <p class="text-white-bg">
-              Establecimiento: {{ event.establishment }}
-            </p>
-            <p class="text-white-bg">
-              Fecha: {{ event.date }} {{ event.time }}
-            </p>
+            <p class="text-white-bg">Establecimiento: {{ event.establishment }}</p>
+            <p class="text-white-bg">Fecha: {{ event.date }} {{ event.time }}</p>
             <p class="text-white-bg">Tipo: {{ event.tipe }}</p>
 
             <hr class="my-3 border border-white-bg" />

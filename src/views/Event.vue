@@ -1,30 +1,22 @@
 <template>
   <div class="bg-black-secundary py-5">
     <div
-      class="mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary"
+      class="mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary rounded-xl"
     >
       <img
         :src="events[0].image"
         alt="Imagen del evento"
-        class="w-full h-[450px] object-cover border-b border-white-bg"
+        class="w-full h-[450px] object-cover border-b border-white-bg rounded-t-xl"
       />
       <div class="mt-3 px-5">
         <h1 class="text-2xl font-bold text-white-bg">
           {{ events[0].title }}
         </h1>
-        <p class="text-xl font-semibold text-white-bg">
-          {{ events[0].date }} a las {{ events[0].hour }}
-        </p>
+        <p class="text-xl font-semibold text-white-bg">{{ events[0].date }} a las {{ events[0].hour }}</p>
         <hr class="my-3 border border-white-bg" />
-        <p class="text-lg text-white-bg">
-          <span class="font-bold">Organizador:</span> {{ events[0].organizer }}
-        </p>
-        <p class="text-lg text-white-bg">
-          <span class="font-bold">Tipo:</span> {{ events[0].tipe }}
-        </p>
-        <p class="text-lg text-white-bg">
-          <span class="font-bold">Local:</span> {{ establishments[0].name }}
-        </p>
+        <p class="text-lg text-white-bg"><span class="font-bold">Organizador:</span> {{ events[0].organizer }}</p>
+        <p class="text-lg text-white-bg"><span class="font-bold">Tipo:</span> {{ events[0].tipe }}</p>
+        <p class="text-lg text-white-bg"><span class="font-bold">Local:</span> {{ establishments[0].name }}</p>
         <p class="text-lg text-white-bg">
           <span class="font-bold">Dirección:</span>
           {{ establishments[0].adress }}
@@ -35,11 +27,7 @@
         </p>
         <p class="text-lg text-white-bg">
           <span class="font-bold"> Edad mínima:</span>
-          {{
-            events[0].minimumAge === "0"
-              ? "Sin restricciones"
-              : events[0].minimumAge + " año(s)"
-          }}
+          {{ events[0].minimumAge === "0" ? "Sin restricciones" : events[0].minimumAge + " año(s)" }}
         </p>
         <p class="text-lg text-white-bg">
           <span class="font-bold"> Precio:</span>
@@ -68,12 +56,10 @@
 
     <!--Coments-->
     <div
-      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary"
+      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary rounded-xl"
     >
       <div class="mt-3 px-5">
-        <label for="comentario" class="block text-white-bg font-bold mb-2">
-          Publicar un comentario:
-        </label>
+        <label for="comentario" class="block text-white-bg font-bold mb-2"> Publicar un comentario: </label>
         <textarea
           id="comentario"
           rows="4"
@@ -81,9 +67,7 @@
           placeholder="Escribe tu comentario aquí..."
         ></textarea>
         <div class="flex">
-          <button
-            class="ml-auto my-3 p-2 bg-purple-primary border border-white-bg text-white font-bold"
-          >
+          <button class="ml-auto my-3 p-2 bg-purple-primary border border-white-bg text-white font-bold">
             Publicar
           </button>
         </div>
@@ -92,11 +76,9 @@
 
     <!--Comments section-->
     <div
-      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary"
+      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary rounded-xl"
     >
-      <p class="text-lg font-semibold px-5 mt-3 text-white-bg">
-        Comentarios: {{ comments.length }}
-      </p>
+      <p class="text-lg font-semibold px-5 mt-3 text-white-bg">Comentarios: {{ comments.length }}</p>
 
       <div
         v-for="comment in comments"

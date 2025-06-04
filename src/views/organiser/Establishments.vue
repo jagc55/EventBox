@@ -2,21 +2,19 @@
   <div class="bg-black-secundary">
     <button
       @click="showModal = true"
-      class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold"
+      class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold border border-white-bg rounded"
     >
       Añadir establecimiento
     </button>
 
-    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">
-      Mis establecimientos
-    </h1>
+    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">Mis establecimientos</h1>
 
     <!-- Establishments grid-->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-5">
       <div
         v-for="establishment in establishments"
         :key="establishment.id"
-        class="flex border border-white-bg rounded overflow-hidden bg-dark-primary"
+        class="flex border border-white-bg rounded-xl overflow-hidden bg-dark-primary"
       >
         <div class="flex flex-col justify-between p-4 w-full">
           <div>
@@ -27,19 +25,13 @@
               <span class="font-bold">Dirección:</span>
               {{ establishment.location }}
             </p>
-            <p class="text-lg text-white-bg">
-              <span class="font-bold">Ciudad:</span> {{ establishment.city }}
-            </p>
+            <p class="text-lg text-white-bg"><span class="font-bold">Ciudad:</span> {{ establishment.city }}</p>
             <p class="text-lg text-white-bg">
               <span class="font-bold">Provincia:</span>
               {{ establishment.province }}
             </p>
-            <p class="text-lg text-white-bg">
-              <span class="font-bold">Teléfono:</span> {{ establishment.tfn }}
-            </p>
-            <p class="text-lg text-white-bg">
-              <span class="font-bold">Email:</span> {{ establishment.email }}
-            </p>
+            <p class="text-lg text-white-bg"><span class="font-bold">Teléfono:</span> {{ establishment.tfn }}</p>
+            <p class="text-lg text-white-bg"><span class="font-bold">Email:</span> {{ establishment.email }}</p>
             <p class="text-lg text-white-bg">
               <span class="font-bold">Eventos pendientes:</span>
             </p>
@@ -54,9 +46,7 @@
       class="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur"
       @click.self="showModal = false"
     >
-      <div
-        class="w-[80%] md:w-[50%] lg:w-[35%] border border-white-bg bg-dark-primary p-4"
-      >
+      <div class="w-[80%] md:w-[50%] lg:w-[35%] border border-white-bg bg-dark-primary p-4 rounded-xl">
         <div class="flex justify-end mb-2">
           <button
             @click="showModal = false"
@@ -97,10 +87,7 @@
             {{ errors.city }}
           </p>
 
-          <select
-            v-model="form.province"
-            class="w-full p-2 border border-dark-primary rounded mb-1"
-          >
+          <select v-model="form.province" class="w-full p-2 border border-dark-primary rounded mb-1">
             <option disabled value="">Selecciona una provincia</option>
             <option v-for="prov in provinces" :key="prov" :value="prov">
               {{ prov }}
@@ -132,7 +119,7 @@
 
           <button
             type="submit"
-            class="mt-2 bg-purple-primary text-white font-bold px-4 py-2 ml-auto"
+            class="mt-2 bg-purple-primary text-white font-bold px-4 py-2 ml-auto rounded border border-white-bg"
           >
             Añadir
           </button>
@@ -246,8 +233,7 @@ function submitForm() {
   errors.value = {};
 
   if (!form.value.name) errors.value.name = "El nombre es obligatorio";
-  if (!form.value.location)
-    errors.value.location = "La dirección es obligatoria";
+  if (!form.value.location) errors.value.location = "La dirección es obligatoria";
   if (!form.value.city) errors.value.city = "La localidad es obligatoria";
   if (!form.value.province) errors.value.province = "Selecciona una provincia";
 

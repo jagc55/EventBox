@@ -2,22 +2,15 @@
   <div class="bg-black-secundary">
     <button
       @click="openModal()"
-      class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold"
+      class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold rounded border border-white-bg"
     >
       Añadir evento
     </button>
 
     <!-- Formulario de edición de establecimiento -->
-    <div
-      class="bg-dark-primary border border-white-bg p-4 m-4 rounded shadow-lg w-[95%] max-w-3xl mx-auto"
-    >
-      <h2 class="text-xl font-bold text-white-bg mb-4">
-        Información del establecimiento
-      </h2>
-      <form
-        @submit.prevent="submitEstablishmentForm"
-        class="flex flex-col gap-2"
-      >
+    <div class="bg-dark-primary border border-white-bg p-4 m-4 rounded shadow-lg w-[95%] max-w-3xl mx-auto rounded-xl">
+      <h2 class="text-xl font-bold text-white-bg mb-4">Información del establecimiento</h2>
+      <form @submit.prevent="submitEstablishmentForm" class="flex flex-col gap-2">
         <input
           v-model="establishmentForm.name"
           type="text"
@@ -48,10 +41,7 @@
           {{ establishmentErrors.city }}
         </p>
 
-        <select
-          v-model="establishmentForm.province"
-          class="p-2 border border-dark-primary w-full rounded"
-        >
+        <select v-model="establishmentForm.province" class="p-2 border border-dark-primary w-full rounded">
           <option disabled value="">Selecciona una provincia</option>
           <option v-for="prov in provinces" :key="prov" :value="prov">
             {{ prov }}
@@ -84,7 +74,7 @@
         <div class="flex justify-end gap-4 mt-2">
           <button
             @click.prevent="deleteEstablishment"
-            class="bg-red-primary text-white px-4 py-2 rounded font-bold"
+            class="bg-red-primary text-white px-4 py-2 rounded font-bold border border-white-bg"
           >
             Eliminar
           </button>
@@ -92,7 +82,7 @@
           <button
             v-if="establishmentModified"
             type="submit"
-            class="bg-blue-secundary text-white px-4 py-2 rounded font-bold"
+            class="bg-blue-secundary text-white px-4 py-2 rounded font-bold border border-white-bg"
           >
             Guardar cambios
           </button>
@@ -100,22 +90,18 @@
       </form>
     </div>
 
-    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">
-      Eventos en {{ establishment }}
-    </h1>
+    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">Eventos en {{ establishment }}</h1>
 
     <!-- Events grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-5 mb-5">
       <div
         v-for="event in events"
         :key="event.id"
-        class="flex flex-col border border-white-bg rounded overflow-hidden bg-dark-primary shadow-xl"
+        class="flex flex-col border border-white-bg overflow-hidden bg-dark-primary shadow-xl rounded-xl"
       >
         <div class="p-4 w-full space-y-2">
           <h2 class="font-bold text-2xl text-white-bg">{{ event.title }}</h2>
-          <p class="font-bold text-lg text-white-bg">
-            {{ event.date }} {{ event.time }}
-          </p>
+          <p class="font-bold text-lg text-white-bg">{{ event.date }} {{ event.time }}</p>
 
           <div class="flex items-center justify-between gap-2">
             <div
@@ -125,7 +111,7 @@
               <span
                 v-for="(tag, index) in event.tags"
                 :key="index"
-                class="inline-block font-bold bg-purple-primary text-white px-3 py-1 border border-dark-primary text-sm mr-1"
+                class="inline-block font-bold bg-purple-primary text-white px-3 py-1 text-sm mr-1 border border-white-bg rounded"
               >
                 #{{ tag }}
               </span>
@@ -149,9 +135,7 @@
       class="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur"
       @click.self="showModal = false"
     >
-      <div
-        class="w-[80%] md:w-[50%] lg:w-[35%] border border-white-bg bg-dark-primary p-4"
-      >
+      <div class="w-[80%] md:w-[50%] lg:w-[35%] border border-white-bg bg-dark-primary p-4 rounded-xl">
         <div class="flex justify-end mb-2">
           <button
             @click="showModal = false"
@@ -162,26 +146,14 @@
         </div>
 
         <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
-          <input
-            v-model="form.title"
-            type="text"
-            placeholder="Título"
-            class="p-2 border border-dark-primary"
-          />
+          <input v-model="form.title" type="text" placeholder="Título" class="p-2 border border-dark-primary" />
           <p v-if="errors.title" class="text-red-600 text-sm">
             {{ errors.title }}
           </p>
 
-          <select
-            v-model="form.category"
-            class="w-full border border-dark-primary p-2 rounded"
-          >
+          <select v-model="form.category" class="w-full border border-dark-primary p-2 rounded">
             <option disabled value="">Selecciona una categoría</option>
-            <option
-              v-for="category in eventCategories"
-              :key="category"
-              :value="category"
-            >
+            <option v-for="category in eventCategories" :key="category" :value="category">
               {{ category }}
             </option>
           </select>
@@ -189,21 +161,12 @@
             {{ errors.category }}
           </p>
 
-          <input
-            v-model="form.date"
-            type="date"
-            :min="minDate"
-            class="p-2 border border-dark-primary"
-          />
+          <input v-model="form.date" type="date" :min="minDate" class="p-2 border border-dark-primary" />
           <p v-if="errors.date" class="text-red-600 text-sm">
             {{ errors.date }}
           </p>
 
-          <input
-            v-model="form.hour"
-            type="time"
-            class="p-2 border border-dark-primary"
-          />
+          <input v-model="form.hour" type="time" class="p-2 border border-dark-primary" />
           <p v-if="errors.hour" class="text-red-600 text-sm">
             {{ errors.hour }}
           </p>
@@ -239,12 +202,7 @@
             {{ errors.price }}
           </p>
 
-          <input
-            v-model="form.image"
-            type="text"
-            placeholder="URL de imagen"
-            class="p-2 border border-dark-primary"
-          />
+          <input v-model="form.image" type="text" placeholder="URL de imagen" class="p-2 border border-dark-primary" />
           <p v-if="errors.image" class="text-red-600 text-sm">
             {{ errors.image }}
           </p>
@@ -260,7 +218,7 @@
 
           <button
             type="submit"
-            class="bg-purple-primary text-white font-bold py-2 px-4 mt-2 self-end"
+            class="bg-purple-primary text-white font-bold py-2 px-4 mt-2 self-end rounded border border-white-bg"
           >
             {{ editingEventId ? "Modificar evento" : "Añadir evento" }}
           </button>
@@ -349,8 +307,7 @@ function validateEventForm(values: typeof form.value) {
   const validationErrors: Record<string, string> = {};
 
   if (!values.title) validationErrors.title = "El título es obligatorio";
-  if (!values.category)
-    validationErrors.category = "La categoría es obligatoria";
+  if (!values.category) validationErrors.category = "La categoría es obligatoria";
   if (!values.date) validationErrors.date = "La fecha es obligatoria";
   if (!values.hour) validationErrors.hour = "La hora es obligatoria";
   if (!values.tags) validationErrors.tags = "Debe añadir al menos una etiqueta";
@@ -361,14 +318,11 @@ function validateEventForm(values: typeof form.value) {
     validationErrors.image = "URL de imagen inválida";
   }
 
-  if (values.minimumAge == null || values.minimumAge < 0)
-    validationErrors.minimumAge = "Edad mínima no válida";
+  if (values.minimumAge == null || values.minimumAge < 0) validationErrors.minimumAge = "Edad mínima no válida";
 
-  if (values.price == null || values.price < 0)
-    validationErrors.price = "Precio no válido";
+  if (values.price == null || values.price < 0) validationErrors.price = "Precio no válido";
 
-  if (!values.description)
-    validationErrors.description = "La descripción es obligatoria";
+  if (!values.description) validationErrors.description = "La descripción es obligatoria";
 
   return validationErrors;
 }
@@ -455,31 +409,22 @@ const establishmentForm = ref({ ...establishmentOriginal.value });
 const establishmentErrors = ref<Record<string, string>>({});
 
 const establishmentModified = computed(
-  () =>
-    JSON.stringify(establishmentForm.value) !==
-    JSON.stringify(establishmentOriginal.value)
+  () => JSON.stringify(establishmentForm.value) !== JSON.stringify(establishmentOriginal.value)
 );
 
 function submitEstablishmentForm() {
   establishmentErrors.value = {};
 
-  if (!establishmentForm.value.name)
-    establishmentErrors.value.name = "El nombre es obligatorio";
-  if (!establishmentForm.value.location)
-    establishmentErrors.value.location = "La dirección es obligatoria";
-  if (!establishmentForm.value.city)
-    establishmentErrors.value.city = "La ciudad es obligatoria";
-  if (!establishmentForm.value.province)
-    establishmentErrors.value.province = "Selecciona una provincia";
+  if (!establishmentForm.value.name) establishmentErrors.value.name = "El nombre es obligatorio";
+  if (!establishmentForm.value.location) establishmentErrors.value.location = "La dirección es obligatoria";
+  if (!establishmentForm.value.city) establishmentErrors.value.city = "La ciudad es obligatoria";
+  if (!establishmentForm.value.province) establishmentErrors.value.province = "Selecciona una provincia";
   if (!establishmentForm.value.tfn) {
     establishmentErrors.value.tfn = "El teléfono es obligatorio";
   } else if (!/^\d+$/.test(establishmentForm.value.tfn)) {
     establishmentErrors.value.tfn = "El teléfono solo puede contener números";
   }
-  if (
-    !establishmentForm.value.email ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(establishmentForm.value.email)
-  ) {
+  if (!establishmentForm.value.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(establishmentForm.value.email)) {
     establishmentErrors.value.email = "Email no válido";
   }
 
