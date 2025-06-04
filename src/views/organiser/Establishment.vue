@@ -120,7 +120,7 @@
               <button @click="openModal(event)">
                 <Pencil class="size-9 bg-blue-secundary" />
               </button>
-              <button>
+              <button @click="deleteEvent(event.id)">
                 <Trash2 class="size-9 bg-red-primary" />
               </button>
             </div>
@@ -246,6 +246,7 @@ const events = ref([
     time: "18:30",
     tags: ["sex", "homo", "rico", "roberto", "pelon"],
     image: "/images/1.jpg",
+    category: "Tecnológico",
   },
   {
     id: "2",
@@ -256,6 +257,7 @@ const events = ref([
     time: "13:30",
     tags: ["calvo", "malalogica", "puto"],
     image: "/images/2.jpg",
+    category: "Educativo",
   },
   {
     id: "3",
@@ -333,19 +335,25 @@ function handleSubmit() {
   if (Object.keys(errors.value).length > 0) return;
 
   const newEvent = {
-    id: editingEventId.value ?? String(events.value.length + 1),
+    id: editingEventId.value ?? Date.now().toString(), // Genera ID único
     title: form.value.title,
-    organizer: "Organizador X",
+    organizer: "Organizador X", // Simulado
     establishment: establishment.value,
     date: form.value.date,
     time: form.value.hour,
     tags: form.value.tags.split(",").map((tag) => tag.trim()),
     image: form.value.image,
+    minimumAge: form.value.minimumAge,
+    price: form.value.price,
+    description: form.value.description,
+    category: form.value.category,
   };
 
   if (editingEventId.value) {
     const idx = events.value.findIndex((e) => e.id === editingEventId.value);
-    if (idx !== -1) events.value[idx] = newEvent;
+    if (idx !== -1) {
+      events.value[idx] = newEvent;
+    }
   } else {
     events.value.push(newEvent);
   }
@@ -363,10 +371,10 @@ function openModal(eventToEdit: any = null) {
       hour: eventToEdit.time,
       tags: eventToEdit.tags.join(", "),
       image: eventToEdit.image,
-      minimumAge: 18,
-      price: 10,
-      description: "Descripción simulada",
-      category: "Entretenimiento",
+      minimumAge: eventToEdit.minimumAge ?? null,
+      price: eventToEdit.price ?? null,
+      description: eventToEdit.description ?? "",
+      category: eventToEdit.category ?? "",
     };
   } else {
     resetForm();
@@ -437,6 +445,12 @@ function submitEstablishmentForm() {
 function deleteEstablishment() {
   if (confirm("¿Estás seguro de que quieres eliminar el establecimiento?")) {
     alert("Establecimiento eliminado (simulado)");
+  }
+}
+
+function deleteEvent(id: string) {
+  if (confirm("¿Quieres eliminar este evento?")) {
+    events.value = events.value.filter((event) => event.id !== id);
   }
 }
 

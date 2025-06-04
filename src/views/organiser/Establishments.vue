@@ -10,7 +10,7 @@
     <h1 class="text-2xl font-bold text-white-bg px-4 py-2">Mis establecimientos</h1>
 
     <!-- Establishments grid-->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-5">
       <div
         v-for="establishment in establishments"
         :key="establishment.id"
@@ -250,6 +250,17 @@ function submitForm() {
   } else if (!isValidEmail(form.value.email)) {
     errors.value.email = "El email no es válido";
   }
+
+  // Si hay errores, no continuar
+  if (Object.keys(errors.value).length > 0) return;
+
+  // Añadir el nuevo establecimiento
+  establishments.value.push({
+    id: Date.now().toString(), // Generar ID simple
+    ...form.value,
+  });
+
+  showModal.value = false;
 }
 
 watch(showModal, (newVal) => {

@@ -63,11 +63,15 @@
         <textarea
           id="comentario"
           rows="4"
+          v-model="newCommentText"
           class="w-full p-3 border border-white-bg rounded"
           placeholder="Escribe tu comentario aquí..."
         ></textarea>
         <div class="flex">
-          <button class="ml-auto my-3 p-2 bg-purple-primary border border-white-bg text-white font-bold">
+          <button
+            class="ml-auto my-3 p-2 bg-purple-primary border border-white-bg text-white font-bold"
+            @click="publishComment"
+          >
             Publicar
           </button>
         </div>
@@ -76,7 +80,7 @@
 
     <!--Comments section-->
     <div
-      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary rounded-xl"
+      class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary rounded-xl pb-2"
     >
       <p class="text-lg font-semibold px-5 mt-3 text-white-bg">Comentarios: {{ comments.length }}</p>
 
@@ -100,6 +104,7 @@
 import { ref } from "vue";
 import { Star } from "lucide-vue-next";
 const likedEvents = ref(false);
+const newCommentText = ref("");
 
 const events = ref([
   {
@@ -163,4 +168,19 @@ const comments = ref([
     text: "Los witis me gustan mucho, me hacen muy feliz y me ayudan a llevar hacia delante mi día a día.",
   },
 ]);
+
+const publishComment = () => {
+  const trimmed = newCommentText.value.trim();
+  if (!trimmed) return;
+
+  const newComment = {
+    id: String(Date.now()),
+    username: "usuarioActual", // Puedes reemplazar esto con el nombre real del usuario logueado
+    date: new Date().toLocaleDateString("es-ES"),
+    text: trimmed,
+  };
+
+  comments.value.unshift(newComment);
+  newCommentText.value = ""; // Limpiar textarea
+};
 </script>
