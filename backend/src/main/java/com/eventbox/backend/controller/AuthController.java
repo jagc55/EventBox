@@ -1,6 +1,5 @@
 package com.eventbox.backend.controller;
 
-import com.eventbox.backend.dto.JwtResponse;
 import com.eventbox.backend.dto.LoginRequest;
 import com.eventbox.backend.dto.RegisterRequest;
 import com.eventbox.backend.model.Role;
@@ -8,10 +7,14 @@ import com.eventbox.backend.model.User;
 import com.eventbox.backend.repository.RoleRepository;
 import com.eventbox.backend.repository.UserRepository;
 import com.eventbox.backend.service.JwtService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,10 +27,13 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
-    public AuthController(UserRepository userRepository, RoleRepository roleRepository,
-                          PasswordEncoder passwordEncoder,
-                          AuthenticationManager authenticationManager,
-                          JwtService jwtService) {
+    public AuthController(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService
+    ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -36,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public JwtResponse register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequest request) {
         Role role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
 
@@ -48,19 +54,37 @@ public class AuthController {
         userRepository.save(user);
 
         String token = jwtService.generateToken(user.getEmail());
-        return new JwtResponse(token);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("userId", user.getId());
+        response.put("roleId", user.getRole().getId());
+        response.put("email", user.getEmail());
+        response.put("name",  user.getName());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
-    public JwtResponse login(@RequestBody LoginRequest request) {
-        var auth = new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
-                request.getPassword()
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
         );
 
-        authenticationManager.authenticate(auth);
-
         String token = jwtService.generateToken(request.getEmail());
-        return new JwtResponse(token);
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("userId", user.getId());
+        response.put("roleId", user.getRole().getId());
+        response.put("email", user.getEmail());
+        response.put("name",  user.getName());
+
+        return ResponseEntity.ok(response);
     }
 }

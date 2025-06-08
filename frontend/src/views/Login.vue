@@ -52,13 +52,14 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { AtSign, Lock, Eye, EyeOff } from "lucide-vue-next";
 import { useRouter } from "vue-router";
-import { sessionStatus } from "@/stores/session";
+import { AtSign, Lock, Eye, EyeOff } from "lucide-vue-next";
+import { useSession } from "@/composables/useSession";
 
 const router = useRouter();
-const showPassword = ref(false);
+const { setSession } = useSession();
 
+const showPassword = ref(false);
 const email = ref("");
 const password = ref("");
 
@@ -67,20 +68,22 @@ const loginUser = async () => {
     const response = await fetch("http://localhost:8080/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email.value,
-        password: password.value,
-      }),
+      body: JSON.stringify({ email: email.value, password: password.value }),
     });
 
     const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.message || "Error al iniciar sesión");
-    }
+    if (!response.ok) throw new Error(data.message || "Error al iniciar sesión");
 
-    localStorage.setItem("token", data.token);
-    sessionStatus.value = true;
+    setSession({
+      token: data.token,
+      userId: data.userId,
+      roleId: data.roleId,
+      email: data.email,
+      name: data.name,
+    });
+
+    alert("Inicio de sesión exitoso");
     router.push({ name: "events" });
   } catch (err: any) {
     alert("Error: " + err.message);

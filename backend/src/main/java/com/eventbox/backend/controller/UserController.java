@@ -2,9 +2,12 @@ package com.eventbox.backend.controller;
 
 import com.eventbox.backend.model.User;
 import com.eventbox.backend.service.UserService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -36,5 +39,10 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+    }
+
+    @PatchMapping("/{id}/role")
+    public ResponseEntity<String> updateUserRole(@PathVariable Long id, @RequestBody Map<String, Integer> payload) {
+        return userService.updateUserRole(id, payload.get("roleId"));
     }
 }

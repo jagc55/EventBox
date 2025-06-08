@@ -99,18 +99,19 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { Eye, EyeOff } from "lucide-vue-next";
-import { RouterLink, useRouter } from "vue-router";
-import { sessionStatus } from "@/stores/session";
+import { useSession } from "@/composables/useSession";
 
-const showPassword1 = ref(false);
-const showPassword2 = ref(false);
+const router = useRouter();
+const { setSession } = useSession();
 
 const email = ref("");
 const username = ref("");
 const password = ref("");
 const confirmPassword = ref("");
-const router = useRouter();
+const showPassword1 = ref(false);
+const showPassword2 = ref(false);
 
 const errors = ref({
   email: "",
@@ -121,15 +122,8 @@ const errors = ref({
 
 const validateForm = () => {
   let valid = true;
+  errors.value = { email: "", username: "", password: "", confirmPassword: "" };
 
-  errors.value = {
-    email: "",
-    username: "",
-    password: "",
-    confirmPassword: "",
-  };
-
-  // Email Validation
   if (!email.value) {
     errors.value.email = "El correo electrónico es obligatorio.";
     valid = false;
@@ -138,31 +132,28 @@ const validateForm = () => {
     valid = false;
   }
 
-  // Username Validation
   if (!username.value) {
     errors.value.username = "El nombre de usuario es un campo requerido.";
     valid = false;
   } else if (username.value.length < 5 || username.value.length > 12) {
-    errors.value.username = "El nombre de usuario debe tener entre 5 y 12 caracteres.";
+    errors.value.username = "Debe tener entre 5 y 12 caracteres.";
     valid = false;
   } else if (!/^[a-zA-Z0-9]+$/.test(username.value)) {
-    errors.value.username = "El nombre de usuario no debe contener espacios ni caracteres especiales.";
+    errors.value.username = "No puede tener espacios ni símbolos.";
     valid = false;
   }
 
-  // Password Validation
   if (!password.value) {
     errors.value.password = "La contraseña es un campo requerido.";
     valid = false;
   } else if (password.value.length < 6) {
-    errors.value.password = "La contraseña debe contener al menos 6 caracteres.";
+    errors.value.password = "Debe tener al menos 6 caracteres.";
     valid = false;
   } else if (!/\d/.test(password.value)) {
-    errors.value.password = "La contraseña debe contener al menos un número.";
+    errors.value.password = "Debe contener al menos un número.";
     valid = false;
   }
 
-  // Confirm Password Validation
   if (confirmPassword.value !== password.value) {
     errors.value.confirmPassword = "Las contraseñas deben coincidir.";
     valid = false;
@@ -182,21 +173,23 @@ const onSubmit = async () => {
         email: email.value,
         name: username.value,
         password: password.value,
-        roleId: 1, // 👈 Ajusta si tienes más roles
+        roleId: 1,
       }),
     });
 
     const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.message || "Error al registrar el usuario");
-    }
+    if (!res.ok) throw new Error(data.message || "Error al registrar el usuario");
 
-    // Guardar token y redirigir o mostrar éxito
-    localStorage.setItem("token", data.token);
-    sessionStatus.value = true;
+    setSession({
+      token: data.token,
+      userId: data.userId,
+      roleId: data.roleId,
+      email: data.email,
+      name: data.name,
+    });
+
     alert("Registro exitoso");
-    // Redirige si quieres:
     router.push({ name: "events" });
   } catch (err: any) {
     alert("Error: " + err.message);

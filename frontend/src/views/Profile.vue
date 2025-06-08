@@ -6,14 +6,21 @@
       <p class="text-2xl font-bold text-white-bg">Datos</p>
       <div class="flex flex-col sm:flex-row">
         <div class="flex flex-col">
-          <p class="text-lg font-bold text-white-bg">marsupilami@gmail.com</p>
-          <p class="text-lg font-bold text-white-bg">marsupilami32</p>
-          <p class="text-lg font-bold text-white-bg mb-2">Organizador</p>
+          <p class="text-lg font-bold text-white-bg">{{ email }}</p>
+          <p class="text-lg font-bold text-white-bg">{{ name }}</p>
+          <p class="text-lg font-bold text-white-bg mb-2">
+            {{ roleId === 2 ? "Organizador" : "Usuario" }}
+          </p>
         </div>
 
         <div class="flex flex-col mx-0 sm:ml-auto gap-3">
-          <!--Cambiar texto si rol organizador-->
-          <button class="bg-purple-primary text-white-bg px-2 rounded">Solicitar organizador</button>
+          <button v-if="roleId === 1" @click="requestOrganizer" class="bg-purple-primary text-white-bg px-2 rounded">
+            Solicitar organizador
+          </button>
+          <button v-else @click="goToEstablishments" class="bg-purple-primary text-white-bg px-2 rounded">
+            Mis establecimientos
+          </button>
+
           <button class="bg-purple-primary text-white-bg px-2 rounded">Cambiar contraseña</button>
         </div>
       </div>
@@ -40,16 +47,12 @@
         </svg>
         <ul class="ml-0 sm:ml-10 grid grid-rows-5 grid-flow-col gap-x-6 gap-y-2 text-lg text-white-bg">
           <li v-for="label in Object.keys(userCategories)" :key="label" class="flex items-center gap-2">
-            <span
-              class="size-3 rounded-sm"
-              :style="{
-                backgroundColor: categoryColors[label],
-              }"
-            />
+            <span class="size-3 rounded-sm" :style="{ backgroundColor: categoryColors[label] }" />
             {{ `${label}: ${userCategories[label]}` }}
           </li>
         </ul>
       </div>
+
       <div class="flex flex-col md:flex-row items-center justify-center gap-14 my-4 sm:my-14">
         <div class="flex flex-col gap-2 text-center text-white-bg text-3xl max-w-[200px]">
           <span class="font-bold text-5xl">5</span> <span>Eventos favoritos</span>
@@ -67,6 +70,42 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { useSession } from "@/composables/useSession";
+
+const router = useRouter();
+const { session, updateRole } = useSession();
+
+// ✅ Computed para usar en el template de forma segura y reactiva
+const roleId = computed(() => session.value?.roleId || 1);
+const name = computed(() => session.value?.name || "");
+const email = computed(() => session.value?.email || "");
+
+const requestOrganizer = async () => {
+  if (!session.value?.userId) return;
+
+  try {
+    const res = await fetch(`http://localhost:8080/api/users/${session.value.userId}/role`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.value.token}`,
+      },
+      body: JSON.stringify({ roleId: 2 }),
+    });
+
+    if (!res.ok) throw new Error("Error updating role");
+
+    alert("Rol organizador concedido");
+    updateRole(2);
+  } catch (err: any) {
+    alert("Error: " + err.message);
+  }
+};
+
+const goToEstablishments = () => {
+  router.push({ name: "establishments" });
+};
 
 const categoryColors: Record<string, string> = {
   cultural: "#9C27B0",
@@ -107,7 +146,6 @@ const slices = computed(() => {
     };
 
     offset -= dash;
-
     return slice;
   });
 });
