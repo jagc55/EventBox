@@ -1,18 +1,12 @@
 <template>
-  <div
-    class="h-full bg-cover bg-[center_10%] scale-105 bg-[url(@/assets/images/bg.png)]"
-  >
+  <div class="h-full bg-cover bg-[center_10%] scale-105 bg-[url(@/assets/images/bg.png)]">
     <div class="flex items-center justify-center size-full bg-black/30">
-      <div
-        class="bg-dark-primary rounded-lg shadow-xl w-full max-w-lg p-10 border border-white-bg"
-      >
+      <div class="bg-dark-primary rounded-lg shadow-xl w-full max-w-lg p-10 border border-white-bg">
         <h1 class="text-2xl font-bold text-white-bg mb-4">Registrar usuario</h1>
         <form class="flex flex-col gap-8" @submit.prevent="onSubmit">
           <!-- Email -->
           <div class="flex flex-col">
-            <div
-              class="flex border border-dark-primary rounded overflow-hidden bg-white-bg h-12"
-            >
+            <div class="flex border border-dark-primary rounded overflow-hidden bg-white-bg h-12">
               <input
                 v-model="email"
                 type="email"
@@ -20,39 +14,24 @@
                 class="w-full pl-3 border-dark-primary"
               />
             </div>
-            <p
-              v-if="errors.email"
-              class="text-red-600 text-sm mt-1 h-[1.25rem]"
-            >
+            <p v-if="errors.email" class="text-red-600 text-sm mt-1 h-[1.25rem]">
               {{ errors.email }}
             </p>
           </div>
 
           <!-- User -->
           <div class="flex flex-col">
-            <div
-              class="flex border border-dark-primary rounded overflow-hidden bg-white-bg h-12"
-            >
-              <input
-                v-model="username"
-                type="text"
-                placeholder="Usuario"
-                class="w-full pl-3 border-dark-primary"
-              />
+            <div class="flex border border-dark-primary rounded overflow-hidden bg-white-bg h-12">
+              <input v-model="username" type="text" placeholder="Usuario" class="w-full pl-3 border-dark-primary" />
             </div>
-            <p
-              v-if="errors.username"
-              class="text-red-600 text-sm mt-1 h-[1.25rem]"
-            >
+            <p v-if="errors.username" class="text-red-600 text-sm mt-1 h-[1.25rem]">
               {{ errors.username }}
             </p>
           </div>
 
           <!-- Password -->
           <div class="flex flex-col">
-            <div
-              class="flex border border-dark-primary rounded overflow-hidden bg-white-bg"
-            >
+            <div class="flex border border-dark-primary rounded overflow-hidden bg-white-bg">
               <input
                 v-model="password"
                 :type="showPassword1 ? 'text' : 'password'"
@@ -64,25 +43,17 @@
                 class="flex shrink-0 justify-center items-center size-12"
                 @click="showPassword1 = !showPassword1"
               >
-                <component
-                  :is="showPassword1 ? EyeOff : Eye"
-                  class="size-7 text-dark-primary"
-                />
+                <component :is="showPassword1 ? EyeOff : Eye" class="size-7 text-dark-primary" />
               </button>
             </div>
-            <p
-              v-if="errors.password"
-              class="text-red-600 text-sm mt-1 h-[1.25rem]"
-            >
+            <p v-if="errors.password" class="text-red-600 text-sm mt-1 h-[1.25rem]">
               {{ errors.password }}
             </p>
           </div>
 
           <!-- Confirm Password -->
           <div class="flex flex-col">
-            <div
-              class="flex border border-dark-primary rounded overflow-hidden bg-white-bg"
-            >
+            <div class="flex border border-dark-primary rounded overflow-hidden bg-white-bg">
               <input
                 v-model="confirmPassword"
                 :type="showPassword2 ? 'text' : 'password'"
@@ -94,16 +65,10 @@
                 class="flex shrink-0 justify-center items-center size-12"
                 @click="showPassword2 = !showPassword2"
               >
-                <component
-                  :is="showPassword2 ? EyeOff : Eye"
-                  class="size-7 text-dark-primary"
-                />
+                <component :is="showPassword2 ? EyeOff : Eye" class="size-7 text-dark-primary" />
               </button>
             </div>
-            <p
-              v-if="errors.confirmPassword"
-              class="text-red-600 text-sm mt-1 h-[1.25rem]"
-            >
+            <p v-if="errors.confirmPassword" class="text-red-600 text-sm mt-1 h-[1.25rem]">
               {{ errors.confirmPassword }}
             </p>
           </div>
@@ -135,7 +100,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Eye, EyeOff } from "lucide-vue-next";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
+import { sessionStatus } from "@/stores/session";
 
 const showPassword1 = ref(false);
 const showPassword2 = ref(false);
@@ -144,6 +110,7 @@ const email = ref("");
 const username = ref("");
 const password = ref("");
 const confirmPassword = ref("");
+const router = useRouter();
 
 const errors = ref({
   email: "",
@@ -176,12 +143,10 @@ const validateForm = () => {
     errors.value.username = "El nombre de usuario es un campo requerido.";
     valid = false;
   } else if (username.value.length < 5 || username.value.length > 12) {
-    errors.value.username =
-      "El nombre de usuario debe tener entre 5 y 12 caracteres.";
+    errors.value.username = "El nombre de usuario debe tener entre 5 y 12 caracteres.";
     valid = false;
   } else if (!/^[a-zA-Z0-9]+$/.test(username.value)) {
-    errors.value.username =
-      "El nombre de usuario no debe contener espacios ni caracteres especiales.";
+    errors.value.username = "El nombre de usuario no debe contener espacios ni caracteres especiales.";
     valid = false;
   }
 
@@ -190,8 +155,7 @@ const validateForm = () => {
     errors.value.password = "La contraseña es un campo requerido.";
     valid = false;
   } else if (password.value.length < 6) {
-    errors.value.password =
-      "La contraseña debe contener al menos 6 caracteres.";
+    errors.value.password = "La contraseña debe contener al menos 6 caracteres.";
     valid = false;
   } else if (!/\d/.test(password.value)) {
     errors.value.password = "La contraseña debe contener al menos un número.";
@@ -207,10 +171,35 @@ const validateForm = () => {
   return valid;
 };
 
-const onSubmit = () => {
-  if (validateForm()) {
-    alert("Formulario válido.");
-    // Aquí puedes manejar el envío a tu API o backend
+const onSubmit = async () => {
+  if (!validateForm()) return;
+
+  try {
+    const res = await fetch("http://localhost:8080/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email.value,
+        name: username.value,
+        password: password.value,
+        roleId: 1, // 👈 Ajusta si tienes más roles
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Error al registrar el usuario");
+    }
+
+    // Guardar token y redirigir o mostrar éxito
+    localStorage.setItem("token", data.token);
+    sessionStatus.value = true;
+    alert("Registro exitoso");
+    // Redirige si quieres:
+    router.push({ name: "events" });
+  } catch (err: any) {
+    alert("Error: " + err.message);
   }
 };
 </script>
