@@ -9,7 +9,7 @@
           <p class="text-lg font-bold text-white-bg">{{ email }}</p>
           <p class="text-lg font-bold text-white-bg">{{ name }}</p>
           <p class="text-lg font-bold text-white-bg mb-2">
-            {{ roleId === 2 ? "Organizador" : "Usuario" }}
+            {{ roleId === 1 ? "Usuario" : roleId === 2 ? "Organizador" : "Administrador" }}
           </p>
         </div>
 

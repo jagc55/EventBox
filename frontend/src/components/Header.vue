@@ -1,19 +1,3 @@
-<script setup lang="ts">
-import { ref } from "vue";
-import { RouterLink, useRouter } from "vue-router";
-import Logo from "@/assets/logo.svg";
-import { useSession } from "@/composables/useSession";
-
-const menuOpen = ref(false);
-const router = useRouter();
-const { session, clearSession, isLoggedIn } = useSession();
-
-const logout = () => {
-  clearSession();
-  router.push({ name: "login" });
-};
-</script>
-
 <template>
   <header class="bg-dark-primary text-white relative z-10">
     <div class="h-16 flex items-center justify-between px-4">
@@ -54,3 +38,19 @@ const logout = () => {
     </div>
   </header>
 </template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { RouterLink, useRouter } from "vue-router";
+import Logo from "@/assets/logo.svg";
+import { useSession } from "@/composables/useSession";
+
+const menuOpen = ref(false);
+const router = useRouter();
+const { clearSession, isLoggedIn } = useSession();
+
+const logout = () => {
+  clearSession();
+  router.push({ name: "login" });
+};
+</script>
