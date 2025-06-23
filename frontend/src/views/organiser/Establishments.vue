@@ -37,7 +37,8 @@
             <p class="text-lg text-white-bg"><span class="font-bold">Teléfono:</span> {{ establishment.phone }}</p>
             <p class="text-lg text-white-bg"><span class="font-bold">Email:</span> {{ establishment.email }}</p>
             <p class="text-lg text-white-bg">
-              <span class="font-bold">Eventos pendientes:</span>
+              <span class="font-bold">Eventos pendientes: </span>
+              <span v-if="establishment.events">{{ countUpcomingEvents(establishment.events) }}</span>
             </p>
           </div>
         </div>
@@ -176,6 +177,7 @@ interface Establishment {
   province: string;
   phone: string;
   email: string;
+  events?: any[]; // <-- Añadido para evitar error TS
 }
 
 const establishments = ref<Establishment[]>([]);
@@ -195,7 +197,26 @@ async function fetchEstablishments() {
       headers: { Authorization: `Bearer ${session.value.token}` },
     });
     if (!res.ok) throw new Error("Error al obtener establecimientos");
-    establishments.value = await res.json();
+    const ests = await res.json();
+    // Para cada establecimiento, cargar sus eventos
+    const withEvents = await Promise.all(
+      ests.map(async (est: any) => {
+        try {
+          const resEvents = await fetch(`/api/establishments/${est.id}/events`, {
+            headers: { Authorization: `Bearer ${session.value.token}` },
+          });
+          if (resEvents.ok) {
+            est.events = await resEvents.json();
+          } else {
+            est.events = [];
+          }
+        } catch {
+          est.events = [];
+        }
+        return est;
+      })
+    );
+    establishments.value = withEvents;
   } catch (e) {
     establishments.value = [];
   } finally {
@@ -310,6 +331,18 @@ async function submitForm() {
 
 function goToEstablishment(establishmentId: string) {
   router.push({ name: "establishment", params: { establishmentId } });
+}
+
+function countUpcomingEvents(events: any[]) {
+  if (!Array.isArray(events)) return 0;
+  const now = new Date();
+  return events.filter((ev) => {
+    if (!ev.date) return false;
+    // Formato esperado: YYYY-MM-DD
+    const [year, month, day] = ev.date.split("-");
+    const eventDate = new Date(Number(year), Number(month) - 1, Number(day));
+    return eventDate >= new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }).length;
 }
 
 watch(showModal, (newVal) => {

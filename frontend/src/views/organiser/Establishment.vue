@@ -374,7 +374,17 @@ function validateEventForm(values: typeof form.value) {
       validationErrors.category = "Selecciona una categoría válida";
     }
   }
-  if (!values.date) validationErrors.date = "La fecha es obligatoria";
+  if (!values.date) {
+    validationErrors.date = "La fecha es obligatoria";
+  } else {
+    // Validar que la fecha no sea pasada
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const selectedDate = new Date(values.date);
+    if (selectedDate < today) {
+      validationErrors.date = "No puedes seleccionar una fecha pasada";
+    }
+  }
   if (!values.hour) validationErrors.hour = "La hora es obligatoria";
   if (!values.tags || values.tags.trim() === "") validationErrors.tags = "Debe añadir al menos una etiqueta";
 
@@ -481,8 +491,12 @@ function openModal(eventToEdit: any = null) {
     form.value = {
       title: eventToEdit.title,
       date: eventToEdit.date,
-      hour: eventToEdit.time,
-      tags: Array.isArray(eventToEdit.tags) ? eventToEdit.tags.join(", ") : "",
+      hour: eventToEdit.time ? eventToEdit.time.slice(0, 5) : "",
+      tags: typeof eventToEdit.tags === "string"
+        ? eventToEdit.tags
+        : Array.isArray(eventToEdit.tags)
+        ? eventToEdit.tags.join(", ")
+        : "",
       image: eventToEdit.imageUrl || eventToEdit.image || "",
       minimumAge: eventToEdit.minimumAge ?? null,
       price: eventToEdit.price ?? null,
@@ -544,9 +558,38 @@ function deleteEstablishment() {
   }
 }
 
-function deleteEvent(id: string) {
+async function deleteEvent(id: string) {
   if (confirm("¿Quieres eliminar este evento?")) {
-    events.value = events.value.filter((event) => event.id !== id);
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+    try {
+      const res = await fetch(`/api/events/${id}`, {
+        method: "DELETE",
+        headers,
+      });
+      if (!res.ok) {
+        let errorMsg = "Error al eliminar el evento.";
+        try {
+          const errorJson = await res.json();
+          if (errorJson && errorJson.message) errorMsg = errorJson.message;
+          else if (typeof errorJson === "string") errorMsg = errorJson;
+        } catch {
+          const errorText = await res.text();
+          if (errorText) errorMsg = errorText;
+        }
+        alert(errorMsg);
+        return;
+      }
+      // Recargar eventos tras eliminar
+      const resEvents = await fetch(`/api/establishments/${establishment.value.id}/events`, { headers });
+      if (resEvents.ok) {
+        events.value = await resEvents.json();
+      } else {
+        events.value = events.value.filter((event) => event.id !== id);
+      }
+    } catch (e: any) {
+      alert(e.message || e);
+    }
   }
 }
 

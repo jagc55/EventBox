@@ -42,4 +42,10 @@ public class EventController {
     public List<Event> getEventsByEstablishment(@PathVariable Long id) {
         return service.findByEstablishmentId(id);
     }
+
+    @PutMapping("/{id}")
+    public Event update(@PathVariable Long id, @RequestBody Event event) {
+        event.setId(id);
+        return service.update(event);
+    }
 }

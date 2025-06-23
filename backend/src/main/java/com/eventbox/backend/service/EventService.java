@@ -35,4 +35,9 @@ public class EventService {
     public List<Event> findByEstablishmentId(Long id) {
         return repo.findByEstablishmentId(id);
     }
+
+    public Event update(Event event) {
+        // Se asume que el evento ya tiene el ID correcto
+        return repo.save(event);
+    }
 }
