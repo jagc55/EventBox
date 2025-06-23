@@ -379,7 +379,7 @@ function validateEventForm(values: typeof form.value) {
   } else {
     // Validar que la fecha no sea pasada
     const today = new Date();
-    today.setHours(0,0,0,0);
+    today.setHours(0, 0, 0, 0);
     const selectedDate = new Date(values.date);
     if (selectedDate < today) {
       validationErrors.date = "No puedes seleccionar una fecha pasada";
@@ -492,11 +492,12 @@ function openModal(eventToEdit: any = null) {
       title: eventToEdit.title,
       date: eventToEdit.date,
       hour: eventToEdit.time ? eventToEdit.time.slice(0, 5) : "",
-      tags: typeof eventToEdit.tags === "string"
-        ? eventToEdit.tags
-        : Array.isArray(eventToEdit.tags)
-        ? eventToEdit.tags.join(", ")
-        : "",
+      tags:
+        typeof eventToEdit.tags === "string"
+          ? eventToEdit.tags
+          : Array.isArray(eventToEdit.tags)
+          ? eventToEdit.tags.join(", ")
+          : "",
       image: eventToEdit.imageUrl || eventToEdit.image || "",
       minimumAge: eventToEdit.minimumAge ?? null,
       price: eventToEdit.price ?? null,
