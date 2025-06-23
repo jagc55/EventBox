@@ -37,4 +37,9 @@ public class LocalityController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+    @GetMapping("/province/{provinceName}")
+    public List<Locality> getByProvinceName(@PathVariable String provinceName) {
+        return service.getByProvinceName(provinceName);
+    }
 }

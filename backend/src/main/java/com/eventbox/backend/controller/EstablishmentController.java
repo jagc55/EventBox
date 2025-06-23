@@ -37,4 +37,9 @@ public class EstablishmentController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+    @GetMapping("/user/{userId}")
+    public List<Establishment> getByUserId(@PathVariable Long userId) {
+        return service.getByUserId(userId);
+    }
 }

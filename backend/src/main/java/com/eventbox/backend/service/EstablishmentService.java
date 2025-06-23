@@ -31,4 +31,8 @@ public class EstablishmentService {
     public void delete(Long id) {
         repo.deleteById(id);
     }
+
+    public List<Establishment> getByUserId(Long userId) {
+        return repo.findByUserId(userId);
+    }
 }

@@ -31,4 +31,8 @@ public class LocalityService {
     public void delete(Long id) {
         repo.deleteById(id);
     }
+
+    public List<Locality> getByProvinceName(String provinceName) {
+        return repo.findByProvinceName(provinceName);
+    }
 }
