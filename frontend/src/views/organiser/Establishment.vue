@@ -105,7 +105,9 @@
       >
         <div class="p-4 w-full space-y-2">
           <h2 class="font-bold text-2xl text-white-bg">{{ event.title }}</h2>
-          <p class="font-bold text-lg text-white-bg">{{ event.date }} {{ event.time }}</p>
+          <p class="font-bold text-lg text-white-bg">
+            {{ formatDate(event.date) }} {{ formatHour(event.time) }}
+          </p>
 
           <div class="flex items-center justify-between gap-2">
             <div
@@ -560,4 +562,15 @@ function getTomorrowDate() {
   return `${year}-${month}-${day}`;
 }
 minDate.value = getTomorrowDate();
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return "";
+  const [year, month, day] = dateStr.split("-");
+  return `${day}/${month}/${year}`;
+}
+function formatHour(timeStr: string) {
+  if (!timeStr) return "";
+  // Puede venir como HH:mm:ss o HH:mm
+  return timeStr.slice(0, 5);
+}
 </script>
