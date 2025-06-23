@@ -536,7 +536,7 @@ function submitEstablishmentForm() {
   establishmentErrors.value = {};
 
   if (!establishmentForm.value.name) establishmentErrors.value.name = "El nombre es obligatorio";
-  if (!establishmentForm.value.location) establishmentErrors.value.location = "La dirección es obligatoria";
+  if (!establishmentForm.value.address) establishmentErrors.value.location = "La dirección es obligatoria";
   if (!establishmentForm.value.city) establishmentErrors.value.city = "La ciudad es obligatoria";
   if (!establishmentForm.value.province) establishmentErrors.value.province = "Selecciona una provincia";
   if (!establishmentForm.value.tfn) {
@@ -549,13 +549,89 @@ function submitEstablishmentForm() {
   }
 
   if (Object.keys(establishmentErrors.value).length === 0) {
-    alert("Cambios guardados correctamente");
+    // Enviar datos al backend para modificar el establecimiento
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    const payload = {
+      name: establishmentForm.value.name,
+      address: establishmentForm.value.address,
+      phone: establishmentForm.value.tfn,
+      email: establishmentForm.value.email,
+      locality: {
+        name: establishmentForm.value.city,
+        province: { name: establishmentForm.value.province },
+      },
+    };
+    fetch(`/api/establishments/${establishment.value.id}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(payload),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          let errorMsg = "Error al guardar los cambios.";
+          try {
+            const errorJson = await res.json();
+            if (errorJson && errorJson.message) errorMsg = errorJson.message;
+            else if (typeof errorJson === "string") errorMsg = errorJson;
+          } catch {
+            const errorText = await res.text();
+            if (errorText) errorMsg = errorText;
+          }
+          alert(errorMsg);
+          return;
+        }
+        // Actualizar datos locales
+        establishment.value = await res.json();
+        establishmentForm.value = {
+          name: establishment.value.name || "",
+          address: establishment.value.address || "",
+          phone: establishment.value.phone || "",
+          email: establishment.value.email || "",
+          city: establishment.value.locality?.name || "",
+          province: establishment.value.locality?.province?.name || "",
+          tfn: establishment.value.phone || "",
+        };
+        alert("Cambios guardados correctamente");
+      })
+      .catch((e) => {
+        alert(e.message || e);
+      });
   }
 }
 
 function deleteEstablishment() {
-  if (confirm("¿Estás seguro de que quieres eliminar el establecimiento?")) {
-    alert("Establecimiento eliminado (simulado)");
+  if (!establishment.value) return;
+  if (confirm("¿Estás seguro de que quieres eliminar el establecimiento? Esto eliminará también todos los eventos asociados.")) {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+    fetch(`/api/establishments/${establishment.value.id}`, {
+      method: "DELETE",
+      headers,
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          let errorMsg = "Error al eliminar el establecimiento.";
+          try {
+            const errorJson = await res.json();
+            if (errorJson && errorJson.message) errorMsg = errorJson.message;
+            else if (typeof errorJson === "string") errorMsg = errorJson;
+          } catch {
+            const errorText = await res.text();
+            if (errorText) errorMsg = errorText;
+          }
+          alert(errorMsg);
+          return;
+        }
+        alert("Establecimiento y eventos asociados eliminados correctamente.");
+        router.push({ name: "establishments" });
+      })
+      .catch((e) => {
+        alert(e.message || e);
+      });
   }
 }
 
