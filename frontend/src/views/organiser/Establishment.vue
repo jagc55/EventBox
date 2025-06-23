@@ -605,7 +605,11 @@ function submitEstablishmentForm() {
 
 function deleteEstablishment() {
   if (!establishment.value) return;
-  if (confirm("¿Estás seguro de que quieres eliminar el establecimiento? Esto eliminará también todos los eventos asociados.")) {
+  if (
+    confirm(
+      "¿Estás seguro de que quieres eliminar el establecimiento? Esto eliminará también todos los eventos asociados."
+    )
+  ) {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
     fetch(`/api/establishments/${establishment.value.id}`, {
