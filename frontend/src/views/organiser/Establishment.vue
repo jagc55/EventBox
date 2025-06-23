@@ -105,9 +105,7 @@
       >
         <div class="p-4 w-full space-y-2">
           <h2 class="font-bold text-2xl text-white-bg">{{ event.title }}</h2>
-          <p class="font-bold text-lg text-white-bg">
-            {{ formatDate(event.date) }} {{ formatHour(event.time) }}
-          </p>
+          <p class="font-bold text-lg text-white-bg">{{ formatDate(event.date) }} {{ formatHour(event.time) }}</p>
 
           <div class="flex items-center justify-between gap-2">
             <div
