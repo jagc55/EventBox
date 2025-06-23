@@ -113,7 +113,7 @@
               :title="(typeof event.tags === 'string' ? event.tags.split(',') : event.tags).map((tag: string) => '#' + tag.trim()).join(' ')"
             >
               <span
-                v-for="(tag, index) in (typeof event.tags === 'string' ? event.tags.split(',') : event.tags)"
+                v-for="(tag, index) in typeof event.tags === 'string' ? event.tags.split(',') : event.tags"
                 :key="index"
                 class="inline-block font-bold bg-purple-primary text-white px-3 py-1 text-sm mr-1 border border-white-bg rounded"
               >
@@ -367,7 +367,9 @@ function validateEventForm(values: typeof form.value) {
     validationErrors.category = "La categoría es obligatoria";
   } else {
     // Validar que la categoría exista en eventCategoriesList
-    const eventTypeObj = eventCategoriesList.value.find((et: {id: number; name: string}) => et.name === values.category);
+    const eventTypeObj = eventCategoriesList.value.find(
+      (et: { id: number; name: string }) => et.name === values.category
+    );
     if (!eventTypeObj) {
       validationErrors.category = "Selecciona una categoría válida";
     }
@@ -403,7 +405,9 @@ async function handleSubmit() {
   };
 
   // Buscar el id del eventType según el nombre seleccionado
-  const eventTypeObj = eventCategoriesList.value.find((et: {id: number; name: string}) => et.name === form.value.category);
+  const eventTypeObj = eventCategoriesList.value.find(
+    (et: { id: number; name: string }) => et.name === form.value.category
+  );
   if (!eventTypeObj) {
     errors.value.form = "Selecciona una categoría válida.";
     return;
