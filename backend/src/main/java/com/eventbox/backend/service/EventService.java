@@ -31,4 +31,8 @@ public class EventService {
     public void delete(Long id) {
         repo.deleteById(id);
     }
+
+    public List<Event> findByEstablishmentId(Long id) {
+        return repo.findByEstablishmentId(id);
+    }
 }

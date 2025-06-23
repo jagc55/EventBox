@@ -14,7 +14,8 @@
       <div
         v-for="establishment in establishments"
         :key="establishment.id"
-        class="flex border border-white-bg rounded-xl overflow-hidden bg-dark-primary"
+        class="flex border border-white-bg rounded-xl overflow-hidden bg-dark-primary cursor-pointer hover:border-purple-primary transition"
+        @click="goToEstablishment(establishment.id)"
       >
         <div class="flex flex-col justify-between p-4 w-full">
           <div>
@@ -139,16 +140,17 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { X } from "lucide-vue-next";
-import { useSession } from "@/composables/useSession"; // Ajusta la ruta si es necesario
+import { useSession } from "@/composables/useSession";
+import { useRouter } from "vue-router";
 
 const showModal = ref(false);
 
 const form = ref({
   name: "",
   address: "",
-  locality: "", // Cambiado de city a locality
+  locality: "",
   province: "",
-  phone: "", // Cambiado de tfn a phone
+  phone: "",
   email: "",
 });
 
@@ -170,7 +172,7 @@ interface Establishment {
   user?: { id: string };
   name: string;
   address: string;
-  locality: Locality; // Ahora es objeto
+  locality: Locality;
   province: string;
   phone: string;
   email: string;
@@ -182,7 +184,8 @@ const loading = ref(false);
 const provinces = ref<{ id: number; name: string }[]>([]);
 const localities = ref<{ id: number; name: string }[]>([]);
 
-const { session } = useSession(); // session contiene token, userId, etc.
+const { session } = useSession();
+const router = useRouter();
 
 async function fetchEstablishments() {
   if (!session.value.userId) return;
@@ -235,7 +238,6 @@ watch(
       return;
     }
     try {
-      // Usar el nombre de la provincia en la URL
       const res = await fetch(`/api/localities/province/${encodeURIComponent(selectedProvince.name)}`);
       if (!res.ok) throw new Error("Error al obtener localidades");
       localities.value = await res.json();
@@ -277,13 +279,12 @@ async function submitForm() {
     errors.value.email = "El email no es válido";
   }
 
-  // Si hay errores, no continuar
   if (Object.keys(errors.value).length > 0) return;
 
   try {
     const payload = {
       ...form.value,
-      user: { id: session.value.userId }, // Enviar user como objeto con id
+      user: { id: session.value.userId },
       locality: { id: form.value.locality },
     };
     console.log("Enviando datos:", payload);
@@ -300,11 +301,15 @@ async function submitForm() {
       console.error("Error al crear establecimiento:", errorText);
       throw new Error("Error al crear establecimiento");
     }
-    await fetchEstablishments(); // Refresca la lista
+    await fetchEstablishments();
     showModal.value = false;
   } catch (e: any) {
     errors.value.general = e.message || "No se pudo crear el establecimiento";
   }
+}
+
+function goToEstablishment(establishmentId: string) {
+  router.push({ name: "establishment", params: { establishmentId } });
 }
 
 watch(showModal, (newVal) => {
@@ -313,9 +318,9 @@ watch(showModal, (newVal) => {
     form.value = {
       name: "",
       address: "",
-      locality: "", // Cambiado de city a locality
+      locality: "",
       province: "",
-      phone: "", // Cambiado de tfn a phone
+      phone: "",
       email: "",
     };
   }

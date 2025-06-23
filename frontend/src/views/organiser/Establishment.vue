@@ -10,7 +10,10 @@
     <!-- Formulario de edición de establecimiento -->
     <div class="bg-dark-primary border border-white-bg p-4 m-4 rounded shadow-lg w-[95%] max-w-3xl mx-auto rounded-xl">
       <h2 class="text-xl font-bold text-white-bg mb-4">Información del establecimiento</h2>
-      <form @submit.prevent="submitEstablishmentForm" class="flex flex-col gap-2">
+      <div v-if="!establishment">
+        <p class="text-red-600">No se pudo cargar el establecimiento.</p>
+      </div>
+      <form v-if="establishment" @submit.prevent="submitEstablishmentForm" class="flex flex-col gap-2">
         <input
           v-model="establishmentForm.name"
           type="text"
@@ -20,9 +23,8 @@
         <p v-if="establishmentErrors.name" class="text-red-600 text-sm">
           {{ establishmentErrors.name }}
         </p>
-
         <input
-          v-model="establishmentForm.location"
+          v-model="establishmentForm.address"
           type="text"
           placeholder="Dirección"
           class="p-2 border border-dark-primary w-full"
@@ -30,27 +32,30 @@
         <p v-if="establishmentErrors.location" class="text-red-600 text-sm">
           {{ establishmentErrors.location }}
         </p>
-
-        <input
-          v-model="establishmentForm.city"
-          type="text"
-          placeholder="Ciudad"
-          class="p-2 border border-dark-primary w-full"
-        />
-        <p v-if="establishmentErrors.city" class="text-red-600 text-sm">
-          {{ establishmentErrors.city }}
-        </p>
-
+        <!-- Select de provincia -->
         <select v-model="establishmentForm.province" class="p-2 border border-dark-primary w-full rounded">
           <option disabled value="">Selecciona una provincia</option>
-          <option v-for="prov in provinces" :key="prov" :value="prov">
-            {{ prov }}
+          <option v-for="prov in provinces" :key="prov.id" :value="prov.name">
+            {{ prov.name }}
           </option>
         </select>
         <p v-if="establishmentErrors.province" class="text-red-600 text-sm">
           {{ establishmentErrors.province }}
         </p>
-
+        <!-- Select de localidad -->
+        <select
+          v-model="establishmentForm.city"
+          class="p-2 border border-dark-primary w-full rounded"
+          :disabled="!establishmentForm.province || localities.length === 0"
+        >
+          <option disabled value="">Selecciona una localidad</option>
+          <option v-for="loc in localities" :key="loc.id" :value="loc.name">
+            {{ loc.name }}
+          </option>
+        </select>
+        <p v-if="establishmentErrors.city" class="text-red-600 text-sm">
+          {{ establishmentErrors.city }}
+        </p>
         <input
           v-model="establishmentForm.tfn"
           type="text"
@@ -60,7 +65,6 @@
         <p v-if="establishmentErrors.tfn" class="text-red-600 text-sm">
           {{ establishmentErrors.tfn }}
         </p>
-
         <input
           v-model="establishmentForm.email"
           type="email"
@@ -70,7 +74,6 @@
         <p v-if="establishmentErrors.email" class="text-red-600 text-sm">
           {{ establishmentErrors.email }}
         </p>
-
         <div class="flex justify-end gap-4 mt-2">
           <button
             @click.prevent="deleteEstablishment"
@@ -78,7 +81,6 @@
           >
             Eliminar
           </button>
-
           <button
             v-if="establishmentModified"
             type="submit"
@@ -90,7 +92,9 @@
       </form>
     </div>
 
-    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">Eventos en {{ establishment }}</h1>
+    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">
+      Eventos en {{ establishment && establishment.name ? establishment.name : "" }}
+    </h1>
 
     <!-- Events grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-5 mb-5">
@@ -106,14 +110,14 @@
           <div class="flex items-center justify-between gap-2">
             <div
               class="flex-1 overflow-hidden whitespace-nowrap text-ellipsis"
-              :title="event.tags.map((tag) => '#' + tag).join(' ')"
+              :title="(typeof event.tags === 'string' ? event.tags.split(',') : event.tags).map((tag: string) => '#' + tag.trim()).join(' ')"
             >
               <span
-                v-for="(tag, index) in event.tags"
+                v-for="(tag, index) in (typeof event.tags === 'string' ? event.tags.split(',') : event.tags)"
                 :key="index"
                 class="inline-block font-bold bg-purple-primary text-white px-3 py-1 text-sm mr-1 border border-white-bg rounded"
               >
-                #{{ tag }}
+                #{{ tag.trim() }}
               </span>
             </div>
             <div class="flex-shrink-0 flex gap-2 ml-2">
@@ -146,6 +150,7 @@
         </div>
 
         <form class="flex flex-col gap-2" @submit.prevent="handleSubmit">
+          <p v-if="errors.form" class="text-red-600 text-sm text-center font-bold">{{ errors.form }}</p>
           <input v-model="form.title" type="text" placeholder="Título" class="p-2 border border-dark-primary" />
           <p v-if="errors.title" class="text-red-600 text-sm">
             {{ errors.title }}
@@ -153,8 +158,8 @@
 
           <select v-model="form.category" class="w-full border border-dark-primary p-2 rounded">
             <option disabled value="">Selecciona una categoría</option>
-            <option v-for="category in eventCategories" :key="category" :value="category">
-              {{ category }}
+            <option v-for="cat in eventCategoriesList" :key="cat.id" :value="cat.name">
+              {{ cat.name }}
             </option>
           </select>
           <p v-if="errors.category" class="text-red-600 text-sm">
@@ -229,57 +234,106 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { Pencil, Trash2, X } from "lucide-vue-next";
+import { useSession } from "@/composables/useSession";
 
 const showModal = ref(false);
 const editingEventId = ref<string | null>(null);
-const establishment = ref("Hotel Witiñon");
+const route = useRoute();
+const router = useRouter();
+const { session } = useSession();
 
-const events = ref([
-  {
-    id: "1",
-    title: "Caza del pitulin",
-    organizer: "Carlitos Superstar",
-    establishment: "Casa Carlos",
-    date: "2025-06-10",
-    time: "18:30",
-    tags: ["sex", "homo", "rico", "roberto", "pelon"],
-    image: "/images/1.jpg",
-    category: "Tecnológico",
-  },
-  {
-    id: "2",
-    title: "Concurso malos programadores",
-    organizer: "Bob Anton",
-    establishment: "Teatro Municipal",
-    date: "2025-06-11",
-    time: "13:30",
-    tags: ["calvo", "malalogica", "puto"],
-    image: "/images/2.jpg",
-    category: "Educativo",
-  },
-  {
-    id: "3",
-    title: "Baile del tulikitaka",
-    organizer: "Anton Bailon",
-    establishment: "Plaza de toros",
-    date: "2025-06-11",
-    time: "13:30",
-    tags: ["tulikitaka", "baile"],
-    image: "/images/3.jpg",
-  },
-  {
-    id: "4",
-    title: "Cariño perdoname solo quiero ver a los niños",
-    organizer: "Divorciado32",
-    establishment: "Carcel Puerto 2",
-    date: "2025-06-11",
-    time: "13:30",
-    tags: ["divorcio"],
-    image: "/images/4.jpg",
-  },
-]);
+const establishment = ref<any>(null);
+const events = ref<any[]>([]);
+
+const establishmentForm = ref<any>({});
+const establishmentErrors = ref<Record<string, string>>({});
+const establishmentModified = computed(
+  () => JSON.stringify(establishmentForm.value) !== JSON.stringify(establishment.value)
+);
+
+const provinces = ref<{ id: number; name: string }[]>([]);
+const localities = ref<{ id: number; name: string }[]>([]);
+const eventCategoriesList = ref<{ id: number; name: string }[]>([]);
+
+onMounted(async () => {
+  const id = route.params.establishmentId;
+  try {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+    // Cargar provincias
+    const resProvinces = await fetch("/api/provinces", { headers });
+    if (resProvinces.ok) {
+      provinces.value = await resProvinces.json();
+    } else {
+      provinces.value = [];
+    }
+    // Cargar tipos de evento desde la API
+    const resEventTypes = await fetch("/api/event-types", { headers });
+    if (resEventTypes.ok) {
+      eventCategoriesList.value = await resEventTypes.json();
+    } else {
+      eventCategoriesList.value = [];
+    }
+    // Cargar datos del establecimiento
+    const resEst = await fetch(`/api/establishments/${id}`, { headers });
+    if (!resEst.ok) {
+      const errorText = await resEst.text();
+      console.error("Error al cargar establecimiento:", errorText);
+      throw new Error("No se pudo cargar el establecimiento");
+    }
+    establishment.value = await resEst.json();
+    establishmentForm.value = {
+      name: establishment.value.name || "",
+      address: establishment.value.address || "",
+      phone: establishment.value.phone || "",
+      email: establishment.value.email || "",
+      city: establishment.value.locality?.name || "",
+      province: establishment.value.locality?.province?.name || "",
+      tfn: establishment.value.phone || "",
+    };
+    // Si hay provincia, cargar localidades
+    if (establishmentForm.value.province) {
+      await fetchLocalities(establishmentForm.value.province);
+    }
+    // Cargar eventos del establecimiento
+    const resEvents = await fetch(`/api/establishments/${id}/events`, { headers });
+    if (!resEvents.ok) throw new Error("No se pudieron cargar los eventos");
+    events.value = await resEvents.json();
+  } catch (e) {
+    establishment.value = null;
+    events.value = [];
+  }
+});
+
+async function fetchLocalities(provinceName: string) {
+  if (!provinceName) {
+    localities.value = [];
+    establishmentForm.value.city = "";
+    return;
+  }
+  try {
+    const res = await fetch(`/api/localities/province/${encodeURIComponent(provinceName)}`);
+    if (!res.ok) throw new Error("Error al obtener localidades");
+    localities.value = await res.json();
+    // Si la ciudad actual no está en la lista, resetear
+    if (!localities.value.some((l) => l.name === establishmentForm.value.city)) {
+      establishmentForm.value.city = "";
+    }
+  } catch (e) {
+    localities.value = [];
+    establishmentForm.value.city = "";
+  }
+}
+
+watch(
+  () => establishmentForm.value.province,
+  async (newProvince) => {
+    await fetchLocalities(newProvince);
+  }
+);
 
 const form = ref({
   title: "",
@@ -309,10 +363,18 @@ function validateEventForm(values: typeof form.value) {
   const validationErrors: Record<string, string> = {};
 
   if (!values.title) validationErrors.title = "El título es obligatorio";
-  if (!values.category) validationErrors.category = "La categoría es obligatoria";
+  if (!values.category) {
+    validationErrors.category = "La categoría es obligatoria";
+  } else {
+    // Validar que la categoría exista en eventCategoriesList
+    const eventTypeObj = eventCategoriesList.value.find((et: {id: number; name: string}) => et.name === values.category);
+    if (!eventTypeObj) {
+      validationErrors.category = "Selecciona una categoría válida";
+    }
+  }
   if (!values.date) validationErrors.date = "La fecha es obligatoria";
   if (!values.hour) validationErrors.hour = "La hora es obligatoria";
-  if (!values.tags) validationErrors.tags = "Debe añadir al menos una etiqueta";
+  if (!values.tags || values.tags.trim() === "") validationErrors.tags = "Debe añadir al menos una etiqueta";
 
   if (!values.image) {
     validationErrors.image = "La imagen es obligatoria";
@@ -330,35 +392,82 @@ function validateEventForm(values: typeof form.value) {
 }
 
 // --- Envío Evento ---
-function handleSubmit() {
+async function handleSubmit() {
   errors.value = validateEventForm(form.value);
   if (Object.keys(errors.value).length > 0) return;
 
-  const newEvent = {
-    id: editingEventId.value ?? Date.now().toString(), // Genera ID único
-    title: form.value.title,
-    organizer: "Organizador X", // Simulado
-    establishment: establishment.value,
-    date: form.value.date,
-    time: form.value.hour,
-    tags: form.value.tags.split(",").map((tag) => tag.trim()),
-    image: form.value.image,
-    minimumAge: form.value.minimumAge,
-    price: form.value.price,
-    description: form.value.description,
-    category: form.value.category,
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  if (editingEventId.value) {
-    const idx = events.value.findIndex((e) => e.id === editingEventId.value);
-    if (idx !== -1) {
-      events.value[idx] = newEvent;
-    }
-  } else {
-    events.value.push(newEvent);
+  // Buscar el id del eventType según el nombre seleccionado
+  const eventTypeObj = eventCategoriesList.value.find((et: {id: number; name: string}) => et.name === form.value.category);
+  if (!eventTypeObj) {
+    errors.value.form = "Selecciona una categoría válida.";
+    return;
   }
 
-  showModal.value = false;
+  // Convertir tags a array de strings, limpiando espacios y vacíos
+  const tagsArray = form.value.tags
+    .split(",")
+    .map((t: string) => t.trim())
+    .filter((t: string) => t.length > 0);
+
+  const eventPayload = {
+    title: form.value.title,
+    description: form.value.description,
+    date: form.value.date,
+    time: form.value.hour.length === 5 ? form.value.hour + ":00" : form.value.hour, // asegurar formato HH:mm:ss
+    price: form.value.price !== null ? Number(form.value.price) : null,
+    minimumAge: form.value.minimumAge !== null ? Number(form.value.minimumAge) : null,
+    imageUrl: form.value.image,
+    tags: tagsArray.join(","), // <-- Enviar como string
+    eventType: { id: eventTypeObj.id },
+    establishment: { id: establishment.value.id },
+    user: { id: session.value.userId },
+  };
+
+  console.log("Payload enviado a /api/events:", eventPayload);
+
+  try {
+    let res;
+    if (editingEventId.value) {
+      res = await fetch(`/api/events/${editingEventId.value}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(eventPayload),
+      });
+    } else {
+      res = await fetch(`/api/events`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(eventPayload),
+      });
+    }
+    if (!res.ok) {
+      let errorMsg = "Error al guardar el evento.";
+      try {
+        const errorJson = await res.json();
+        if (errorJson && errorJson.message) errorMsg = errorJson.message;
+        else if (typeof errorJson === "string") errorMsg = errorJson;
+      } catch {
+        const errorText = await res.text();
+        if (errorText) errorMsg = errorText;
+      }
+      errors.value.form = errorMsg;
+      return;
+    }
+    const resEvents = await fetch(`/api/establishments/${establishment.value.id}/events`, { headers });
+    if (resEvents.ok) {
+      events.value = await resEvents.json();
+    }
+    showModal.value = false;
+    resetForm();
+  } catch (e: any) {
+    errors.value.form = e.message || e;
+  }
 }
 
 // --- Abrir/Cerrar Modal Evento ---
@@ -369,12 +478,12 @@ function openModal(eventToEdit: any = null) {
       title: eventToEdit.title,
       date: eventToEdit.date,
       hour: eventToEdit.time,
-      tags: eventToEdit.tags.join(", "),
-      image: eventToEdit.image,
+      tags: Array.isArray(eventToEdit.tags) ? eventToEdit.tags.join(", ") : "",
+      image: eventToEdit.imageUrl || eventToEdit.image || "",
       minimumAge: eventToEdit.minimumAge ?? null,
       price: eventToEdit.price ?? null,
       description: eventToEdit.description ?? "",
-      category: eventToEdit.category ?? "",
+      category: eventToEdit.eventType?.name ?? "",
     };
   } else {
     resetForm();
@@ -404,22 +513,6 @@ watch(showModal, (visible) => {
   }
 });
 
-const establishmentOriginal = ref({
-  name: "Hotel Witiñon",
-  location: "Calle Falsa 123",
-  city: "Witicity",
-  province: "Madrid",
-  tfn: "123456789",
-  email: "hotel@witinon.com",
-});
-
-const establishmentForm = ref({ ...establishmentOriginal.value });
-const establishmentErrors = ref<Record<string, string>>({});
-
-const establishmentModified = computed(
-  () => JSON.stringify(establishmentForm.value) !== JSON.stringify(establishmentOriginal.value)
-);
-
 function submitEstablishmentForm() {
   establishmentErrors.value = {};
 
@@ -437,7 +530,6 @@ function submitEstablishmentForm() {
   }
 
   if (Object.keys(establishmentErrors.value).length === 0) {
-    establishmentOriginal.value = { ...establishmentForm.value };
     alert("Cambios guardados correctamente");
   }
 }
@@ -464,70 +556,4 @@ function getTomorrowDate() {
   return `${year}-${month}-${day}`;
 }
 minDate.value = getTomorrowDate();
-
-const eventCategories = [
-  "Cultural",
-  "Social",
-  "Educativo",
-  "Deportivo",
-  "Empresarial",
-  "Tecnológico",
-  "Religioso / Espiritual",
-  "Salud y bienestar",
-  "Entretenimiento",
-  "Otros",
-];
-
-const provinces = [
-  "Álava",
-  "Albacete",
-  "Alicante",
-  "Almería",
-  "Asturias",
-  "Ávila",
-  "Badajoz",
-  "Barcelona",
-  "Burgos",
-  "Cáceres",
-  "Cádiz",
-  "Cantabria",
-  "Castellón",
-  "Ciudad Real",
-  "Córdoba",
-  "Cuenca",
-  "Gerona",
-  "Granada",
-  "Guadalajara",
-  "Guipúzcoa",
-  "Huelva",
-  "Huesca",
-  "Islas Baleares",
-  "Jaén",
-  "La Coruña",
-  "La Rioja",
-  "Las Palmas",
-  "León",
-  "Lérida",
-  "Lugo",
-  "Madrid",
-  "Málaga",
-  "Murcia",
-  "Navarra",
-  "Orense",
-  "Palencia",
-  "Pontevedra",
-  "Salamanca",
-  "Santa Cruz de Tenerife",
-  "Segovia",
-  "Sevilla",
-  "Soria",
-  "Tarragona",
-  "Teruel",
-  "Toledo",
-  "Valencia",
-  "Valladolid",
-  "Vizcaya",
-  "Zamora",
-  "Zaragoza",
-];
 </script>

@@ -37,4 +37,9 @@ public class EventController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+    @GetMapping("/establishments/{id}/events")
+    public List<Event> getEventsByEstablishment(@PathVariable Long id) {
+        return service.findByEstablishmentId(id);
+    }
 }
