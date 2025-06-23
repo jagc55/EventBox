@@ -20,9 +20,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./frontend
 
       - name: Build the project
         run: npm run build
+        working-directory: ./frontend
 
       # Subir a S3
       - name: Deploy to S3
@@ -34,4 +36,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: eventbox/frontend/dist
+          SOURCE_DIR: ./frontend/dist
