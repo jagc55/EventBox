@@ -9,7 +9,6 @@
 
     <h1 class="text-2xl font-bold text-white-bg px-4 py-2">Mis establecimientos</h1>
 
-    <!-- Establishments grid-->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-5">
       <div
         v-for="establishment in establishments"
@@ -45,7 +44,6 @@
       </div>
     </div>
 
-    <!-- Modal -->
     <div
       v-show="showModal"
       class="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur"
@@ -177,7 +175,7 @@ interface Establishment {
   province: string;
   phone: string;
   email: string;
-  events?: any[]; // <-- Añadido para evitar error TS
+  events?: any[];
 }
 
 const establishments = ref<Establishment[]>([]);
@@ -198,7 +196,6 @@ async function fetchEstablishments() {
     });
     if (!res.ok) throw new Error("Error al obtener establecimientos");
     const ests = await res.json();
-    // Para cada establecimiento, cargar sus eventos
     const withEvents = await Promise.all(
       ests.map(async (est: any) => {
         try {
@@ -338,7 +335,6 @@ function countUpcomingEvents(events: any[]) {
   const now = new Date();
   return events.filter((ev) => {
     if (!ev.date) return false;
-    // Formato esperado: YYYY-MM-DD
     const [year, month, day] = ev.date.split("-");
     const eventDate = new Date(Number(year), Number(month) - 1, Number(day));
     return eventDate >= new Date(now.getFullYear(), now.getMonth(), now.getDate());
