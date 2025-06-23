@@ -1,3 +1,6 @@
+# Este archivo fue movido a la raíz del proyecto en .github/workflows/deploy.yml
+# Puedes eliminar este archivo si ya no lo necesitas.
+
 name: Build Vue Project
 
 on:
