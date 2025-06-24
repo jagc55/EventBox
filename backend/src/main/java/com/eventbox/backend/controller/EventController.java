@@ -23,6 +23,11 @@ public class EventController {
         return service.getAll();
     }
 
+    @GetMapping("/ordered")
+    public List<Event> getAllOrderedByDate() {
+        return service.getAllOrderedByDate();
+    }
+
     @GetMapping("/{id}")
     public Optional<Event> getById(@PathVariable Long id) {
         return service.getById(id);

@@ -154,7 +154,7 @@
         <span>{{ showPast ? "▲" : "▼" }}</span>
       </button>
       <div v-show="showPast" class="border-x border-b border-white-bg rounded-b-xl bg-dark-primary">
-        <div v-if="pastEvents.length === 0" class="p-4 text-white-bg">No hay eventos pasados.</div>
+        <div v-if="pastEvents.length === 0" class="p-4 text-white-bg">No hay eventos finalizados.</div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-2 md:mx-5 mb-5">
           <div
             v-for="event in pastEvents"

@@ -18,6 +18,8 @@ public class EventService {
 
     public List<Event> getAll() {
         return repo.findAll();
+    }    public List<Event> getAllOrderedByDate() {
+        return repo.findAllByOrderByDateAscTimeAsc();
     }
 
     public Optional<Event> getById(Long id) {

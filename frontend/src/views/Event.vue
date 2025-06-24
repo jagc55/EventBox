@@ -1,44 +1,61 @@
 <template>
   <div class="bg-black-secundary py-5">
+    <!-- Loading indicator -->
+    <div v-if="loading" class="text-center py-8">
+      <p class="text-white-bg text-lg">Cargando evento...</p>
+    </div>
+
+    <!-- Error message -->
+    <div v-if="error" class="text-center py-8">
+      <p class="text-red-500 text-lg">{{ error }}</p>
+      <button @click="loadEventData" class="mt-4 bg-purple-primary text-white px-4 py-2 rounded hover:bg-purple-600">
+        Reintentar
+      </button>
+    </div>
+
+    <!-- Event details -->
     <div
+      v-if="event && !loading && !error"
       class="mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary rounded-xl"
     >
       <img
-        :src="events[0].image"
+        :src="event.imageUrl"
         alt="Imagen del evento"
         class="w-full h-[450px] object-cover border-b border-white-bg rounded-t-xl"
       />
       <div class="mt-3 px-5">
         <h1 class="text-2xl font-bold text-white-bg">
-          {{ events[0].title }}
+          {{ event.title }}
         </h1>
-        <p class="text-xl font-semibold text-white-bg">{{ events[0].date }} a las {{ events[0].hour }}</p>
+        <p class="text-xl font-semibold text-white-bg">{{ formatDateTime(event.date, event.time) }}</p>
         <hr class="my-3 border border-white-bg" />
-        <p class="text-lg text-white-bg"><span class="font-bold">Organizador:</span> {{ events[0].organizer }}</p>
-        <p class="text-lg text-white-bg"><span class="font-bold">Tipo:</span> {{ events[0].tipe }}</p>
-        <p class="text-lg text-white-bg"><span class="font-bold">Local:</span> {{ establishments[0].name }}</p>
+        <p class="text-lg text-white-bg"><span class="font-bold">Organizador:</span> {{ event.user.name }}</p>
+        <p class="text-lg text-white-bg"><span class="font-bold">Tipo:</span> {{ event.eventType.name }}</p>
+        <p class="text-lg text-white-bg"><span class="font-bold">Local:</span> {{ event.establishment.name }}</p>
         <p class="text-lg text-white-bg">
           <span class="font-bold">Dirección:</span>
-          {{ establishments[0].adress }}
+          {{ event.establishment.address }}
         </p>
         <p class="text-lg text-white-bg">
-          <span class="font-bold"> Ciudad: </span>{{ establishments[0].city }},
-          {{ establishments[0].province }}
+          <span class="font-bold">Localidad:</span> {{ event.establishment.locality.name }}
+        </p>
+        <p class="text-lg text-white-bg">
+          <span class="font-bold">Provincia:</span> {{ event.establishment.locality.province.name }}
         </p>
         <p class="text-lg text-white-bg">
           <span class="font-bold"> Edad mínima:</span>
-          {{ events[0].minimumAge === "0" ? "Sin restricciones" : events[0].minimumAge + " año(s)" }}
+          {{ event.minimumAge === 0 ? "Sin restricciones" : event.minimumAge + " año(s)" }}
         </p>
         <p class="text-lg text-white-bg">
           <span class="font-bold"> Precio:</span>
-          {{ events[0].price === "0" ? "Gratuito" : events[0].price + " €" }}
+          {{ event.price === 0 ? "Gratuito" : event.price + " €" }}
         </p>
         <hr class="my-3 border border-white-bg" />
-        <p class="text-lg text-white-bg">{{ events[0].description }}</p>
+        <p class="text-lg text-white-bg">{{ event.description }}</p>
         <hr class="my-3 border border-white-bg" />
         <div class="flex gap-3 mb-3">
           <span
-            v-for="(tag, index) in events[0].tags"
+            v-for="(tag, index) in getEventTags(event)"
             :key="index"
             class="font-bold bg-purple-primary rounded text-white px-3 py-1 border border-white-bg"
           >
@@ -101,57 +118,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { Star } from "lucide-vue-next";
+import { useEvent } from "@/composables/useEvent";
+import { formatDateTime } from "@/utils/dateFormat";
+
+const route = useRoute();
 const likedEvents = ref(false);
 const newCommentText = ref("");
 
-const events = ref([
-  {
-    id: "1",
-    title: "Caza del witi amarillo",
-    tipe: "Otros",
-    organizer: "Witi Witiñon",
-    establishment: "Hotel Witiñon",
-    date: "10/06/2025",
-    hour: "18:30",
-    tags: ["Witi", "Gekko", "Amarillo"],
-    image: "/images/5.jpg",
-    minimumAge: "3",
-    price: "0",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-      "Donec et ultrices eros. " +
-      "Pellentesque sapien nibh, malesuada nec fermentum in, rutrum sed nunc. " +
-      "Suspendisse vitae felis venenatis, venenatis lorem et, sollicitudin elit. " +
-      "Etiam facilisis, ligula eu euismod sollicitudin, quam erat pulvinar nisi, id facilisis mi nunc a neque. " +
-      "Vivamus interdum arcu quis euismod consectetur. " +
-      "Aliquam ligula leo, pulvinar et malesuada ac, consequat vitae neque. " +
-      "Suspendisse potenti. " +
-      "Nullam non porttitor tortor. " +
-      "Vestibulum vestibulum quam eget turpis iaculis, nec porta est elementum." +
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-      "Donec et ultrices eros. " +
-      "Pellentesque sapien nibh, malesuada nec fermentum in, rutrum sed nunc. " +
-      "Suspendisse vitae felis venenatis, venenatis lorem et, sollicitudin elit. " +
-      "Etiam facilisis, ligula eu euismod sollicitudin, quam erat pulvinar nisi, id facilisis mi nunc a neque. " +
-      "Vivamus interdum arcu quis euismod consectetur. " +
-      "Aliquam ligula leo, pulvinar et malesuada ac, consequat vitae neque. " +
-      "Suspendisse potenti. " +
-      "Nullam non porttitor tortor. " +
-      "Vestibulum vestibulum quam eget turpis iaculis, nec porta est elementum.",
-  },
-]);
+// Usar el composable para obtener el evento
+const { event, loading, error, loadEvent, getEventTags } = useEvent();
 
-const establishments = ref([
-  {
-    id: "1",
-    name: "Hotel Witiñon",
-    adress: "Calle Segovia nº 3",
-    city: "San Fernando",
-    province: "Cádiz",
-  },
-]);
+// Función para cargar los datos del evento
+const loadEventData = async () => {
+  const eventId = parseInt(route.params.eventId as string);
+  if (!isNaN(eventId)) {
+    await loadEvent(eventId);
+  } else {
+    error.value = "ID de evento inválido";
+  }
+};
+
+// Cargar evento al montar el componente
+onMounted(() => {
+  loadEventData();
+});
 
 const comments = ref([
   {
