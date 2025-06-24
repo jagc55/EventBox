@@ -86,47 +86,108 @@
             type="submit"
             class="bg-blue-secundary text-white px-4 py-2 rounded font-bold border border-white-bg"
           >
-            Guardar cambios
+            Modificar
           </button>
         </div>
       </form>
     </div>
 
-    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">
-      Eventos en {{ establishment && establishment.name ? establishment.name : "" }}
-    </h1>
-
-    <!-- Events grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-5 mb-5">
-      <div
-        v-for="event in events"
-        :key="event.id"
-        class="flex flex-col border border-white-bg overflow-hidden bg-dark-primary shadow-xl rounded-xl"
+    <div class="my-8 mx-2 md:mx-8 lg:mx-10">
+      <button
+        class="w-full flex items-center justify-between bg-dark-primary border border-white-bg px-4 py-3 rounded-t-xl text-left text-2xl font-bold text-white-bg focus:outline-none"
+        :class="!showUpcoming ? 'rounded-b-xl' : ''"
+        @click="showUpcoming = !showUpcoming"
       >
-        <div class="p-4 w-full space-y-2">
-          <h2 class="font-bold text-2xl text-white-bg">{{ event.title }}</h2>
-          <p class="font-bold text-lg text-white-bg">{{ formatDate(event.date) }} {{ formatHour(event.time) }}</p>
+        <span>Eventos pendientes en {{ establishment && establishment.name ? establishment.name : "" }}</span>
+        <span>{{ showUpcoming ? "▲" : "▼" }}</span>
+      </button>
+      <div v-show="showUpcoming" class="border-x border-b border-white-bg rounded-b-xl bg-dark-primary">
+        <div v-if="upcomingEvents.length === 0" class="p-4 text-white-bg">No hay eventos pendientes.</div>
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-2 md:mx-5 mb-5">
+          <div
+            v-for="event in upcomingEvents"
+            :key="event.id"
+            class="flex flex-col border border-white-bg overflow-hidden bg-dark-primary shadow-xl rounded-xl mt-4"
+          >
+            <div class="p-4 w-full space-y-2">
+              <h2 class="font-bold text-2xl text-white-bg">{{ event.title }}</h2>
+              <p class="font-bold text-lg text-white-bg">{{ formatDate(event.date) }} {{ formatHour(event.time) }}</p>
 
-          <div class="flex items-center justify-between gap-2">
-            <div
-              class="flex-1 overflow-hidden whitespace-nowrap text-ellipsis"
-              :title="(typeof event.tags === 'string' ? event.tags.split(',') : event.tags).map((tag: string) => '#' + tag.trim()).join(' ')"
-            >
-              <span
-                v-for="(tag, index) in typeof event.tags === 'string' ? event.tags.split(',') : event.tags"
-                :key="index"
-                class="inline-block font-bold bg-purple-primary text-white px-3 py-1 text-sm mr-1 border border-white-bg rounded"
-              >
-                #{{ tag.trim() }}
-              </span>
+              <div class="flex items-center justify-between gap-2">
+                <div
+                  class="flex-1 overflow-hidden whitespace-nowrap text-ellipsis"
+                  :title="
+                    (typeof event.tags === 'string' ? event.tags.split(',') : event.tags)
+                      .map((tag: string) => '#' + tag.trim())
+                      .join(' ')
+                  "
+                >
+                  <span
+                    v-for="(tag, index) in typeof event.tags === 'string' ? event.tags.split(',') : event.tags"
+                    :key="index"
+                    class="inline-block font-bold bg-purple-primary text-white px-3 py-1 text-sm mr-1 border border-white-bg rounded"
+                  >
+                    #{{ (tag as string).trim() }}
+                  </span>
+                </div>
+                <div class="flex-shrink-0 flex gap-2 ml-2">
+                  <button @click="openModal(event)">
+                    <Pencil class="size-9 bg-blue-secundary" />
+                  </button>
+                  <button @click="deleteEvent(event.id)">
+                    <Trash2 class="size-9 bg-red-primary" />
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="flex-shrink-0 flex gap-2 ml-2">
-              <button @click="openModal(event)">
-                <Pencil class="size-9 bg-blue-secundary" />
-              </button>
-              <button @click="deleteEvent(event.id)">
-                <Trash2 class="size-9 bg-red-primary" />
-              </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="my-8 mx-2 md:mx-8 lg:mx-10">
+      <button
+        class="w-full flex items-center justify-between bg-dark-primary border border-white-bg px-4 py-3 rounded-t-xl text-left text-2xl font-bold text-white-bg focus:outline-none"
+        :class="!showPast ? 'rounded-b-xl' : ''"
+        @click="showPast = !showPast"
+      >
+        <span>Eventos finalizados en {{ establishment && establishment.name ? establishment.name : "" }}</span>
+        <span>{{ showPast ? "▲" : "▼" }}</span>
+      </button>
+      <div v-show="showPast" class="border-x border-b border-white-bg rounded-b-xl bg-dark-primary">
+        <div v-if="pastEvents.length === 0" class="p-4 text-white-bg">No hay eventos pasados.</div>
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5 mx-2 md:mx-5 mb-5">
+          <div
+            v-for="event in pastEvents"
+            :key="event.id"
+            class="flex flex-col border border-white-bg overflow-hidden bg-dark-primary shadow-xl rounded-xl mt-4"
+          >
+            <div class="p-4 w-full space-y-2">
+              <h2 class="font-bold text-2xl text-white-bg">{{ event.title }}</h2>
+              <p class="font-bold text-lg text-white-bg">{{ formatDate(event.date) }} {{ formatHour(event.time) }}</p>
+              <div class="flex items-center justify-between gap-2">
+                <div
+                  class="flex-1 overflow-hidden whitespace-nowrap text-ellipsis"
+                  :title="
+                    (typeof event.tags === 'string' ? event.tags.split(',') : event.tags)
+                      .map((tag: string) => '#' + tag.trim())
+                      .join(' ')
+                  "
+                >
+                  <span
+                    v-for="(tag, index) in typeof event.tags === 'string' ? event.tags.split(',') : event.tags"
+                    :key="index"
+                    class="inline-block font-bold bg-purple-primary text-white px-3 py-1 text-sm mr-1 border border-white-bg rounded"
+                  >
+                    #{{ tag.trim() }}
+                  </span>
+                </div>
+                <div class="flex-shrink-0 flex gap-2 ml-2">
+                  <!-- Solo botón de eliminar para eventos pasados -->
+                  <button @click="deleteEvent(event.id)">
+                    <Trash2 class="size-9 bg-red-primary" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -250,9 +311,17 @@ const events = ref<any[]>([]);
 
 const establishmentForm = ref<any>({});
 const establishmentErrors = ref<Record<string, string>>({});
-const establishmentModified = computed(
-  () => JSON.stringify(establishmentForm.value) !== JSON.stringify(establishment.value)
-);
+const establishmentModified = computed(() => {
+  if (!establishment.value) return false;
+  return (
+    establishmentForm.value.name !== (establishment.value.name || "") ||
+    establishmentForm.value.address !== (establishment.value.address || "") ||
+    establishmentForm.value.tfn !== (establishment.value.phone || "") ||
+    establishmentForm.value.email !== (establishment.value.email || "") ||
+    establishmentForm.value.city !== (establishment.value.locality?.name || "") ||
+    establishmentForm.value.province !== (establishment.value.locality?.province?.name || "")
+  );
+});
 
 const provinces = ref<{ id: number; name: string }[]>([]);
 const localities = ref<{ id: number; name: string }[]>([]);
@@ -695,4 +764,25 @@ function formatHour(timeStr: string) {
   // Puede venir como HH:mm:ss o HH:mm
   return timeStr.slice(0, 5);
 }
+
+const showUpcoming = ref(true);
+const showPast = ref(false);
+
+const upcomingEvents = computed(() => {
+  const now = new Date();
+  return events.value.filter((event) => {
+    if (!event.date) return false;
+    // Combina fecha y hora para comparar correctamente
+    const eventDateTime = new Date(event.date + "T" + (event.time ? event.time : "00:00:00"));
+    return eventDateTime >= now;
+  });
+});
+const pastEvents = computed(() => {
+  const now = new Date();
+  return events.value.filter((event) => {
+    if (!event.date) return false;
+    const eventDateTime = new Date(event.date + "T" + (event.time ? event.time : "00:00:00"));
+    return eventDateTime < now;
+  });
+});
 </script>
