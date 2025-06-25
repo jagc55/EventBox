@@ -22,7 +22,7 @@ export function useEvents() {
       // Opción 2: Obtener todos y ordenar en frontend (implementación actual)
       events.value = await ApiService.getAllEvents();
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Error al cargar eventos";
+      error.value = "Error al cargar los eventos. Por favor, inténtalo de nuevo.";
       console.error("Error loading events:", err);
     } finally {
       loading.value = false;

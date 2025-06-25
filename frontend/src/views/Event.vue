@@ -71,8 +71,9 @@
       </div>
     </div>
 
-    <!--Coments-->
+    <!--Comments form-->
     <div
+      v-if="event && !loading && !error"
       class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary rounded-xl"
     >
       <div class="mt-3 px-5">
@@ -83,13 +84,17 @@
           v-model="newCommentText"
           class="w-full p-3 border border-white-bg rounded"
           placeholder="Escribe tu comentario aquí..."
+          :disabled="!isLoggedIn"
         ></textarea>
         <div class="flex">
+          <p v-if="!isLoggedIn" class="text-white-bg text-sm mt-2">Debes iniciar sesión para comentar</p>
           <button
-            class="ml-auto my-3 p-2 bg-purple-primary border border-white-bg text-white font-bold"
-            @click="publishComment"
+            v-if="isLoggedIn"
+            class="ml-auto my-3 p-2 bg-purple-primary border border-white-bg text-white font-bold rounded hover:bg-purple-600"
+            @click="handlePublishComment"
+            :disabled="!newCommentText.trim() || publishingComment"
           >
-            Publicar
+            {{ publishingComment ? "Publicando..." : "Publicar comentario" }}
           </button>
         </div>
       </div>
@@ -97,83 +102,138 @@
 
     <!--Comments section-->
     <div
+      v-if="event && !loading && !error"
       class="mt-5 mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 w-auto border border-white-bg rounded bg-dark-primary rounded-xl pb-2"
     >
       <p class="text-lg font-semibold px-5 mt-3 text-white-bg">Comentarios: {{ comments.length }}</p>
 
+      <!-- Loading comments -->
+      <div v-if="commentsLoading" class="text-center py-4">
+        <p class="text-white-bg">Cargando comentarios...</p>
+      </div>
+
+      <!-- Comments error -->
+      <div v-if="commentsError" class="text-center py-4">
+        <p class="text-red-500">{{ commentsError }}</p>
+      </div>
+
+      <!-- No comments message -->
+      <div v-if="!commentsLoading && !commentsError && comments.length === 0" class="text-center py-4">
+        <p class="text-white-bg">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+      </div>
+
+      <!-- Comments list -->
       <div
         v-for="comment in comments"
         :key="comment.id"
-        class="px-5 py-3 mx-5 my-3 bg-white border border-white-bg rounded"
+        class="relative px-5 py-3 mx-5 my-3 bg-white border border-white-bg rounded"
       >
         <div class="flex items-center">
-          <p class="text-lg font-semibold">@{{ comment.username }}</p>
-          <p class="ml-auto text-lg font-semibold">{{ comment.date }}</p>
+          <p class="text-lg font-semibold">@{{ comment.user.name }}</p>
+          <p class="ml-auto text-lg font-semibold">{{ formatCommentDate(comment.date) }}</p>
         </div>
         <hr class="my-3 border border-white-bg" />
-        <p class="text-lg">{{ comment.text }}</p>
+        <p class="text-lg">{{ comment.description }}</p>
+
+        <!-- Delete button (only for comment author or admin) -->
+        <button
+          v-if="canDeleteComment(comment)"
+          @click="handleDeleteComment(comment.id)"
+          class="absolute bottom-2 right-2 p-1 text-red-500 hover:text-red-700 hover:bg-red-100 rounded"
+          title="Eliminar comentario"
+        >
+          <Trash2 :size="16" />
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRoute } from "vue-router";
-import { Star } from "lucide-vue-next";
+import { Star, Trash2 } from "lucide-vue-next";
 import { useEvent } from "@/composables/useEvent";
+import { useComments } from "@/composables/useComments";
+import { useAuth } from "@/composables/useAuth";
+import { useSession } from "@/composables/useSession";
 import { formatDateTime } from "@/utils/dateFormat";
 
 const route = useRoute();
 const likedEvents = ref(false);
 const newCommentText = ref("");
+const publishingComment = ref(false);
 
 // Usar el composable para obtener el evento
 const { event, loading, error, loadEvent, getEventTags } = useEvent();
 
+// Usar el composable de autenticación
+const { isLoggedIn, canDeleteComment, currentUser } = useAuth();
+
+// Cargar sesión del localStorage
+const { loadSessionFromStorage } = useSession();
+
+// Obtener el ID del evento de la ruta
+const eventId = computed(() => parseInt(route.params.eventId as string));
+
+// Usar el composable de comentarios
+const {
+  comments,
+  loading: commentsLoading,
+  error: commentsError,
+  loadComments,
+  createComment,
+  deleteComment,
+  formatCommentDate,
+} = useComments(eventId.value);
+
 // Función para cargar los datos del evento
 const loadEventData = async () => {
-  const eventId = parseInt(route.params.eventId as string);
-  if (!isNaN(eventId)) {
-    await loadEvent(eventId);
+  if (!isNaN(eventId.value)) {
+    await loadEvent(eventId.value);
   } else {
     error.value = "ID de evento inválido";
   }
 };
 
-// Cargar evento al montar el componente
-onMounted(() => {
-  loadEventData();
+// Cargar evento y comentarios al montar el componente
+onMounted(async () => {
+  // Cargar sesión del localStorage
+  loadSessionFromStorage();
+
+  await loadEventData();
+  if (!error.value) {
+    await loadComments();
+  }
 });
 
-const comments = ref([
-  {
-    id: "2",
-    username: "jagc55",
-    date: "05/10/2024",
-    text: "Voy a escribir el mismo comentario porque los witis me gustan mucho, me hacen muy feliz y me ayudan a llevar hacia delante mi día a día.",
-  },
+// Recargar comentarios si cambia el evento
+watch(eventId, async (newEventId) => {
+  if (!isNaN(newEventId)) {
+    await loadComments();
+  }
+});
 
-  {
-    id: "1",
-    username: "jagc55",
-    date: "05/10/2024",
-    text: "Los witis me gustan mucho, me hacen muy feliz y me ayudan a llevar hacia delante mi día a día.",
-  },
-]);
+// Función para publicar un comentario
+const handlePublishComment = async () => {
+  if (!newCommentText.value.trim() || !currentUser.value || !currentUser.value.id) return;
 
-const publishComment = () => {
-  const trimmed = newCommentText.value.trim();
-  if (!trimmed) return;
+  publishingComment.value = true;
 
-  const newComment = {
-    id: String(Date.now()),
-    username: "usuarioActual", // Puedes reemplazar esto con el nombre real del usuario logueado
-    date: new Date().toLocaleDateString("es-ES"),
-    text: trimmed,
-  };
+  try {
+    const success = await createComment(newCommentText.value, currentUser.value.id);
+    if (success) {
+      newCommentText.value = ""; // Limpiar textarea
+    }
+  } finally {
+    publishingComment.value = false;
+  }
+};
 
-  comments.value.unshift(newComment);
-  newCommentText.value = ""; // Limpiar textarea
+// Función para eliminar un comentario
+const handleDeleteComment = async (commentId: number) => {
+  if (confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
+    await deleteComment(commentId);
+  }
 };
 </script>

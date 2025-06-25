@@ -15,7 +15,7 @@ export function useEvent() {
     try {
       event.value = await ApiService.getEventById(eventId);
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Error al cargar el evento";
+      error.value = "Error al cargar el evento. Por favor, verifica el enlace e inténtalo de nuevo.";
       console.error("Error loading event:", err);
     } finally {
       loading.value = false;

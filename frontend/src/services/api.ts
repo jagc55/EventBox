@@ -46,6 +46,14 @@ export interface Event {
   user: User;
 }
 
+export interface Comment {
+  id: number;
+  description: string;
+  date: string; // LocalDateTime se convierte a string en JSON
+  user: User;
+  event: Event;
+}
+
 export class ApiService {
   private static async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -91,5 +99,34 @@ export class ApiService {
 
   static async getEventsByEstablishment(establishmentId: number): Promise<Event[]> {
     return this.makeRequest<Event[]>(`/events/establishments/${establishmentId}/events`);
+  }
+
+  // Comments endpoints
+  static async getCommentsByEvent(eventId: number): Promise<Comment[]> {
+    return this.makeRequest<Comment[]>(`/comments/event/${eventId}`);
+  }
+
+  static async createComment(comment: { description: string; userId: number; eventId: number }): Promise<Comment> {
+    return this.makeRequest<Comment>("/comments/create", {
+      method: "POST",
+      body: JSON.stringify(comment),
+    });
+  }
+
+  static async deleteComment(commentId: number): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // No intentar parsear JSON para respuestas DELETE
+    // Solo verificar que la respuesta sea exitosa
+    return;
   }
 }
