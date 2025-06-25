@@ -2,7 +2,7 @@
   <div class="bg-black-secundary pt-[68px]">
     <button
       @click="openModal()"
-      class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold rounded border border-white-bg"
+      class="bg-purple-primary hover:bg-purple-600 text-white px-3 py-1.5 mt-3 ml-4 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
     >
       Añadir evento
     </button>
@@ -77,14 +77,14 @@
         <div class="flex justify-end gap-4 mt-2">
           <button
             @click.prevent="deleteEstablishment"
-            class="bg-red-primary text-white px-4 py-2 rounded font-bold border border-white-bg"
+            class="bg-red-primary hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
           >
             Eliminar
           </button>
           <button
             v-if="establishmentModified"
             type="submit"
-            class="bg-blue-secundary text-white px-4 py-2 rounded font-bold border border-white-bg"
+            class="bg-blue-secundary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
           >
             Modificar
           </button>
@@ -204,9 +204,9 @@
         <div class="flex justify-end mb-2">
           <button
             @click="showModal = false"
-            class="border border-dark-primary size-7 bg-red-primary text-white flex items-center justify-center rounded"
+            class="bg-red-primary hover:bg-red-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
           >
-            <X />
+            <X class="w-5 h-5" />
           </button>
         </div>
 
@@ -284,7 +284,7 @@
 
           <button
             type="submit"
-            class="bg-purple-primary text-white font-bold py-2 px-4 mt-2 self-end rounded border border-white-bg"
+            class="bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg self-end"
           >
             {{ editingEventId ? "Modificar evento" : "Añadir evento" }}
           </button>

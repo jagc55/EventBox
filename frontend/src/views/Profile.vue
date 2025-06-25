@@ -14,14 +14,26 @@
         </div>
 
         <div class="flex flex-col mx-0 sm:ml-auto gap-3">
-          <button v-if="roleId === 1" @click="requestOrganizer" class="bg-purple-primary text-white-bg px-2 rounded">
+          <button
+            v-if="roleId === 1"
+            @click="requestOrganizer"
+            class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
+          >
             Solicitar organizador
           </button>
-          <button v-else @click="goToEstablishments" class="bg-purple-primary text-white-bg px-2 rounded">
+          <button
+            v-else
+            @click="goToEstablishments"
+            class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
+          >
             Mis establecimientos
           </button>
 
-          <button class="bg-purple-primary text-white-bg px-2 rounded">Cambiar contraseña</button>
+          <button
+            class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
+          >
+            Cambiar contraseña
+          </button>
         </div>
       </div>
     </div>

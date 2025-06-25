@@ -41,7 +41,7 @@
             <input
               type="submit"
               value="Acceder"
-              class="bg-purple-primary border border-dark-primary rounded h-11 text-white font-semibold px-4 shadow-md"
+              class="bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg cursor-pointer"
             />
           </div>
         </form>

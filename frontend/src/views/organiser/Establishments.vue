@@ -2,7 +2,7 @@
   <div class="bg-black-secundary pt-[68px]">
     <button
       @click="showModal = true"
-      class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold border border-white-bg rounded"
+      class="bg-purple-primary hover:bg-purple-600 text-white px-3 py-1.5 mt-3 ml-4 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
     >
       Añadir establecimiento
     </button>
@@ -53,9 +53,9 @@
         <div class="flex justify-end mb-2">
           <button
             @click="showModal = false"
-            class="border border-dark-primary size-7 bg-red-primary text-white flex items-center justify-center rounded"
+            class="bg-red-primary hover:bg-red-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
           >
-            <X />
+            <X class="w-5 h-5" />
           </button>
         </div>
 
@@ -126,7 +126,7 @@
 
           <button
             type="submit"
-            class="mt-2 bg-purple-primary text-white font-bold px-4 py-2 ml-auto rounded border border-white-bg"
+            class="bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg self-end"
           >
             Añadir
           </button>
