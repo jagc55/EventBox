@@ -54,6 +54,12 @@ export interface Comment {
   event: Event;
 }
 
+export interface Favorite {
+  user: User;
+  event: Event;
+  addedAt: string; // LocalDateTime se convierte a string en JSON
+}
+
 export class ApiService {
   private static async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -128,5 +134,26 @@ export class ApiService {
     // No intentar parsear JSON para respuestas DELETE
     // Solo verificar que la respuesta sea exitosa
     return;
+  }
+
+  // Favorites endpoints
+  static async getFavoritesByUser(userId: number): Promise<Favorite[]> {
+    return this.makeRequest<Favorite[]>(`/favorites/user/${userId}`);
+  }
+
+  static async isFavorite(userId: number, eventId: number): Promise<boolean> {
+    return this.makeRequest<boolean>(`/favorites/user/${userId}/event/${eventId}`);
+  }
+
+  static async addToFavorites(userId: number, eventId: number): Promise<{ message: string }> {
+    return this.makeRequest<{ message: string }>(`/favorites/user/${userId}/event/${eventId}`, {
+      method: "POST",
+    });
+  }
+
+  static async removeFromFavorites(userId: number, eventId: number): Promise<{ message: string }> {
+    return this.makeRequest<{ message: string }>(`/favorites/user/${userId}/event/${eventId}`, {
+      method: "DELETE",
+    });
   }
 }

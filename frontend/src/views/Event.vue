@@ -62,10 +62,12 @@
             #{{ tag }}
           </span>
           <button
-            class="ml-auto border border-white-bg p-2 bg-purple-primary rounded flex shrink-0 items-center size-9"
-            @click="likedEvents = !likedEvents"
+            class="ml-auto border border-white-bg p-2 bg-purple-primary rounded flex shrink-0 items-center size-9 hover:bg-purple-600 transition-all duration-200"
+            @click="handleToggleFavorite"
+            :disabled="!isLoggedIn || togglingFavorite"
+            :title="isLoggedIn ? (isEventFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos') : 'Debes iniciar sesión para añadir favoritos'"
           >
-            <Star :fill="likedEvents ? 'yellow' : 'none'" />
+            <Star :fill="isEventFavorite ? 'yellow' : 'none'" :color="isEventFavorite ? 'yellow' : 'white'" />
           </button>
         </div>
       </div>
@@ -157,12 +159,14 @@ import { useEvent } from "@/composables/useEvent";
 import { useComments } from "@/composables/useComments";
 import { useAuth } from "@/composables/useAuth";
 import { useSession } from "@/composables/useSession";
+import { useFavorites } from "@/composables/useFavorites";
 import { formatDateTime } from "@/utils/dateFormat";
 
 const route = useRoute();
-const likedEvents = ref(false);
 const newCommentText = ref("");
 const publishingComment = ref(false);
+const isEventFavorite = ref(false);
+const togglingFavorite = ref(false);
 
 // Usar el composable para obtener el evento
 const { event, loading, error, loadEvent, getEventTags } = useEvent();
@@ -187,6 +191,9 @@ const {
   formatCommentDate,
 } = useComments(eventId.value);
 
+// Usar el composable de favoritos
+const { isFavorite, toggleFavorite } = useFavorites();
+
 // Función para cargar los datos del evento
 const loadEventData = async () => {
   if (!isNaN(eventId.value)) {
@@ -204,6 +211,8 @@ onMounted(async () => {
   await loadEventData();
   if (!error.value) {
     await loadComments();
+    // Verificar estado de favoritos si el usuario está logueado
+    await checkFavoriteStatus();
   }
 });
 
@@ -211,6 +220,16 @@ onMounted(async () => {
 watch(eventId, async (newEventId) => {
   if (!isNaN(newEventId)) {
     await loadComments();
+    await checkFavoriteStatus();
+  }
+});
+
+// Verificar favoritos cuando cambie el usuario
+watch(currentUser, async (newUser) => {
+  if (newUser && !isNaN(eventId.value)) {
+    await checkFavoriteStatus();
+  } else {
+    isEventFavorite.value = false;
   }
 });
 
@@ -234,6 +253,36 @@ const handlePublishComment = async () => {
 const handleDeleteComment = async (commentId: number) => {
   if (confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
     await deleteComment(commentId);
+  }
+};
+
+// Función para verificar si el evento está en favoritos
+const checkFavoriteStatus = async () => {
+  if (currentUser.value && currentUser.value.id && !isNaN(eventId.value)) {
+    try {
+      isEventFavorite.value = await isFavorite(currentUser.value.id, eventId.value);
+    } catch (error) {
+      console.error('Error checking favorite status:', error);
+      isEventFavorite.value = false;
+    }
+  }
+};
+
+// Función para toggle favorito
+const handleToggleFavorite = async () => {
+  if (!currentUser.value || !currentUser.value.id) return;
+
+  togglingFavorite.value = true;
+
+  try {
+    const result = await toggleFavorite(currentUser.value.id, eventId.value);
+    if (result !== null) {
+      isEventFavorite.value = result;
+    }
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+  } finally {
+    togglingFavorite.value = false;
   }
 };
 </script>
