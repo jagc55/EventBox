@@ -65,7 +65,13 @@
             class="ml-auto border border-white-bg p-2 bg-purple-primary rounded flex shrink-0 items-center size-9 hover:bg-purple-600 transition-all duration-200"
             @click="handleToggleFavorite"
             :disabled="!isLoggedIn || togglingFavorite"
-            :title="isLoggedIn ? (isEventFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos') : 'Debes iniciar sesión para añadir favoritos'"
+            :title="
+              isLoggedIn
+                ? isEventFavorite
+                  ? 'Quitar de favoritos'
+                  : 'Añadir a favoritos'
+                : 'Debes iniciar sesión para añadir favoritos'
+            "
           >
             <Star :fill="isEventFavorite ? 'yellow' : 'none'" :color="isEventFavorite ? 'yellow' : 'white'" />
           </button>
@@ -262,7 +268,7 @@ const checkFavoriteStatus = async () => {
     try {
       isEventFavorite.value = await isFavorite(currentUser.value.id, eventId.value);
     } catch (error) {
-      console.error('Error checking favorite status:', error);
+      console.error("Error checking favorite status:", error);
       isEventFavorite.value = false;
     }
   }
@@ -280,7 +286,7 @@ const handleToggleFavorite = async () => {
       isEventFavorite.value = result;
     }
   } catch (error) {
-    console.error('Error toggling favorite:', error);
+    console.error("Error toggling favorite:", error);
   } finally {
     togglingFavorite.value = false;
   }
