@@ -107,6 +107,11 @@ export class ApiService {
     return this.makeRequest<Event[]>(`/events/establishments/${establishmentId}/events`);
   }
 
+  // Event Types endpoints
+  static async getAllEventTypes(): Promise<EventType[]> {
+    return this.makeRequest<EventType[]>("/event-types");
+  }
+
   // Comments endpoints
   static async getCommentsByEvent(eventId: number): Promise<Comment[]> {
     return this.makeRequest<Comment[]>(`/comments/event/${eventId}`);

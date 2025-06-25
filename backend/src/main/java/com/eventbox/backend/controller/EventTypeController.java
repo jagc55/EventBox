@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/event-types")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class EventTypeController {
 
     private final EventTypeService service;
