@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-black-secundary py-5">
+  <div class="bg-black-secundary py-5 pt-[88px]">
     <!-- Loading indicator -->
     <div v-if="loading" class="text-center py-8">
       <p class="text-white-bg text-lg">Cargando evento...</p>

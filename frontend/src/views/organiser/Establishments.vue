@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-black-secundary">
+  <div class="bg-black-secundary pt-[68px]">
     <button
       @click="showModal = true"
       class="bg-purple-primary text-white p-1 mt-3 ml-4 font-bold border border-white-bg rounded"

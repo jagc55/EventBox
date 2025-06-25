@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-black-secundary">
+  <div class="bg-black-secundary pt-[68px]">
     <div
       class="mt-4 p-4 sm:py-2 border border-white-bg bg-dark-primary mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 rounded-xl"
     >
@@ -9,7 +9,7 @@
           <p class="text-lg font-bold text-white-bg">{{ email }}</p>
           <p class="text-lg font-bold text-white-bg">{{ name }}</p>
           <p class="text-lg font-bold text-white-bg mb-2">
-            {{ roleId === 1 ? "Usuario" : roleId === 2 ? "Organizador" : "Administrador" }}
+            Rol de {{ roleId === 1 ? "Usuario" : roleId === 2 ? "Organizador" : "Administrador" }}
           </p>
         </div>
 

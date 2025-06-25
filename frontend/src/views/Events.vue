@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-black-secundary">
+  <div class="bg-black-secundary pt-[68px]">
     <!-- Contenedor central -->
     <div class="max-w-screen-xl mx-auto px-6 lg:px-8 pt-4">
       <!-- Loading indicator -->

@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-dark-primary text-white relative z-10">
+  <header class="bg-dark-primary text-white fixed top-0 left-0 right-0 z-50">
     <div class="h-16 flex items-center justify-between px-4">
       <RouterLink to="/" class="flex-shrink-0 flex items-center h-full space-x-2 hover:opacity-70 transition">
         <Logo class="size-16" />
