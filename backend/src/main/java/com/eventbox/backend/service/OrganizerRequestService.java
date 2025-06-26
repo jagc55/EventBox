@@ -7,7 +7,6 @@ import com.eventbox.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +65,7 @@ public class OrganizerRequestService {
     }
     
     // Aprobar una solicitud
-    public OrganizerRequest approveRequest(Long requestId, Long adminId, String comments) {
+    public OrganizerRequest approveRequest(Long requestId, Long adminId) {
         Optional<OrganizerRequest> requestOptional = organizerRequestRepository.findById(requestId);
         if (requestOptional.isEmpty()) {
             throw new RuntimeException("Solicitud no encontrada");
@@ -87,9 +86,6 @@ public class OrganizerRequestService {
         
         // Actualizar la solicitud
         request.setStatus(OrganizerRequest.RequestStatus.APPROVED);
-        request.setReviewedAt(LocalDateTime.now());
-        request.setReviewedBy(admin);
-        request.setComments(comments);
         
         // Cambiar el rol del usuario a organizador
         userService.updateUserRole(request.getUser().getId(), 2);
@@ -98,7 +94,7 @@ public class OrganizerRequestService {
     }
     
     // Rechazar una solicitud
-    public OrganizerRequest rejectRequest(Long requestId, Long adminId, String comments) {
+    public OrganizerRequest rejectRequest(Long requestId, Long adminId) {
         Optional<OrganizerRequest> requestOptional = organizerRequestRepository.findById(requestId);
         if (requestOptional.isEmpty()) {
             throw new RuntimeException("Solicitud no encontrada");
@@ -119,9 +115,6 @@ public class OrganizerRequestService {
         
         // Actualizar la solicitud
         request.setStatus(OrganizerRequest.RequestStatus.REJECTED);
-        request.setReviewedAt(LocalDateTime.now());
-        request.setReviewedBy(admin);
-        request.setComments(comments);
         
         return organizerRequestRepository.save(request);
     }

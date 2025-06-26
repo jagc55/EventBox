@@ -12,13 +12,13 @@ export function useAuth() {
     const currentUserId = session.value.userId;
     const currentUserRole = session.value.roleId;
 
-    // Puede eliminar si es el autor del comentario o si es administrador (roleId = 1)
-    return comment.user.id === currentUserId || currentUserRole === 1;
+    // Puede eliminar si es el autor del comentario o si es administrador (roleId = 3)
+    return comment.user.id === currentUserId || currentUserRole === 3;
   });
 
   // Verificar si el usuario es administrador
   const isAdmin = computed(() => {
-    return isLoggedIn.value && session.value.roleId === 1;
+    return isLoggedIn.value && session.value.roleId === 3;
   });
 
   // Obtener el usuario actual

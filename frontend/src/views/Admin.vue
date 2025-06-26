@@ -37,7 +37,7 @@
           >
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
+                <div class="flex items-center gap-3">
                   <h3 class="text-lg font-semibold text-white-bg">
                     {{ request.user.name }}
                   </h3>

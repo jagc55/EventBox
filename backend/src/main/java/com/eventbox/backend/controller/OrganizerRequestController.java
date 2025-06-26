@@ -58,9 +58,8 @@ public class OrganizerRequestController {
     public ResponseEntity<?> approveRequest(@PathVariable Long requestId, @RequestBody Map<String, Object> payload) {
         try {
             Long adminId = ((Number) payload.get("adminId")).longValue();
-            String comments = (String) payload.getOrDefault("comments", "");
             
-            OrganizerRequest request = organizerRequestService.approveRequest(requestId, adminId, comments);
+            OrganizerRequest request = organizerRequestService.approveRequest(requestId, adminId);
             return ResponseEntity.ok(Map.of("message", "Solicitud aprobada correctamente", "request", request));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -72,9 +71,8 @@ public class OrganizerRequestController {
     public ResponseEntity<?> rejectRequest(@PathVariable Long requestId, @RequestBody Map<String, Object> payload) {
         try {
             Long adminId = ((Number) payload.get("adminId")).longValue();
-            String comments = (String) payload.getOrDefault("comments", "");
             
-            OrganizerRequest request = organizerRequestService.rejectRequest(requestId, adminId, comments);
+            OrganizerRequest request = organizerRequestService.rejectRequest(requestId, adminId);
             return ResponseEntity.ok(Map.of("message", "Solicitud rechazada", "request", request));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

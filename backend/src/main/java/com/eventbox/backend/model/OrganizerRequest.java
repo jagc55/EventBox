@@ -22,16 +22,6 @@ public class OrganizerRequest {
     @Column(name = "requested_at", nullable = false)
     private LocalDateTime requestedAt = LocalDateTime.now();
     
-    @Column(name = "reviewed_at")
-    private LocalDateTime reviewedAt;
-    
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "reviewed_by")
-    private User reviewedBy;
-    
-    @Column(columnDefinition = "TEXT")
-    private String comments;
-    
     public enum RequestStatus {
         PENDING, APPROVED, REJECTED
     }
@@ -76,29 +66,5 @@ public class OrganizerRequest {
     
     public void setRequestedAt(LocalDateTime requestedAt) {
         this.requestedAt = requestedAt;
-    }
-    
-    public LocalDateTime getReviewedAt() {
-        return reviewedAt;
-    }
-    
-    public void setReviewedAt(LocalDateTime reviewedAt) {
-        this.reviewedAt = reviewedAt;
-    }
-    
-    public User getReviewedBy() {
-        return reviewedBy;
-    }
-    
-    public void setReviewedBy(User reviewedBy) {
-        this.reviewedBy = reviewedBy;
-    }
-    
-    public String getComments() {
-        return comments;
-    }
-    
-    public void setComments(String comments) {
-        this.comments = comments;
     }
 }
