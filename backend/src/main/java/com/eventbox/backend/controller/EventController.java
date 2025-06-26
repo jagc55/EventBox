@@ -53,4 +53,9 @@ public class EventController {
         event.setId(id);
         return service.update(event);
     }
+
+    @GetMapping("/following/{userId}")
+    public List<Event> getEventsByFollowedUsers(@PathVariable Long userId) {
+        return service.getEventsByFollowedUsers(userId);
+    }
 }

@@ -1,31 +1,138 @@
 import { ref, computed } from "vue";
-import { ApiService, type Event } from "@/services/api";
+import { ApiService, type Event, type Favorite } from "@/services/api";
+import { useAuth } from "./useAuth";
 
 export function useEvents() {
+  const { currentUser, isLoggedIn } = useAuth();
+
   const events = ref<Event[]>([]);
+  const favoriteEvents = ref<Event[]>([]);
+  const followingEvents = ref<Event[]>([]);
+  const finishedEvents = ref<Event[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const activeTab = ref("upcoming"); // "upcoming", "finished", "favorites", "following"
 
   // Filtros
   const searchQuery = ref("");
   const selectedDate = ref("");
   const selectedProvince = ref("");
-  // Función para cargar todos los eventos
-  const loadEvents = async () => {
+  // Función para cargar todos los eventos (ahora solo próximos)
+  const loadUpcomingEvents = async () => {
     loading.value = true;
     error.value = null;
 
     try {
-      // Opción 1: Usar endpoint ordenado del backend (más eficiente)
-      // events.value = await ApiService.getAllEventsOrdered();
+      const allEvents = await ApiService.getAllEvents();
+      const now = new Date();
 
-      // Opción 2: Obtener todos y ordenar en frontend (implementación actual)
-      events.value = await ApiService.getAllEvents();
+      // Filtrar solo eventos futuros
+      events.value = allEvents
+        .filter((event) => {
+          const eventDateTime = new Date(`${event.date}T${event.time}`);
+          return eventDateTime > now;
+        })
+        .sort((a, b) => {
+          const dateTimeA = new Date(`${a.date}T${a.time}`);
+          const dateTimeB = new Date(`${b.date}T${b.time}`);
+          return dateTimeA.getTime() - dateTimeB.getTime();
+        });
     } catch (err) {
-      error.value = "Error al cargar los eventos. Por favor, inténtalo de nuevo.";
-      console.error("Error loading events:", err);
+      error.value = "Error al cargar los eventos próximos. Por favor, inténtalo de nuevo.";
+      console.error("Error loading upcoming events:", err);
     } finally {
       loading.value = false;
+    }
+  };
+
+  // Función para cargar eventos finalizados
+  const loadFinishedEvents = async () => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const allEvents = await ApiService.getAllEvents();
+      const now = new Date();
+
+      // Filtrar solo eventos pasados y ordenar en orden descendente
+      finishedEvents.value = allEvents
+        .filter((event) => {
+          const eventDateTime = new Date(`${event.date}T${event.time}`);
+          return eventDateTime <= now;
+        })
+        .sort((a, b) => {
+          const dateTimeA = new Date(`${a.date}T${a.time}`);
+          const dateTimeB = new Date(`${b.date}T${b.time}`);
+          return dateTimeB.getTime() - dateTimeA.getTime(); // Orden descendente
+        });
+    } catch (err) {
+      error.value = "Error al cargar los eventos finalizados. Por favor, inténtalo de nuevo.";
+      console.error("Error loading finished events:", err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Función para cargar eventos favoritos
+  const loadFavoriteEvents = async () => {
+    if (!isLoggedIn.value || !currentUser.value?.id) return;
+
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const favorites: Favorite[] = await ApiService.getFavoritesByUser(currentUser.value.id);
+      favoriteEvents.value = favorites
+        .map((fav) => fav.event)
+        .sort((a, b) => {
+          const dateTimeA = new Date(`${a.date}T${a.time}`);
+          const dateTimeB = new Date(`${b.date}T${b.time}`);
+          return dateTimeA.getTime() - dateTimeB.getTime();
+        });
+    } catch (err) {
+      error.value = "Error al cargar los eventos favoritos.";
+      console.error("Error loading favorite events:", err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Función para cargar eventos de usuarios seguidos
+  const loadFollowingEvents = async () => {
+    if (!isLoggedIn.value || !currentUser.value?.id) return;
+
+    loading.value = true;
+    error.value = null;
+
+    try {
+      followingEvents.value = await ApiService.getEventsByFollowedUsers(currentUser.value.id);
+    } catch (err) {
+      error.value = "Error al cargar los eventos de usuarios seguidos.";
+      console.error("Error loading following events:", err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Función para cambiar de pestaña
+  const setActiveTab = (tab: string) => {
+    activeTab.value = tab;
+
+    switch (tab) {
+      case "upcoming":
+        loadUpcomingEvents();
+        break;
+      case "finished":
+        loadFinishedEvents();
+        break;
+      case "favorites":
+        loadFavoriteEvents();
+        break;
+      case "following":
+        loadFollowingEvents();
+        break;
+      default:
+        loadUpcomingEvents();
     }
   };
 
@@ -37,9 +144,28 @@ export function useEvents() {
       .map((tag) => tag.trim())
       .filter((tag) => tag.length > 0);
   };
-  // Eventos filtrados y ordenados por fecha (más recientes primero)
+  // Eventos filtrados y ordenados por fecha
   const filteredEvents = computed(() => {
-    return events.value
+    let sourceEvents: Event[] = [];
+
+    switch (activeTab.value) {
+      case "upcoming":
+        sourceEvents = events.value;
+        break;
+      case "finished":
+        sourceEvents = finishedEvents.value;
+        break;
+      case "favorites":
+        sourceEvents = favoriteEvents.value;
+        break;
+      case "following":
+        sourceEvents = followingEvents.value;
+        break;
+      default:
+        sourceEvents = events.value;
+    }
+
+    return sourceEvents
       .filter((event) => {
         // Filtro por búsqueda (título o tags)
         if (searchQuery.value) {
@@ -62,24 +188,37 @@ export function useEvents() {
         return true;
       })
       .sort((a, b) => {
-        // Ordenar por fecha y hora (más próximos primero - orden ascendente)
         const dateTimeA = new Date(`${a.date}T${a.time}`);
         const dateTimeB = new Date(`${b.date}T${b.time}`);
 
-        // Orden ascendente (más próximos primero)
-        return dateTimeA.getTime() - dateTimeB.getTime();
+        // Orden según la pestaña activa
+        if (activeTab.value === "finished") {
+          // Para eventos finalizados: orden descendente (más recientes primero)
+          return dateTimeB.getTime() - dateTimeA.getTime();
+        } else {
+          // Para el resto: orden ascendente (más próximos primero)
+          return dateTimeA.getTime() - dateTimeB.getTime();
+        }
       });
   });
 
   return {
     events,
+    favoriteEvents,
+    followingEvents,
+    finishedEvents,
     filteredEvents,
     loading,
     error,
     searchQuery,
     selectedDate,
     selectedProvince,
-    loadEvents,
+    activeTab,
+    loadUpcomingEvents,
+    loadFinishedEvents,
+    loadFavoriteEvents,
+    loadFollowingEvents,
+    setActiveTab,
     getEventTags,
   };
 }

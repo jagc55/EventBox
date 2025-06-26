@@ -1,7 +1,7 @@
 <template>
   <div class="bg-black-secundary pt-[68px]">
     <!-- Contenedor central -->
-    <div class="max-w-screen-xl mx-auto px-6 lg:px-8 pt-4">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 pt-4">
       <!-- Loading indicator -->
       <div v-if="loading" class="text-center py-8">
         <p class="text-white-bg text-lg">Cargando eventos...</p>
@@ -10,12 +10,15 @@
       <!-- Error message -->
       <div v-if="error" class="text-center py-8">
         <p class="text-red-500 text-lg">{{ error }}</p>
-        <button @click="loadEvents" class="mt-4 bg-purple-primary text-white px-4 py-2 rounded hover:bg-purple-600">
+        <button
+          @click="setActiveTab(activeTab)"
+          class="mt-4 bg-purple-primary text-white px-4 py-2 rounded hover:bg-purple-600"
+        >
           Reintentar
         </button>
       </div>
 
-      <!-- Filtros -->
+      <!-- Buscador con el mismo ancho que el contenedor de eventos -->
       <div
         v-if="!loading && !error"
         class="border border-white-bg rounded-xl mb-5 p-4 bg-dark-primary flex flex-wrap gap-4 justify-center items-center shadow-xl"
@@ -40,48 +43,97 @@
         </select>
       </div>
 
-      <!-- Grid de eventos -->
-      <div v-if="!loading && !error" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Mensaje cuando no hay eventos -->
-        <div v-if="filteredEvents.length === 0" class="col-span-full text-center py-8">
-          <p class="text-white-bg text-lg">No se encontraron eventos</p>
+      <!-- Contenedor con pestañas y eventos -->
+      <div
+        v-if="!loading && !error"
+        class="border border-white-bg rounded-xl bg-dark-primary shadow-xl overflow-hidden mb-8"
+      >
+        <!-- Pestañas -->
+        <div class="flex border-b border-white-bg">
+          <button
+            :class="[
+              'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
+              activeTab === 'upcoming' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+            ]"
+            @click="setActiveTab('upcoming')"
+          >
+            Próximos eventos
+          </button>
+          <button
+            :class="[
+              'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
+              activeTab === 'finished' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+            ]"
+            @click="setActiveTab('finished')"
+          >
+            Eventos finalizados
+          </button>
+          <button
+            :class="[
+              'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
+              activeTab === 'favorites' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+            ]"
+            @click="setActiveTab('favorites')"
+          >
+            Eventos favoritos
+          </button>
+          <button
+            :class="[
+              'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg hover:bg-purple-600 transition-colors',
+              activeTab === 'following' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+            ]"
+            @click="setActiveTab('following')"
+          >
+            Siguiendo
+          </button>
         </div>
-        <div
-          v-for="event in filteredEvents"
-          :key="event.id"
-          class="bg-dark-primary border border-white-bg rounded shadow-xl flex flex-col transition duration-300 hover:scale-105 cursor-pointer"
-          @click="navigateToEvent(event.id)"
-        >
-          <img
-            :src="event.imageUrl"
-            alt="Imagen del evento"
-            class="w-full h-48 object-cover border-b border-white-bg rounded"
-          />
-          <div class="p-4 flex flex-col flex-grow space-y-2">
-            <h2 class="text-2xl font-bold text-white-bg truncate">
-              {{ event.title }}
-            </h2>
-            <p class="text-sm text-white-bg">Organizador: {{ event.user.name }}</p>
-            <hr class="my-3 border border-white-bg" />
-            <p class="text-white-bg">Establecimiento: {{ event.establishment.name }}</p>
-            <p class="text-white-bg">Fecha: {{ formatDate(event.date) }} {{ formatTime(event.time) }}</p>
-            <p class="text-white-bg">Tipo: {{ event.eventType.name }}</p>
-            <p class="text-white-bg">Precio: {{ event.price === 0 ? "Gratuito" : event.price + "€" }}</p>
 
-            <hr class="my-3 border border-white-bg" />
-
-            <!-- Tags con truncamiento -->
+        <!-- Contenido de eventos -->
+        <div class="p-6">
+          <!-- Grid de eventos -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Mensaje cuando no hay eventos -->
+            <div v-if="filteredEvents.length === 0" class="col-span-full text-center py-8">
+              <p class="text-white-bg text-lg">No se encontraron eventos</p>
+            </div>
             <div
-              class="overflow-hidden whitespace-nowrap text-ellipsis"
-              :title="getEventTags(event).map((tag: string) => '#' + tag).join(' ')"
+              v-for="event in filteredEvents"
+              :key="event.id"
+              class="bg-dark-primary border border-white-bg rounded shadow-xl flex flex-col transition duration-300 hover:scale-105 cursor-pointer"
+              @click="navigateToEvent(event.id)"
             >
-              <span
-                v-for="(tag, index) in getEventTags(event)"
-                :key="index"
-                class="inline-block font-bold bg-purple-primary text-white px-3 py-1 border border-white-bg text-sm mr-1 rounded"
-              >
-                #{{ tag }}
-              </span>
+              <img
+                :src="event.imageUrl"
+                alt="Imagen del evento"
+                class="w-full h-48 object-cover border-b border-white-bg rounded"
+              />
+              <div class="p-4 flex flex-col flex-grow space-y-2">
+                <h2 class="text-2xl font-bold text-white-bg truncate">
+                  {{ event.title }}
+                </h2>
+                <p class="text-sm text-white-bg">Organizador: {{ event.user.name }}</p>
+                <hr class="my-3 border border-white-bg" />
+                <p class="text-white-bg">Establecimiento: {{ event.establishment.name }}</p>
+                <p class="text-white-bg">Fecha: {{ formatDate(event.date) }} {{ formatTime(event.time) }}</p>
+                <p class="text-white-bg">Tipo: {{ event.eventType.name }}</p>
+                <p class="text-white-bg">Precio: {{ event.price === 0 ? "Gratuito" : event.price + "€" }}</p>
+
+                <hr class="my-3 border border-white-bg" />
+
+                <!-- Tags con truncamiento -->
+                <div
+                  class="overflow-hidden whitespace-nowrap text-ellipsis"
+                  :title="getEventTags(event).map((tag: string) => '#' + tag).join(' ')"
+                >
+                  <span
+                    v-for="(tag, index) in getEventTags(event)"
+                    :key="index"
+                    class="inline-block font-bold bg-purple-primary text-white px-3 py-1 border border-white-bg text-sm mr-1 rounded"
+                  >
+                    #{{ tag }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -99,8 +151,18 @@ import { formatDate, formatTime } from "@/utils/dateFormat";
 const router = useRouter();
 
 // Usar el composable de eventos
-const { filteredEvents, loading, error, searchQuery, selectedDate, selectedProvince, loadEvents, getEventTags } =
-  useEvents();
+const {
+  filteredEvents,
+  loading,
+  error,
+  searchQuery,
+  selectedDate,
+  selectedProvince,
+  activeTab,
+  loadUpcomingEvents,
+  setActiveTab,
+  getEventTags,
+} = useEvents();
 
 // Función para navegar al detalle del evento
 const navigateToEvent = (eventId: number) => {
@@ -109,7 +171,7 @@ const navigateToEvent = (eventId: number) => {
 
 // Cargar eventos al montar el componente
 onMounted(() => {
-  loadEvents();
+  setActiveTab("upcoming"); // Esto cargará los próximos eventos
 });
 
 const provinces = [

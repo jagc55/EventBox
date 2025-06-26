@@ -107,6 +107,10 @@ export class ApiService {
     return this.makeRequest<Event[]>(`/events/establishments/${establishmentId}/events`);
   }
 
+  static async getEventsByFollowedUsers(userId: number): Promise<Event[]> {
+    return this.makeRequest<Event[]>(`/events/following/${userId}`);
+  }
+
   // Event Types endpoints
   static async getAllEventTypes(): Promise<EventType[]> {
     return this.makeRequest<EventType[]>("/event-types");
@@ -160,5 +164,10 @@ export class ApiService {
     return this.makeRequest<{ message: string }>(`/favorites/user/${userId}/event/${eventId}`, {
       method: "DELETE",
     });
+  }
+
+  // User Follow interfaces and endpoints
+  static async getFollowing(userId: number): Promise<any[]> {
+    return this.makeRequest<any[]>(`/user-follows/${userId}/following`);
   }
 }

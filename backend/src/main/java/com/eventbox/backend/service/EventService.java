@@ -42,4 +42,8 @@ public class EventService {
         // Se asume que el evento ya tiene el ID correcto
         return repo.save(event);
     }
+
+    public List<Event> getEventsByFollowedUsers(Long userId) {
+        return repo.findEventsByFollowedUsersNotStarted(userId);
+    }
 }
