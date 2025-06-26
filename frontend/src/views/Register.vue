@@ -162,8 +162,54 @@ const validateForm = () => {
   return valid;
 };
 
+const checkUserExists = async () => {
+  try {
+    let hasErrors = false;
+
+    // Verificar si el email ya existe
+    const emailRes = await fetch(`http://localhost:8080/api/auth/check-email?email=${encodeURIComponent(email.value)}`);
+
+    if (emailRes.ok) {
+      const emailData = await emailRes.json();
+      if (emailData.exists) {
+        errors.value.email = "Este correo electrónico ya está registrado.";
+        hasErrors = true;
+      }
+    }
+
+    // Verificar si el nombre de usuario ya existe
+    const usernameRes = await fetch(
+      `http://localhost:8080/api/auth/check-username?username=${encodeURIComponent(username.value)}`
+    );
+
+    if (usernameRes.ok) {
+      const usernameData = await usernameRes.json();
+      if (usernameData.exists) {
+        errors.value.username = "Este nombre de usuario ya está en uso.";
+        hasErrors = true;
+      }
+    }
+
+    return !hasErrors;
+  } catch (error) {
+    console.error("Error al verificar usuario:", error);
+    alert("Error de conexión al verificar usuario. Por favor, inténtalo de nuevo.");
+    return false;
+  }
+};
+
 const onSubmit = async () => {
+  // Limpiar errores previos
+  errors.value = { email: "", username: "", password: "", confirmPassword: "" };
+
   if (!validateForm()) return;
+
+  // Verificar si el usuario ya existe antes de registrar
+  const userExists = await checkUserExists();
+  if (!userExists) {
+    // Los errores ya están establecidos en checkUserExists(), simplemente retornamos
+    return;
+  }
 
   try {
     const res = await fetch("http://localhost:8080/api/auth/register", {
@@ -179,7 +225,20 @@ const onSubmit = async () => {
 
     const data = await res.json();
 
-    if (!res.ok) throw new Error(data.message || "Error al registrar el usuario");
+    if (!res.ok) {
+      // Manejar errores específicos del servidor como backup
+      if (data.message && data.message.includes("email")) {
+        errors.value.email = "Este correo electrónico ya está registrado.";
+      } else if (
+        (data.message && data.message.includes("usuario")) ||
+        (data.message && data.message.includes("username"))
+      ) {
+        errors.value.username = "Este nombre de usuario ya está en uso.";
+      } else {
+        alert("Error: " + (data.message || "Error al registrar el usuario"));
+      }
+      return;
+    }
 
     setSession({
       token: data.token,

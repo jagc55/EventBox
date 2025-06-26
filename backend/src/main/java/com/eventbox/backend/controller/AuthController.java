@@ -43,6 +43,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequest request) {
+        // Verificar si el email ya existe
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "El correo electrónico ya está registrado"));
+        }
+        
+        // Verificar si el nombre de usuario ya existe
+        if (userRepository.findByName(request.getName()).isPresent()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "El nombre de usuario ya está en uso"));
+        }
+
         Role role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
 
@@ -107,5 +119,17 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Token inválido"));
         }
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+        boolean exists = userRepository.findByEmail(email).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @GetMapping("/check-username")
+    public ResponseEntity<Map<String, Boolean>> checkUsername(@RequestParam String username) {
+        boolean exists = userRepository.findByName(username).isPresent();
+        return ResponseEntity.ok(Map.of("exists", exists));
     }
 }
