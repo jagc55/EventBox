@@ -30,22 +30,18 @@
         </div>
 
         <div v-else class="space-y-4">
-          <div
-            v-for="request in requests"
-            :key="request.id"
-            class="border border-gray-600 bg-black-secundary p-4 rounded-lg"
-          >
+          <div v-for="request in requests" :key="request.id" class="border border-white bg-white p-4 rounded-lg">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div class="flex-1">
                 <div class="flex items-center gap-3">
-                  <h3 class="text-lg font-semibold text-white-bg">
+                  <h3 class="text-lg font-semibold text-black">
                     {{ request.user.name }}
                   </h3>
                 </div>
-                <p class="text-white-bg opacity-80">{{ request.user.email }}</p>
-                <p class="text-white-bg opacity-60 text-sm">Solicitado: {{ formatDate(request.requestedAt) }}</p>
+                <p class="text-black opacity-80">{{ request.user.email }}</p>
+                <p class="text-black opacity-60 text-sm">Solicitado: {{ formatDate(request.requestedAt) }}</p>
                 <div v-if="request.comments" class="mt-2">
-                  <p class="text-white-bg text-sm"><strong>Comentarios:</strong> {{ request.comments }}</p>
+                  <p class="text-black text-sm"><strong>Comentarios:</strong> {{ request.comments }}</p>
                 </div>
               </div>
 
