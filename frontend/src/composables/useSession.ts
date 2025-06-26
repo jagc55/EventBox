@@ -47,6 +47,38 @@ const updateRole = (newRoleId: number) => {
   localStorage.setItem("session", JSON.stringify(session.value));
 };
 
+// Refresca la información del usuario desde el servidor
+const refreshSession = async () => {
+  if (!session.value.token) return false;
+
+  try {
+    const response = await fetch("http://localhost:8080/api/auth/refresh", {
+      headers: {
+        Authorization: `Bearer ${session.value.token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      session.value = {
+        ...session.value,
+        userId: data.userId,
+        roleId: data.roleId,
+        email: data.email,
+        name: data.name,
+      };
+      localStorage.setItem("session", JSON.stringify(session.value));
+      return true;
+    } else {
+      clearSession();
+      return false;
+    }
+  } catch (error) {
+    console.error("Error refreshing session:", error);
+    return false;
+  }
+};
+
 export function useSession() {
   return {
     session,
@@ -54,6 +86,7 @@ export function useSession() {
     clearSession,
     loadSessionFromStorage,
     updateRole,
+    refreshSession,
     isLoggedIn,
   };
 }

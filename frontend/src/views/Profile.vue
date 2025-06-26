@@ -1,38 +1,169 @@
 <template>
   <div class="bg-black-secundary pt-[68px]">
     <div
-      class="mt-4 p-4 sm:py-2 border border-white-bg bg-dark-primary mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 rounded-xl"
+      class="mt-6 p-6 border border-white-bg bg-dark-primary mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 rounded-2xl shadow-2xl"
     >
-      <p class="text-2xl font-bold text-white-bg">Datos</p>
-      <div class="flex flex-col sm:flex-row">
-        <div class="flex flex-col">
-          <p class="text-lg font-bold text-white-bg">{{ email }}</p>
-          <p class="text-lg font-bold text-white-bg">{{ name }}</p>
-          <p class="text-lg font-bold text-white-bg mb-2">
-            Rol de {{ roleId === 1 ? "Usuario" : roleId === 2 ? "Organizador" : "Administrador" }}
-          </p>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-2 h-8 bg-gradient-to-b from-purple-primary to-purple-600 rounded-full"></div>
+        <h2 class="text-2xl font-bold text-white-bg">Información Personal</h2>
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Información del usuario -->
+        <div class="flex-1 space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-purple-primary rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Email</p>
+                <p class="text-lg font-semibold text-white-bg">{{ email }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-purple-primary rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Usuario</p>
+                <p class="text-lg font-semibold text-white-bg">{{ name }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-purple-primary rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Rol</p>
+                <p class="text-lg font-semibold text-white-bg">
+                  {{ roleId === 1 ? "Usuario" : roleId === 2 ? "Organizador" : "Administrador" }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seguidores y Siguiendo -->
+          <div class="mt-6">
+            <h3 class="text-sm text-gray-400 mb-3">Social</h3>
+            <div class="flex gap-6">
+              <button
+                @click="openFollowersModal"
+                class="group flex items-center gap-3 text-white-bg hover:text-purple-300 transition-all duration-200"
+              >
+                <div
+                  class="w-10 h-10 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                >
+                  <svg class="w-5 h-5 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="text-left">
+                  <p class="text-xl font-bold">{{ followersCount }}</p>
+                  <p class="text-sm opacity-80 group-hover:underline">Seguidores</p>
+                </div>
+              </button>
+
+              <button
+                @click="openFollowingModal"
+                class="group flex items-center gap-3 text-white-bg hover:text-purple-300 transition-all duration-200"
+              >
+                <div
+                  class="w-10 h-10 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                >
+                  <svg class="w-5 h-5 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="text-left">
+                  <p class="text-xl font-bold">{{ followingCount }}</p>
+                  <p class="text-sm opacity-80 group-hover:underline">Siguiendo</p>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="flex flex-col mx-0 sm:ml-auto gap-3">
+        <!-- Botones de acción -->
+        <div class="flex flex-col gap-3 lg:w-auto">
           <button
-            v-if="roleId === 1"
+            v-if="roleId === 1 && !hasPendingRequest"
             @click="requestOrganizer"
-            class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
+            :disabled="loadingPendingRequest"
+            class="bg-purple-primary hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm w-48 disabled:opacity-50"
           >
-            Solicitar organizador
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+              <path
+                fill-rule="evenodd"
+                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            {{ loadingPendingRequest ? "Verificando..." : "Solicitar organizador" }}
           </button>
+
           <button
-            v-else
-            @click="goToEstablishments"
-            class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
+            v-else-if="roleId === 1 && hasPendingRequest"
+            class="bg-purple-primary text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 text-sm w-48 cursor-not-allowed opacity-75"
+            disabled
           >
-            Mis establecimientos
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            Solicitud pendiente
+          </button>
+
+          <button
+            v-else-if="roleId >= 2"
+            @click="goToEstablishments"
+            class="bg-purple-primary hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm w-48"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            Establecimientos
           </button>
 
           <button
             @click="showPasswordModal = true"
-            class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
+            class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm w-48"
           >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
             Cambiar contraseña
           </button>
         </div>
@@ -40,30 +171,33 @@
     </div>
 
     <div
-      class="mt-4 px-4 py-2 border border-white-bg bg-dark-primary mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 mb-4 rounded-xl"
+      class="mt-4 p-6 border border-white-bg bg-dark-primary mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52 mb-4 rounded-2xl shadow-2xl"
     >
-      <div class="flex justify-between items-baseline mb-4">
-        <p class="text-2xl font-bold text-white-bg">Tus estadísticas</p>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-2 h-8 bg-gradient-to-b from-purple-primary to-purple-600 rounded-full"></div>
+        <h2 class="text-2xl font-bold text-white-bg">Estadísticas</h2>
 
         <!-- Botón para alternar gráficos -->
-        <button
-          v-if="!isLoadingFavorites && !favoritesLoading && !isLoadingEventTypes"
-          @click="showBarChart = !showBarChart"
-          class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm"
-        >
-          <svg v-if="showBarChart" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <!-- Icono circular -->
-            <circle cx="12" cy="12" r="10" />
-          </svg>
-          <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <!-- Icono de barras -->
-            <rect x="3" y="12" width="3" height="5" />
-            <rect x="7" y="8" width="3" height="9" />
-            <rect x="11" y="6" width="3" height="11" />
-            <rect x="15" y="10" width="3" height="7" />
-          </svg>
-          {{ showBarChart ? "Circular" : "Barras" }}
-        </button>
+        <div class="ml-auto">
+          <button
+            v-if="!isLoadingFavorites && !favoritesLoading && !isLoadingEventTypes"
+            @click="showBarChart = !showBarChart"
+            class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm"
+          >
+            <svg v-if="showBarChart" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- Icono circular -->
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <!-- Icono de barras -->
+              <rect x="3" y="12" width="3" height="5" />
+              <rect x="7" y="8" width="3" height="9" />
+              <rect x="11" y="6" width="3" height="11" />
+              <rect x="15" y="10" width="3" height="7" />
+            </svg>
+            {{ showBarChart ? "Circular" : "Barras" }}
+          </button>
+        </div>
       </div>
 
       <!-- Mensaje de carga -->
@@ -181,6 +315,114 @@
         <div class="flex flex-col gap-2 text-center text-white-bg text-3xl max-w-[200px]">
           <span class="font-bold text-5xl">{{ upcomingEventsCount }}</span>
           <span>Eventos en los próximos 3 meses</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de seguidores -->
+    <div
+      v-show="showFollowersModal"
+      class="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur z-50"
+      @click.self="closeFollowersModal"
+    >
+      <div
+        class="w-[90%] md:w-[50%] lg:w-[40%] border border-white-bg bg-dark-primary p-6 rounded-xl max-h-[80vh] overflow-hidden flex flex-col"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-white-bg">Seguidores ({{ followersCount }})</h2>
+          <button
+            @click="closeFollowersModal"
+            class="bg-red-primary hover:bg-red-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto">
+          <div v-if="loadingFollowData" class="text-center py-8">
+            <p class="text-white-bg">Cargando seguidores...</p>
+          </div>
+
+          <div v-else-if="myFollowers.length === 0" class="text-center py-8">
+            <p class="text-white-bg opacity-70">No tienes seguidores aún</p>
+          </div>
+
+          <div v-else class="space-y-3">
+            <div
+              v-for="follow in myFollowers"
+              :key="follow.id"
+              class="flex items-center gap-3 p-3 bg-black-secundary rounded-lg"
+            >
+              <div class="flex-1">
+                <p class="text-white-bg font-medium">{{ follow.follower.name }}</p>
+                <p class="text-white-bg text-sm opacity-70">{{ follow.follower.email }}</p>
+                <p class="text-white-bg text-xs opacity-50">Te sigue desde: {{ formatDate(follow.createdAt) }}</p>
+              </div>
+              <div class="text-white-bg text-sm opacity-60">
+                {{
+                  follow.follower.role.id === 1 ? "Usuario" : follow.follower.role.id === 2 ? "Organizador" : "Admin"
+                }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de siguiendo -->
+    <div
+      v-show="showFollowingModal"
+      class="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur z-50"
+      @click.self="closeFollowingModal"
+    >
+      <div
+        class="w-[90%] md:w-[50%] lg:w-[40%] border border-white-bg bg-dark-primary p-6 rounded-xl max-h-[80vh] overflow-hidden flex flex-col"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-white-bg">Siguiendo ({{ followingCount }})</h2>
+          <button
+            @click="closeFollowingModal"
+            class="bg-red-primary hover:bg-red-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto">
+          <div v-if="loadingFollowData" class="text-center py-8">
+            <p class="text-white-bg">Cargando usuarios que sigues...</p>
+          </div>
+
+          <div v-else-if="myFollowing.length === 0" class="text-center py-8">
+            <p class="text-white-bg opacity-70">No sigues a ningún usuario aún</p>
+          </div>
+
+          <div v-else class="space-y-3">
+            <div
+              v-for="follow in myFollowing"
+              :key="follow.id"
+              class="flex items-center justify-between p-3 bg-black-secundary rounded-lg"
+            >
+              <div class="flex-1">
+                <p class="text-white-bg font-medium">{{ follow.followed.name }}</p>
+                <p class="text-white-bg text-sm opacity-70">{{ follow.followed.email }}</p>
+                <p class="text-white-bg text-xs opacity-50">Siguiendo desde: {{ formatDate(follow.createdAt) }}</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="text-white-bg text-sm opacity-60">
+                  {{
+                    follow.followed.role.id === 1 ? "Usuario" : follow.followed.role.id === 2 ? "Organizador" : "Admin"
+                  }}
+                </div>
+                <button
+                  @click="unfollowUser(follow.followed.id)"
+                  class="bg-red-primary hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
+                >
+                  Dejar de seguir
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -303,7 +545,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { Eye, EyeOff } from "lucide-vue-next";
 import { useSession } from "@/composables/useSession";
@@ -311,7 +553,7 @@ import { useFavorites } from "@/composables/useFavorites";
 import { ApiService } from "@/services/api";
 
 const router = useRouter();
-const { session, updateRole } = useSession();
+const { session, updateRole, refreshSession } = useSession();
 
 // Datos de favoritos y tipos de eventos
 const favoritesData = ref<any[]>([]);
@@ -329,6 +571,19 @@ const passwordSuccess = ref("");
 const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
 const showConfirmPassword = ref(false);
+
+// Estado para modales de seguidores
+const showFollowersModal = ref(false);
+const showFollowingModal = ref(false);
+const myFollowers = ref<any[]>([]);
+const myFollowing = ref<any[]>([]);
+const followersCount = ref(0);
+const followingCount = ref(0);
+const loadingFollowData = ref(false);
+
+// Estado para solicitud de organizador
+const hasPendingRequest = ref(false);
+const loadingPendingRequest = ref(false);
 
 const passwordForm = ref({
   currentPassword: "",
@@ -378,7 +633,25 @@ const loadEventTypes = async () => {
 
 // Cargar favoritos y tipos de eventos al montar el componente
 onMounted(async () => {
-  await Promise.all([loadUserFavorites(), loadEventTypes()]);
+  await Promise.all([loadUserFavorites(), loadEventTypes(), loadFollowData(), checkPendingRequest()]);
+
+  // Listener para detectar cuando se aprueba la solicitud del usuario actual
+  const handleRoleUpdate = async (event: Event) => {
+    const customEvent = event as CustomEvent<{ userId: number; newRoleId: number }>;
+    const { userId, newRoleId } = customEvent.detail;
+    if (userId === session.value?.userId) {
+      // El rol de este usuario cambió, refrescar la sesión
+      await refreshSession();
+      hasPendingRequest.value = false;
+    }
+  };
+
+  window.addEventListener("userRoleUpdated", handleRoleUpdate);
+
+  // Limpiar el listener cuando el componente se desmonte
+  onUnmounted(() => {
+    window.removeEventListener("userRoleUpdated", handleRoleUpdate);
+  });
 });
 
 // Computed para estadísticas basadas en favoritos reales
@@ -511,19 +784,25 @@ const requestOrganizer = async () => {
   if (!session.value?.userId) return;
 
   try {
-    const res = await fetch(`http://localhost:8080/api/users/${session.value.userId}/role`, {
-      method: "PATCH",
+    // NUEVO: Crear solicitud en lugar de cambiar rol directamente
+    const res = await fetch(`http://localhost:8080/api/organizer-requests`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.value.token}`,
       },
-      body: JSON.stringify({ roleId: 2 }),
+      body: JSON.stringify({ userId: session.value.userId }),
     });
 
-    if (!res.ok) throw new Error("Error updating role");
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Error al enviar solicitud");
+    }
 
-    alert("Rol organizador concedido");
-    updateRole(2);
+    alert("Solicitud de organizador enviada. Esperando aprobación del administrador.");
+
+    // Actualizar el estado de la solicitud pendiente
+    hasPendingRequest.value = true;
   } catch (err: any) {
     alert("Error: " + err.message);
   }
@@ -643,6 +922,152 @@ const changePassword = async () => {
   } finally {
     changingPassword.value = false;
   }
+};
+
+// Funciones para el sistema de seguidores
+const loadFollowData = async () => {
+  if (!session.value?.userId) return;
+
+  try {
+    // Cargar contadores
+    const countsResponse = await fetch(`http://localhost:8080/api/user-follows/${session.value.userId}/counts`, {
+      headers: {
+        Authorization: `Bearer ${session.value.token}`,
+      },
+    });
+
+    if (countsResponse.ok) {
+      const counts = await countsResponse.json();
+      followersCount.value = counts.followersCount;
+      followingCount.value = counts.followingCount;
+    }
+  } catch (error) {
+    console.error("Error loading follow data:", error);
+  }
+};
+
+// Verificar si el usuario tiene una solicitud pendiente de organizador
+const checkPendingRequest = async () => {
+  if (!session.value?.userId || roleId.value !== 1) {
+    hasPendingRequest.value = false;
+    return;
+  }
+
+  loadingPendingRequest.value = true;
+  try {
+    const response = await fetch(`http://localhost:8080/api/organizer-requests/user/${session.value.userId}/pending`, {
+      headers: { Authorization: `Bearer ${session.value.token}` },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      hasPendingRequest.value = data.hasPendingRequest;
+    }
+  } catch (error) {
+    console.error("Error checking pending request:", error);
+  } finally {
+    loadingPendingRequest.value = false;
+  }
+};
+
+const loadFollowersData = async () => {
+  if (!session.value?.userId) return;
+
+  loadingFollowData.value = true;
+  try {
+    const response = await fetch(`http://localhost:8080/api/user-follows/${session.value.userId}/followers`, {
+      headers: {
+        Authorization: `Bearer ${session.value.token}`,
+      },
+    });
+
+    if (response.ok) {
+      myFollowers.value = await response.json();
+    }
+  } catch (error) {
+    console.error("Error loading followers:", error);
+  } finally {
+    loadingFollowData.value = false;
+  }
+};
+
+const loadFollowingData = async () => {
+  if (!session.value?.userId) return;
+
+  loadingFollowData.value = true;
+  try {
+    const response = await fetch(`http://localhost:8080/api/user-follows/${session.value.userId}/following`, {
+      headers: {
+        Authorization: `Bearer ${session.value.token}`,
+      },
+    });
+
+    if (response.ok) {
+      myFollowing.value = await response.json();
+    }
+  } catch (error) {
+    console.error("Error loading following:", error);
+  } finally {
+    loadingFollowData.value = false;
+  }
+};
+
+const openFollowersModal = async () => {
+  showFollowersModal.value = true;
+  await loadFollowersData();
+};
+
+const openFollowingModal = async () => {
+  showFollowingModal.value = true;
+  await loadFollowingData();
+};
+
+const closeFollowersModal = () => {
+  showFollowersModal.value = false;
+  myFollowers.value = [];
+};
+
+const closeFollowingModal = () => {
+  showFollowingModal.value = false;
+  myFollowing.value = [];
+};
+
+const unfollowUser = async (userId: number) => {
+  if (!session.value?.userId) return;
+
+  try {
+    const response = await fetch("http://localhost:8080/api/user-follows", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.value.token}`,
+      },
+      body: JSON.stringify({
+        followerId: session.value.userId,
+        followedId: userId,
+      }),
+    });
+
+    if (response.ok) {
+      // Actualizar los datos
+      await loadFollowingData();
+      await loadFollowData();
+    } else {
+      const errorData = await response.json();
+      alert("Error: " + (errorData.error || "Error al dejar de seguir usuario"));
+    }
+  } catch (error) {
+    console.error("Error unfollowing user:", error);
+    alert("Error de conexión");
+  }
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 };
 
 const categoryColors: Record<string, string> = {

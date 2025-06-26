@@ -1,6 +1,7 @@
 package com.eventbox.backend.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "User")
@@ -17,11 +18,18 @@ public class User {
     private String name;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+    @Column(name = "followers_count", nullable = false)
+    private Integer followersCount = 0;
+
+    @Column(name = "following_count", nullable = false)
+    private Integer followingCount = 0;
 
     public User() {}
 
@@ -73,5 +81,21 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Integer getFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(Integer followersCount) {
+        this.followersCount = followersCount;
+    }
+
+    public Integer getFollowingCount() {
+        return followingCount;
+    }
+
+    public void setFollowingCount(Integer followingCount) {
+        this.followingCount = followingCount;
     }
 }

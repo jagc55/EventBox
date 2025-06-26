@@ -7,7 +7,10 @@
       Añadir establecimiento
     </button>
 
-    <h1 class="text-2xl font-bold text-white-bg px-4 py-2">Mis establecimientos</h1>
+    <div class="flex items-center gap-3 px-4 py-2">
+      <div class="w-2 h-8 bg-gradient-to-b from-purple-primary to-purple-600 rounded-full"></div>
+      <h1 class="text-2xl font-bold text-white-bg">Mis establecimientos</h1>
+    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-5">
       <div
@@ -139,8 +142,8 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { X } from "lucide-vue-next";
-import { useSession } from "@/composables/useSession";
 import { useRouter } from "vue-router";
+import { useSession } from "../../composables/useSession";
 
 const showModal = ref(false);
 

@@ -17,6 +17,10 @@
         <template v-else>
           <RouterLink :to="{ name: 'profile' }" class="hover:underline"> Mi perfil </RouterLink>
           <hr class="h-5 border-r border-white-bg" />
+          <RouterLink v-if="session?.roleId === 3" :to="{ name: 'admin' }" class="hover:underline">
+            Administrador
+          </RouterLink>
+          <hr v-if="session?.roleId === 3" class="h-5 border-r border-white-bg" />
           <button @click="logout" class="hover:underline">Cerrar sesión</button>
         </template>
       </nav>
@@ -33,6 +37,10 @@
       <template v-else>
         <RouterLink :to="{ name: 'profile' }" class="block hover:underline"> Mi perfil </RouterLink>
         <hr class="w-full border-t border-white-bg" />
+        <RouterLink v-if="session?.roleId === 3" :to="{ name: 'admin' }" class="block hover:underline">
+          Administrador
+        </RouterLink>
+        <hr v-if="session?.roleId === 3" class="w-full border-t border-white-bg" />
         <button @click="logout" class="block hover:underline text-left">Cerrar sesión</button>
       </template>
     </div>
@@ -47,7 +55,7 @@ import { useSession } from "@/composables/useSession";
 
 const menuOpen = ref(false);
 const router = useRouter();
-const { clearSession, isLoggedIn } = useSession();
+const { clearSession, isLoggedIn, session } = useSession();
 
 const logout = () => {
   clearSession();
