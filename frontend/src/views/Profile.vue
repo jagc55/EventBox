@@ -30,6 +30,7 @@
           </button>
 
           <button
+            @click="showPasswordModal = true"
             class="bg-purple-primary hover:bg-purple-600 text-white-bg px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg text-sm"
           >
             Cambiar contraseña
@@ -183,12 +184,128 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de cambio de contraseña -->
+    <div
+      v-show="showPasswordModal"
+      class="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur z-50"
+      @click.self="closePasswordModal"
+    >
+      <div class="w-[90%] md:w-[50%] lg:w-[35%] border border-white-bg bg-dark-primary p-6 rounded-xl">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-white-bg">Cambiar contraseña</h2>
+          <button
+            @click="closePasswordModal"
+            class="bg-red-primary hover:bg-red-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form @submit.prevent="changePassword" class="flex flex-col gap-4">
+          <div>
+            <label class="block text-white-bg font-medium mb-2">Contraseña actual</label>
+            <div class="flex border border-dark-primary rounded-lg overflow-hidden bg-white">
+              <input
+                v-model="passwordForm.currentPassword"
+                :type="showCurrentPassword ? 'text' : 'password'"
+                placeholder="Introduce tu contraseña actual"
+                class="w-full p-3 border-none outline-none"
+                required
+              />
+              <button
+                type="button"
+                class="flex shrink-0 justify-center items-center px-3"
+                @click="showCurrentPassword = !showCurrentPassword"
+              >
+                <component :is="showCurrentPassword ? EyeOff : Eye" class="w-5 h-5 text-dark-primary" />
+              </button>
+            </div>
+            <p v-if="passwordErrors.currentPassword" class="text-red-500 text-sm mt-1">
+              {{ passwordErrors.currentPassword }}
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-white-bg font-medium mb-2">Nueva contraseña</label>
+            <div class="flex border border-dark-primary rounded-lg overflow-hidden bg-white">
+              <input
+                v-model="passwordForm.newPassword"
+                :type="showNewPassword ? 'text' : 'password'"
+                placeholder="Introduce tu nueva contraseña"
+                class="w-full p-3 border-none outline-none"
+                required
+              />
+              <button
+                type="button"
+                class="flex shrink-0 justify-center items-center px-3"
+                @click="showNewPassword = !showNewPassword"
+              >
+                <component :is="showNewPassword ? EyeOff : Eye" class="w-5 h-5 text-dark-primary" />
+              </button>
+            </div>
+            <p v-if="passwordErrors.newPassword" class="text-red-500 text-sm mt-1">
+              {{ passwordErrors.newPassword }}
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-white-bg font-medium mb-2">Confirmar nueva contraseña</label>
+            <div class="flex border border-dark-primary rounded-lg overflow-hidden bg-white">
+              <input
+                v-model="passwordForm.confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                placeholder="Repite tu nueva contraseña"
+                class="w-full p-3 border-none outline-none"
+                required
+              />
+              <button
+                type="button"
+                class="flex shrink-0 justify-center items-center px-3"
+                @click="showConfirmPassword = !showConfirmPassword"
+              >
+                <component :is="showConfirmPassword ? EyeOff : Eye" class="w-5 h-5 text-dark-primary" />
+              </button>
+            </div>
+            <p v-if="passwordErrors.confirmPassword" class="text-red-500 text-sm mt-1">
+              {{ passwordErrors.confirmPassword }}
+            </p>
+          </div>
+
+          <p v-if="passwordErrors.general" class="text-red-500 text-sm text-center">
+            {{ passwordErrors.general }}
+          </p>
+
+          <p v-if="passwordSuccess" class="text-green-500 text-sm text-center">
+            {{ passwordSuccess }}
+          </p>
+
+          <div class="flex gap-3 justify-end mt-4">
+            <button
+              type="button"
+              @click="closePasswordModal"
+              class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              :disabled="changingPassword"
+              class="bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
+            >
+              {{ changingPassword ? "Cambiando..." : "Cambiar contraseña" }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { Eye, EyeOff } from "lucide-vue-next";
 import { useSession } from "@/composables/useSession";
 import { useFavorites } from "@/composables/useFavorites";
 import { ApiService } from "@/services/api";
@@ -204,6 +321,27 @@ const isLoadingEventTypes = ref(false);
 
 // Estado para alternar entre gráficos
 const showBarChart = ref(false);
+
+// Estado para el modal de cambio de contraseña
+const showPasswordModal = ref(false);
+const changingPassword = ref(false);
+const passwordSuccess = ref("");
+const showCurrentPassword = ref(false);
+const showNewPassword = ref(false);
+const showConfirmPassword = ref(false);
+
+const passwordForm = ref({
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+});
+
+const passwordErrors = ref({
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+  general: "",
+});
 
 // Usar el composable de favoritos
 const { favorites, loadFavorites, loading: favoritesLoading } = useFavorites();
@@ -393,6 +531,118 @@ const requestOrganizer = async () => {
 
 const goToEstablishments = () => {
   router.push({ name: "establishments" });
+};
+
+// Funciones para el modal de cambio de contraseña
+const closePasswordModal = () => {
+  showPasswordModal.value = false;
+  passwordForm.value = {
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  };
+  passwordErrors.value = {
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    general: "",
+  };
+  passwordSuccess.value = "";
+  showCurrentPassword.value = false;
+  showNewPassword.value = false;
+  showConfirmPassword.value = false;
+};
+
+const validatePasswords = () => {
+  passwordErrors.value = {
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    general: "",
+  };
+
+  let isValid = true;
+
+  // Validar contraseña actual
+  if (!passwordForm.value.currentPassword) {
+    passwordErrors.value.currentPassword = "La contraseña actual es obligatoria";
+    isValid = false;
+  }
+
+  // Validar nueva contraseña (mismas reglas que Register.vue)
+  if (!passwordForm.value.newPassword) {
+    passwordErrors.value.newPassword = "La nueva contraseña es un campo requerido.";
+    isValid = false;
+  } else if (passwordForm.value.newPassword.length < 6) {
+    passwordErrors.value.newPassword = "Debe tener al menos 6 caracteres.";
+    isValid = false;
+  } else if (!/\d/.test(passwordForm.value.newPassword)) {
+    passwordErrors.value.newPassword = "Debe contener al menos un número.";
+    isValid = false;
+  }
+
+  // Validar confirmación de contraseña
+  if (!passwordForm.value.confirmPassword) {
+    passwordErrors.value.confirmPassword = "Debes confirmar la nueva contraseña";
+    isValid = false;
+  } else if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
+    passwordErrors.value.confirmPassword = "Las contraseñas deben coincidir.";
+    isValid = false;
+  }
+
+  return isValid;
+};
+
+const changePassword = async () => {
+  if (!validatePasswords()) return;
+
+  changingPassword.value = true;
+  passwordSuccess.value = "";
+
+  try {
+    console.log("Intentando cambiar contraseña para usuario:", session.value.userId);
+    console.log("URL:", `http://localhost:8080/api/users/${session.value.userId}/password`);
+
+    const response = await fetch(`http://localhost:8080/api/users/${session.value.userId}/password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.value.token}`,
+      },
+      body: JSON.stringify({
+        currentPassword: passwordForm.value.currentPassword,
+        newPassword: passwordForm.value.newPassword,
+      }),
+    });
+
+    console.log("Response status:", response.status);
+    console.log("Response ok:", response.ok);
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Response data:", data);
+      passwordSuccess.value = data.message || "Contraseña cambiada correctamente";
+      setTimeout(() => {
+        closePasswordModal();
+      }, 2000);
+    } else {
+      // Intentar leer como JSON, si falla leer como texto
+      try {
+        const data = await response.json();
+        console.log("Error response data:", data);
+        passwordErrors.value.general = data.error || "Error al cambiar la contraseña";
+      } catch (jsonError) {
+        const text = await response.text();
+        console.log("Error response text:", text);
+        passwordErrors.value.general = text || "Error al cambiar la contraseña";
+      }
+    }
+  } catch (error) {
+    console.error("Error completo:", error);
+    passwordErrors.value.general = "Error de conexión. Inténtalo de nuevo.";
+  } finally {
+    changingPassword.value = false;
+  }
 };
 
 const categoryColors: Record<string, string> = {

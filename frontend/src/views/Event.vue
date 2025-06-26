@@ -53,6 +53,12 @@
           <span class="font-bold"> Precio:</span>
           {{ event.price === 0 ? "Gratuito" : event.price + " €" }}
         </p>
+        <p class="text-lg text-white-bg">
+          <span class="font-bold">Teléfono de contacto:</span> {{ event.establishment.phone }}
+        </p>
+        <p class="text-lg text-white-bg">
+          <span class="font-bold">Email de contacto:</span> {{ event.establishment.email }}
+        </p>
         <hr class="my-3 border border-white-bg" />
         <p class="text-lg text-white-bg">{{ event.description }}</p>
         <hr class="my-3 border border-white-bg" />
