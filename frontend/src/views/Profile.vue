@@ -545,7 +545,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, onUnmounted, nextTick } from "vue";
+import { computed, onMounted, ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { Eye, EyeOff } from "lucide-vue-next";
 import { useSession } from "@/composables/useSession";
@@ -553,7 +553,7 @@ import { useFavorites } from "@/composables/useFavorites";
 import { ApiService } from "@/services/api";
 
 const router = useRouter();
-const { session, setSession } = useSession();
+const { session, updateRole, refreshSession } = useSession();
 
 // Datos de favoritos y tipos de eventos
 const favoritesData = ref<any[]>([]);
@@ -640,29 +640,9 @@ onMounted(async () => {
     const customEvent = event as CustomEvent<{ userId: number; newRoleId: number }>;
     const { userId, newRoleId } = customEvent.detail;
     if (userId === session.value?.userId) {
-      console.log("Cambio de rol detectado para el usuario actual:", { userId, newRoleId });
-
-      // Actualizar primero el estado local
+      // El rol de este usuario cambió, refrescar la sesión
+      await refreshSession();
       hasPendingRequest.value = false;
-
-      // Forzar la actualización completa de la sesión
-      const refreshed = await forceSessionRefresh();
-      if (refreshed) {
-        console.log("Sesión actualizada correctamente, nuevo rol:", session.value.roleId);
-      } else {
-        console.error("Error al refrescar la sesión, usando actualización local");
-        // Como último recurso, actualizar el rol local usando setSession
-        setSession({
-          token: session.value.token,
-          userId: session.value.userId,
-          roleId: newRoleId,
-          email: session.value.email,
-          name: session.value.name,
-        });
-      }
-
-      // Forzar una actualización de la reactividad
-      await nextTick();
     }
   };
 
@@ -1164,34 +1144,4 @@ const barChartData = computed(() => {
     };
   });
 });
-
-// Función para forzar la actualización de la sesión (usada internamente por el listener)
-const forceSessionRefresh = async () => {
-  if (!session.value?.token) return false;
-
-  try {
-    const response = await fetch("http://localhost:8080/api/auth/refresh", {
-      headers: {
-        Authorization: `Bearer ${session.value.token}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      // Actualizar completamente la sesión
-      setSession({
-        token: session.value.token,
-        userId: data.userId,
-        roleId: data.roleId,
-        email: data.email,
-        name: data.name,
-      });
-      console.log("Sesión actualizada correctamente:", data);
-      return true;
-    }
-  } catch (error) {
-    console.error("Error al actualizar sesión:", error);
-  }
-  return false;
-};
 </script>
