@@ -37,7 +37,7 @@ public class OrganizerRequestService {
         
         // Verificar si ya es organizador o administrador
         if (user.getRole().getId() >= 2) {
-            throw new RuntimeException("El usuario ya tiene rol de organizador o administrador");
+            throw new RuntimeException("El usuario ya tiene rol de organizador o administrador. Si los cambios no son visibles, prueba a cerrar sesión e iniciar de nuevo");
         }
         
         // Verificar si ya tiene una solicitud pendiente

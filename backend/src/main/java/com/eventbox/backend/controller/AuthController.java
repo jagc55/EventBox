@@ -100,27 +100,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/refresh")
-    public ResponseEntity<Map<String, Object>> refreshUserInfo(@RequestHeader("Authorization") String authHeader) {
-        try {
-            String token = authHeader.substring(7); // Remover "Bearer "
-            String email = jwtService.extractUsername(token);
-            
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("userId", user.getId());
-            response.put("roleId", user.getRole().getId());
-            response.put("email", user.getEmail());
-            response.put("name", user.getName());
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Token inválido"));
-        }
-    }
-
     @GetMapping("/check-email")
     public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
         boolean exists = userRepository.findByEmail(email).isPresent();

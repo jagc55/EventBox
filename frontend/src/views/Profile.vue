@@ -8,70 +8,71 @@
         <h2 class="text-2xl font-bold text-white-bg">Información Personal</h2>
       </div>
 
-      <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Información del usuario -->
-        <div class="flex-1 space-y-4">
-          <div class="space-y-3">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-purple-primary rounded-lg flex items-center justify-center">
-                <svg class="w-4 h-4 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm text-gray-400">Email</p>
-                <p class="text-lg font-semibold text-white-bg">{{ email }}</p>
-              </div>
+      <div class="space-y-6">
+        <!-- Información del usuario en horizontal -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-purple-primary rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+              </svg>
             </div>
-
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-purple-primary rounded-lg flex items-center justify-center">
-                <svg class="w-4 h-4 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clip-rule="evenodd"
-                  ></path>
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm text-gray-400">Usuario</p>
-                <p class="text-lg font-semibold text-white-bg">{{ name }}</p>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-purple-primary rounded-lg flex items-center justify-center">
-                <svg class="w-4 h-4 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fill-rule="evenodd"
-                    d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5z"
-                    clip-rule="evenodd"
-                  ></path>
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm text-gray-400">Rol</p>
-                <p class="text-lg font-semibold text-white-bg">
-                  {{ roleId === 1 ? "Usuario" : roleId === 2 ? "Organizador" : "Administrador" }}
-                </p>
-              </div>
+            <div>
+              <p class="text-sm text-gray-400">Email</p>
+              <p class="text-lg font-semibold text-white-bg">{{ email }}</p>
             </div>
           </div>
 
-          <!-- Seguidores y Siguiendo -->
-          <div class="mt-6">
-            <h3 class="text-sm text-gray-400 mb-3">Social</h3>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-purple-primary rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Usuario</p>
+              <p class="text-lg font-semibold text-white-bg">{{ name }}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-purple-primary rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Rol</p>
+              <p class="text-lg font-semibold text-white-bg">
+                {{ roleId === 1 ? "Usuario" : roleId === 2 ? "Organizador" : "Administrador" }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seguidores, Siguiendo y Botones de acción -->
+        <div>
+          <h3 class="text-sm text-gray-400 mb-4">Social</h3>
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <!-- Seguidores y Siguiendo -->
             <div class="flex gap-6">
               <button
                 @click="openFollowersModal"
-                class="group flex items-center gap-3 text-white-bg hover:text-purple-300 transition-all duration-200"
+                class="group flex items-center gap-4 text-white-bg hover:text-purple-300 transition-all duration-200"
               >
                 <div
-                  class="w-10 h-10 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                  class="w-12 h-12 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
                 >
-                  <svg class="w-5 h-5 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"
                     ></path>
@@ -85,12 +86,12 @@
 
               <button
                 @click="openFollowingModal"
-                class="group flex items-center gap-3 text-white-bg hover:text-purple-300 transition-all duration-200"
+                class="group flex items-center gap-4 text-white-bg hover:text-purple-300 transition-all duration-200"
               >
                 <div
-                  class="w-10 h-10 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                  class="w-12 h-12 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
                 >
-                  <svg class="w-5 h-5 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
                     ></path>
@@ -102,70 +103,70 @@
                 </div>
               </button>
             </div>
+
+            <!-- Botones de acción -->
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button
+                v-if="roleId === 1 && !hasPendingRequest"
+                @click="requestOrganizer"
+                :disabled="loadingPendingRequest"
+                class="bg-purple-primary hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm w-full sm:w-48 disabled:opacity-50"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
+                  <path
+                    fill-rule="evenodd"
+                    d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                {{ loadingPendingRequest ? "Verificando..." : "Solicitar organizador" }}
+              </button>
+
+              <button
+                v-else-if="roleId === 1 && hasPendingRequest"
+                class="bg-purple-primary text-white font-medium px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-sm w-full sm:w-48 cursor-not-allowed opacity-75"
+                disabled
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Solicitud pendiente
+              </button>
+
+              <button
+                v-else-if="roleId >= 2"
+                @click="goToEstablishments"
+                class="bg-purple-primary hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm w-full sm:w-48"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Establecimientos
+              </button>
+
+              <button
+                @click="showPasswordModal = true"
+                class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm w-full sm:w-48"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                Cambiar contraseña
+              </button>
+            </div>
           </div>
-        </div>
-
-        <!-- Botones de acción -->
-        <div class="flex flex-col gap-3 lg:w-auto">
-          <button
-            v-if="roleId === 1 && !hasPendingRequest"
-            @click="requestOrganizer"
-            :disabled="loadingPendingRequest"
-            class="bg-purple-primary hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm w-48 disabled:opacity-50"
-          >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-              <path
-                fill-rule="evenodd"
-                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            {{ loadingPendingRequest ? "Verificando..." : "Solicitar organizador" }}
-          </button>
-
-          <button
-            v-else-if="roleId === 1 && hasPendingRequest"
-            class="bg-purple-primary text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 text-sm w-48 cursor-not-allowed opacity-75"
-            disabled
-          >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            Solicitud pendiente
-          </button>
-
-          <button
-            v-else-if="roleId >= 2"
-            @click="goToEstablishments"
-            class="bg-purple-primary hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm w-48"
-          >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            Establecimientos
-          </button>
-
-          <button
-            @click="showPasswordModal = true"
-            class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2 text-sm w-48"
-          >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            Cambiar contraseña
-          </button>
         </div>
       </div>
     </div>
@@ -545,7 +546,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, onUnmounted } from "vue";
+import { computed, onMounted, ref, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Eye, EyeOff } from "lucide-vue-next";
 import { useSession } from "@/composables/useSession";
@@ -553,7 +554,7 @@ import { useFavorites } from "@/composables/useFavorites";
 import { ApiService } from "@/services/api";
 
 const router = useRouter();
-const { session, updateRole, refreshSession } = useSession();
+const { session } = useSession();
 
 // Datos de favoritos y tipos de eventos
 const favoritesData = ref<any[]>([]);
@@ -631,27 +632,9 @@ const loadEventTypes = async () => {
   }
 };
 
-// Cargar favoritos y tipos de eventos al montar el componente
-onMounted(async () => {
-  await Promise.all([loadUserFavorites(), loadEventTypes(), loadFollowData(), checkPendingRequest()]);
-
-  // Listener para detectar cuando se aprueba la solicitud del usuario actual
-  const handleRoleUpdate = async (event: Event) => {
-    const customEvent = event as CustomEvent<{ userId: number; newRoleId: number }>;
-    const { userId, newRoleId } = customEvent.detail;
-    if (userId === session.value?.userId) {
-      // El rol de este usuario cambió, refrescar la sesión
-      await refreshSession();
-      hasPendingRequest.value = false;
-    }
-  };
-
-  window.addEventListener("userRoleUpdated", handleRoleUpdate);
-
-  // Limpiar el listener cuando el componente se desmonte
-  onUnmounted(() => {
-    window.removeEventListener("userRoleUpdated", handleRoleUpdate);
-  });
+onMounted(() => {
+  // Cargar datos de forma asíncrona
+  Promise.all([loadUserFavorites(), loadEventTypes(), loadFollowData(), checkPendingRequest()]);
 });
 
 // Computed para estadísticas basadas en favoritos reales
@@ -780,6 +763,17 @@ const roleId = computed(() => session.value?.roleId || 1);
 const name = computed(() => session.value?.name || "");
 const email = computed(() => session.value?.email || "");
 
+// Watch para detectar cambios en el rol del usuario
+watch(roleId, (newRoleId, oldRoleId) => {
+  if (newRoleId !== 1) {
+    // Si ya no es usuario normal, limpiar estado de solicitud pendiente
+    hasPendingRequest.value = false;
+  } else if (newRoleId === 1 && oldRoleId !== 1) {
+    // Si cambió a usuario normal, verificar solicitudes pendientes
+    checkPendingRequest();
+  }
+});
+
 const requestOrganizer = async () => {
   if (!session.value?.userId) return;
 
@@ -879,9 +873,6 @@ const changePassword = async () => {
   passwordSuccess.value = "";
 
   try {
-    console.log("Intentando cambiar contraseña para usuario:", session.value.userId);
-    console.log("URL:", `http://localhost:8080/api/users/${session.value.userId}/password`);
-
     const response = await fetch(`http://localhost:8080/api/users/${session.value.userId}/password`, {
       method: "PATCH",
       headers: {
@@ -894,12 +885,8 @@ const changePassword = async () => {
       }),
     });
 
-    console.log("Response status:", response.status);
-    console.log("Response ok:", response.ok);
-
     if (response.ok) {
       const data = await response.json();
-      console.log("Response data:", data);
       passwordSuccess.value = data.message || "Contraseña cambiada correctamente";
       setTimeout(() => {
         closePasswordModal();
@@ -908,16 +895,13 @@ const changePassword = async () => {
       // Intentar leer como JSON, si falla leer como texto
       try {
         const data = await response.json();
-        console.log("Error response data:", data);
         passwordErrors.value.general = data.error || "Error al cambiar la contraseña";
       } catch (jsonError) {
         const text = await response.text();
-        console.log("Error response text:", text);
         passwordErrors.value.general = text || "Error al cambiar la contraseña";
       }
     }
   } catch (error) {
-    console.error("Error completo:", error);
     passwordErrors.value.general = "Error de conexión. Inténtalo de nuevo.";
   } finally {
     changingPassword.value = false;
@@ -948,6 +932,7 @@ const loadFollowData = async () => {
 
 // Verificar si el usuario tiene una solicitud pendiente de organizador
 const checkPendingRequest = async () => {
+  // Solo verificar si es usuario (rol 1) y tiene sesión activa
   if (!session.value?.userId || roleId.value !== 1) {
     hasPendingRequest.value = false;
     return;
@@ -962,9 +947,12 @@ const checkPendingRequest = async () => {
     if (response.ok) {
       const data = await response.json();
       hasPendingRequest.value = data.hasPendingRequest;
+    } else {
+      hasPendingRequest.value = false;
     }
   } catch (error) {
     console.error("Error checking pending request:", error);
+    hasPendingRequest.value = false;
   } finally {
     loadingPendingRequest.value = false;
   }

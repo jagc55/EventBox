@@ -126,14 +126,6 @@ const approveRequest = async (request: any) => {
 
     if (response.ok) {
       alert("Solicitud aprobada correctamente");
-
-      // Disparar un evento personalizado para notificar el cambio de rol
-      window.dispatchEvent(
-        new CustomEvent("userRoleUpdated", {
-          detail: { userId: request.user.id, newRoleId: 2 },
-        })
-      );
-
       loadRequests();
     } else {
       const errorData = await response.json();
