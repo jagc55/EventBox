@@ -107,7 +107,7 @@
             <!-- Botones de acción -->
             <div class="flex flex-col sm:flex-row gap-3">
               <button
-                v-if="roleId === 1 && !hasPendingRequest"
+                v-if="session?.userId && roleId === 1 && !hasPendingRequest"
                 @click="requestOrganizer"
                 :disabled="loadingPendingRequest"
                 class="bg-purple-primary hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm w-full sm:w-48 disabled:opacity-50"
@@ -123,7 +123,7 @@
               </button>
 
               <button
-                v-else-if="roleId === 1 && hasPendingRequest"
+                v-else-if="session?.userId && roleId === 1 && hasPendingRequest"
                 class="bg-purple-primary text-white font-medium px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-sm w-full sm:w-48 cursor-not-allowed opacity-75"
                 disabled
               >
@@ -138,7 +138,7 @@
               </button>
 
               <button
-                v-else-if="roleId >= 2"
+                v-else-if="session?.userId && roleId && roleId >= 2"
                 @click="goToEstablishments"
                 class="bg-purple-primary hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm w-full sm:w-48"
               >
@@ -546,7 +546,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, onUnmounted, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Eye, EyeOff } from "lucide-vue-next";
 import { useSession } from "@/composables/useSession";
@@ -759,13 +759,13 @@ const upcomingEventsCount = computed(() => {
 });
 
 // ✅ Computed para usar en el template de forma segura y reactiva
-const roleId = computed(() => session.value?.roleId || 1);
+const roleId = computed(() => session.value?.roleId);
 const name = computed(() => session.value?.name || "");
 const email = computed(() => session.value?.email || "");
 
 // Watch para detectar cambios en el rol del usuario
 watch(roleId, (newRoleId, oldRoleId) => {
-  if (newRoleId !== 1) {
+  if (newRoleId && newRoleId !== 1) {
     // Si ya no es usuario normal, limpiar estado de solicitud pendiente
     hasPendingRequest.value = false;
   } else if (newRoleId === 1 && oldRoleId !== 1) {
@@ -957,6 +957,17 @@ const checkPendingRequest = async () => {
     loadingPendingRequest.value = false;
   }
 };
+
+// Watch para detectar cuando la sesión se carga inicialmente
+watch(
+  () => session.value?.userId,
+  (newUserId) => {
+    if (newUserId && roleId.value === 1) {
+      checkPendingRequest();
+    }
+  },
+  { immediate: true }
+);
 
 const loadFollowersData = async () => {
   if (!session.value?.userId) return;
