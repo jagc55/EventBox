@@ -62,49 +62,80 @@
         <!-- Seguidores, Siguiendo y Botones de acción -->
         <div>
           <h3 class="text-sm text-gray-400 mb-4">Social</h3>
-          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <!-- Seguidores y Siguiendo -->
-            <div class="flex gap-6">
-              <button
-                @click="openFollowersModal"
-                class="group flex items-center gap-4 text-white-bg hover:text-purple-300 transition-all duration-200"
-              >
-                <div
-                  class="w-12 h-12 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
-                >
-                  <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"
-                    ></path>
-                  </svg>
-                </div>
-                <div class="text-left">
-                  <p class="text-xl font-bold">{{ followersCount }}</p>
-                  <p class="text-sm opacity-80 group-hover:underline">Seguidores</p>
-                </div>
-              </button>
 
-              <button
-                @click="openFollowingModal"
-                class="group flex items-center gap-4 text-white-bg hover:text-purple-300 transition-all duration-200"
-              >
-                <div
-                  class="w-12 h-12 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+          <!-- Container principal con justificación entre elementos -->
+          <div class="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-6">
+            <!-- Lado izquierdo: Seguidores, Siguiendo y Establecimientos -->
+            <div class="space-y-4">
+              <!-- Primera fila: Seguidores y Siguiendo -->
+              <div class="flex gap-6">
+                <!-- Solo mostrar seguidores si el usuario es organizador o administrador -->
+                <button
+                  v-if="roleId && roleId >= 2"
+                  @click="openFollowersModal"
+                  class="group flex items-center gap-4 text-white-bg hover:text-purple-300 transition-all duration-200"
                 >
-                  <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
-                    ></path>
-                  </svg>
-                </div>
-                <div class="text-left">
-                  <p class="text-xl font-bold">{{ followingCount }}</p>
-                  <p class="text-sm opacity-80 group-hover:underline">Siguiendo</p>
-                </div>
-              </button>
+                  <div
+                    class="w-12 h-12 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                  >
+                    <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <p class="text-xl font-bold">{{ followersCount }}</p>
+                    <p class="text-sm opacity-80 group-hover:underline">Seguidores</p>
+                  </div>
+                </button>
+
+                <button
+                  @click="openFollowingModal"
+                  class="group flex items-center gap-4 text-white-bg hover:text-purple-300 transition-all duration-200"
+                >
+                  <div
+                    class="w-12 h-12 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                  >
+                    <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <p class="text-xl font-bold">{{ followingCount }}</p>
+                    <p class="text-sm opacity-80 group-hover:underline">Siguiendo</p>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Segunda fila: Solo Establecimientos seguidos -->
+              <div>
+                <button
+                  @click="openEstablishmentsModal"
+                  class="group flex items-center gap-4 text-white-bg hover:text-purple-300 transition-all duration-200"
+                >
+                  <div
+                    class="w-12 h-12 bg-purple-primary group-hover:bg-purple-600 rounded-lg flex items-center justify-center transition-colors duration-200"
+                  >
+                    <svg class="w-6 h-6 text-white-bg" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fill-rule="evenodd"
+                        d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <p class="text-xl font-bold">{{ establishmentsFollowingCount }}</p>
+                    <p class="text-sm opacity-80 group-hover:underline">Establecimientos seguidos</p>
+                  </div>
+                </button>
+              </div>
             </div>
 
-            <!-- Botones de acción -->
+            <!-- Lado derecho: Botones de acción completamente separados y alineados al borde derecho -->
             <div class="flex flex-col sm:flex-row gap-3">
               <button
                 v-if="session?.userId && roleId === 1 && !hasPendingRequest"
@@ -428,6 +459,68 @@
       </div>
     </div>
 
+    <!-- Modal de establecimientos seguidos -->
+    <div
+      v-show="showEstablishmentsModal"
+      class="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur z-50"
+      @click.self="closeEstablishmentsModal"
+    >
+      <div
+        class="w-[90%] md:w-[50%] lg:w-[40%] border border-white-bg bg-dark-primary p-6 rounded-xl max-h-[80vh] overflow-hidden flex flex-col"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-white-bg">
+            Establecimientos Seguidos ({{ establishmentsFollowingCount }})
+          </h2>
+          <button
+            @click="closeEstablishmentsModal"
+            class="bg-red-primary hover:bg-red-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto">
+          <div v-if="loadingFollowData" class="text-center py-8">
+            <p class="text-white-bg">Cargando establecimientos que sigues...</p>
+          </div>
+
+          <div v-else-if="myEstablishments.length === 0" class="text-center py-8">
+            <p class="text-white-bg opacity-70">No sigues ningún establecimiento aún</p>
+          </div>
+
+          <div v-else class="space-y-3">
+            <div
+              v-for="establishmentFollow in myEstablishments"
+              :key="establishmentFollow.id"
+              class="flex items-center justify-between p-4 bg-black-secundary rounded-lg"
+            >
+              <div class="flex-1">
+                <h3 class="text-white-bg font-bold text-lg">{{ establishmentFollow.establishment.name }}</h3>
+                <p class="text-white-bg text-sm opacity-70 mt-1">
+                  <span class="font-medium">Organizador:</span> {{ establishmentFollow.establishment.user.name }}
+                </p>
+                <p class="text-white-bg text-sm opacity-70">
+                  <span class="font-medium">Dirección:</span> {{ establishmentFollow.establishment.address }}
+                </p>
+                <p class="text-white-bg text-xs opacity-50 mt-2">
+                  Siguiendo desde: {{ formatDate(establishmentFollow.createdAt) }}
+                </p>
+              </div>
+              <div class="flex items-center gap-3 ml-4">
+                <button
+                  @click="unfollowEstablishment(establishmentFollow.establishment.id)"
+                  class="bg-red-primary hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
+                >
+                  Dejar de seguir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de cambio de contraseña -->
     <div
       v-show="showPasswordModal"
@@ -576,10 +669,13 @@ const showConfirmPassword = ref(false);
 // Estado para modales de seguidores
 const showFollowersModal = ref(false);
 const showFollowingModal = ref(false);
+const showEstablishmentsModal = ref(false);
 const myFollowers = ref<any[]>([]);
 const myFollowing = ref<any[]>([]);
+const myEstablishments = ref<any[]>([]);
 const followersCount = ref(0);
 const followingCount = ref(0);
+const establishmentsFollowingCount = ref(0);
 const loadingFollowData = ref(false);
 
 // Estado para solicitud de organizador
@@ -913,7 +1009,7 @@ const loadFollowData = async () => {
   if (!session.value?.userId) return;
 
   try {
-    // Cargar contadores
+    // Cargar contadores de usuarios
     const countsResponse = await fetch(`http://localhost:8080/api/user-follows/${session.value.userId}/counts`, {
       headers: {
         Authorization: `Bearer ${session.value.token}`,
@@ -924,6 +1020,21 @@ const loadFollowData = async () => {
       const counts = await countsResponse.json();
       followersCount.value = counts.followersCount;
       followingCount.value = counts.followingCount;
+    }
+
+    // Cargar contador de establecimientos seguidos
+    const establishmentCountResponse = await fetch(
+      `http://localhost:8080/api/establishment-follows/user/${session.value.userId}/count`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.value.token}`,
+        },
+      }
+    );
+
+    if (establishmentCountResponse.ok) {
+      const establishmentCounts = await establishmentCountResponse.json();
+      establishmentsFollowingCount.value = establishmentCounts.establishmentsFollowingCount;
     }
   } catch (error) {
     console.error("Error loading follow data:", error);
@@ -1011,6 +1122,30 @@ const loadFollowingData = async () => {
   }
 };
 
+const loadEstablishmentsData = async () => {
+  if (!session.value?.userId) return;
+
+  loadingFollowData.value = true;
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/establishment-follows/user/${session.value.userId}/establishments`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.value.token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      myEstablishments.value = await response.json();
+    }
+  } catch (error) {
+    console.error("Error loading establishments:", error);
+  } finally {
+    loadingFollowData.value = false;
+  }
+};
+
 const openFollowersModal = async () => {
   showFollowersModal.value = true;
   await loadFollowersData();
@@ -1021,6 +1156,11 @@ const openFollowingModal = async () => {
   await loadFollowingData();
 };
 
+const openEstablishmentsModal = async () => {
+  showEstablishmentsModal.value = true;
+  await loadEstablishmentsData();
+};
+
 const closeFollowersModal = () => {
   showFollowersModal.value = false;
   myFollowers.value = [];
@@ -1029,6 +1169,11 @@ const closeFollowersModal = () => {
 const closeFollowingModal = () => {
   showFollowingModal.value = false;
   myFollowing.value = [];
+};
+
+const closeEstablishmentsModal = () => {
+  showEstablishmentsModal.value = false;
+  myEstablishments.value = [];
 };
 
 const unfollowUser = async (userId: number) => {
@@ -1057,6 +1202,36 @@ const unfollowUser = async (userId: number) => {
     }
   } catch (error) {
     console.error("Error unfollowing user:", error);
+    alert("Error de conexión");
+  }
+};
+
+const unfollowEstablishment = async (establishmentId: number) => {
+  if (!session.value?.userId) return;
+
+  try {
+    const response = await fetch("http://localhost:8080/api/establishment-follows", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.value.token}`,
+      },
+      body: JSON.stringify({
+        userId: session.value.userId,
+        establishmentId,
+      }),
+    });
+
+    if (response.ok) {
+      // Actualizar los datos
+      await loadEstablishmentsData();
+      await loadFollowData();
+    } else {
+      const errorData = await response.json();
+      alert("Error: " + (errorData.error || "Error al dejar de seguir establecimiento"));
+    }
+  } catch (error) {
+    console.error("Error unfollowing establishment:", error);
     alert("Error de conexión");
   }
 };

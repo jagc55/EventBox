@@ -38,6 +38,11 @@ public class UserFollowService {
         User follower = followerOptional.get();
         User followed = followedOptional.get();
         
+        // Verificar que solo se pueda seguir a organizadores y administradores
+        if (followed.getRole().getId() < 2) {
+            throw new RuntimeException("Solo puedes seguir a organizadores y administradores");
+        }
+        
         // Verificar si ya lo sigue
         if (userFollowRepository.existsByFollowerAndFollowed(follower, followed)) {
             throw new RuntimeException("Ya sigues a este usuario");

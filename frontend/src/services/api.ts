@@ -167,7 +167,82 @@ export class ApiService {
   }
 
   // User Follow interfaces and endpoints
+  static async followUser(followerId: number, followedId: number): Promise<{ message: string; follow: any }> {
+    return this.makeRequest<{ message: string; follow: any }>("/user-follows", {
+      method: "POST",
+      body: JSON.stringify({ followerId, followedId }),
+    });
+  }
+
+  static async unfollowUser(followerId: number, followedId: number): Promise<{ message: string }> {
+    return this.makeRequest<{ message: string }>("/user-follows", {
+      method: "DELETE",
+      body: JSON.stringify({ followerId, followedId }),
+    });
+  }
+
+  static async isFollowing(followerId: number, followedId: number): Promise<{ isFollowing: boolean }> {
+    return this.makeRequest<{ isFollowing: boolean }>(
+      `/user-follows/check?followerId=${followerId}&followedId=${followedId}`
+    );
+  }
+
   static async getFollowing(userId: number): Promise<any[]> {
     return this.makeRequest<any[]>(`/user-follows/${userId}/following`);
+  }
+
+  static async getFollowers(userId: number): Promise<any[]> {
+    return this.makeRequest<any[]>(`/user-follows/${userId}/followers`);
+  }
+
+  static async getFollowCounts(userId: number): Promise<{ followersCount: number; followingCount: number }> {
+    return this.makeRequest<{ followersCount: number; followingCount: number }>(`/user-follows/${userId}/counts`);
+  }
+
+  static async getMostFollowedUsers(): Promise<any[]> {
+    return this.makeRequest<any[]>("/user-follows/most-followed");
+  }
+
+  // Establishment Follow methods
+  static async followEstablishment(userId: number, establishmentId: number): Promise<{ message: string; follow: any }> {
+    return this.makeRequest<{ message: string; follow: any }>("/establishment-follows", {
+      method: "POST",
+      body: JSON.stringify({ userId, establishmentId }),
+    });
+  }
+
+  static async unfollowEstablishment(userId: number, establishmentId: number): Promise<{ message: string }> {
+    return this.makeRequest<{ message: string }>("/establishment-follows", {
+      method: "DELETE",
+      body: JSON.stringify({ userId, establishmentId }),
+    });
+  }
+
+  static async isFollowingEstablishment(userId: number, establishmentId: number): Promise<{ isFollowing: boolean }> {
+    return this.makeRequest<{ isFollowing: boolean }>(
+      `/establishment-follows/check?userId=${userId}&establishmentId=${establishmentId}`
+    );
+  }
+
+  static async getFollowedEstablishments(userId: number): Promise<any[]> {
+    return this.makeRequest<any[]>(`/establishment-follows/user/${userId}/establishments`);
+  }
+
+  static async getEstablishmentFollowers(establishmentId: number): Promise<any[]> {
+    return this.makeRequest<any[]>(`/establishment-follows/establishment/${establishmentId}/followers`);
+  }
+
+  static async getFollowedEstablishmentsCount(userId: number): Promise<{ establishmentsFollowingCount: number }> {
+    return this.makeRequest<{ establishmentsFollowingCount: number }>(`/establishment-follows/user/${userId}/count`);
+  }
+
+  static async getEstablishmentFollowersCount(establishmentId: number): Promise<{ followersCount: number }> {
+    return this.makeRequest<{ followersCount: number }>(
+      `/establishment-follows/establishment/${establishmentId}/count`
+    );
+  }
+
+  static async getMostFollowedEstablishments(): Promise<any[]> {
+    return this.makeRequest<any[]>("/establishment-follows/most-followed");
   }
 }
