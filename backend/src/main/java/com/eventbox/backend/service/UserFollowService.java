@@ -110,7 +110,7 @@ public class UserFollowService {
             throw new RuntimeException("Usuario no encontrado");
         }
         
-        return userFollowRepository.findByFollowedOrderByCreatedAtDesc(userOptional.get());
+        return userFollowRepository.findByFollowedWithFollowerOrderByCreatedAtDesc(userOptional.get());
     }
     
     // Obtener usuarios que sigue un usuario
@@ -120,7 +120,7 @@ public class UserFollowService {
             throw new RuntimeException("Usuario no encontrado");
         }
         
-        return userFollowRepository.findByFollowerOrderByCreatedAtDesc(userOptional.get());
+        return userFollowRepository.findByFollowerWithFollowedOrderByCreatedAtDesc(userOptional.get());
     }
     
     // Obtener conteo de seguidores

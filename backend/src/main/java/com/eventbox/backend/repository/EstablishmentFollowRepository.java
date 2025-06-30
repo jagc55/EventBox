@@ -25,6 +25,14 @@ public interface EstablishmentFollowRepository extends JpaRepository<Establishme
     // Obtener seguidores de un establecimiento
     List<EstablishmentFollow> findByEstablishmentOrderByCreatedAtDesc(Establishment establishment);
     
+    // Obtener establecimientos seguidos con JOIN FETCH para evitar lazy loading
+    @Query("SELECT ef FROM EstablishmentFollow ef JOIN FETCH ef.establishment WHERE ef.follower = :user ORDER BY ef.createdAt DESC")
+    List<EstablishmentFollow> findByFollowerWithEstablishmentOrderByCreatedAtDesc(User user);
+    
+    // Obtener seguidores de establecimiento con JOIN FETCH para evitar lazy loading
+    @Query("SELECT ef FROM EstablishmentFollow ef JOIN FETCH ef.follower WHERE ef.establishment = :establishment ORDER BY ef.createdAt DESC")
+    List<EstablishmentFollow> findByEstablishmentWithFollowerOrderByCreatedAtDesc(Establishment establishment);
+    
     // Contar seguidores de un establecimiento
     long countByEstablishment(Establishment establishment);
     

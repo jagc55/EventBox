@@ -93,7 +93,7 @@ public class EstablishmentFollowService {
             throw new RuntimeException("Usuario no encontrado");
         }
         
-        return establishmentFollowRepository.findByFollowerOrderByCreatedAtDesc(userOptional.get());
+        return establishmentFollowRepository.findByFollowerWithEstablishmentOrderByCreatedAtDesc(userOptional.get());
     }
     
     // Obtener seguidores de un establecimiento
@@ -103,9 +103,9 @@ public class EstablishmentFollowService {
             throw new RuntimeException("Establecimiento no encontrado");
         }
         
-        return establishmentFollowRepository.findByEstablishmentOrderByCreatedAtDesc(establishmentOptional.get());
+        return establishmentFollowRepository.findByEstablishmentWithFollowerOrderByCreatedAtDesc(establishmentOptional.get());
     }
-    
+
     // Obtener conteo de establecimientos que sigue un usuario
     public long getFollowedEstablishmentsCount(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);

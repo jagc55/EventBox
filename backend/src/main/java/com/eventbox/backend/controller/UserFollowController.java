@@ -5,8 +5,10 @@ import com.eventbox.backend.service.UserFollowService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user-follows")
@@ -56,10 +58,23 @@ public class UserFollowController {
     
     // Obtener seguidores de un usuario
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<List<UserFollow>> getFollowers(@PathVariable Long userId) {
+    public ResponseEntity<?> getFollowers(@PathVariable Long userId) {
         try {
             List<UserFollow> followers = userFollowService.getFollowers(userId);
-            return ResponseEntity.ok(followers);
+            
+            // Convertir a un formato más simple para evitar problemas de serialización
+            List<Map<String, Object>> result = followers.stream()
+                .map(follow -> {
+                    Map<String, Object> userInfo = new HashMap<>();
+                    userInfo.put("id", follow.getFollower().getId());
+                    userInfo.put("name", follow.getFollower().getName());
+                    userInfo.put("email", follow.getFollower().getEmail());
+                    userInfo.put("createdAt", follow.getCreatedAt());
+                    return userInfo;
+                })
+                .collect(Collectors.toList());
+                
+            return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -67,10 +82,23 @@ public class UserFollowController {
     
     // Obtener usuarios que sigue un usuario
     @GetMapping("/{userId}/following")
-    public ResponseEntity<List<UserFollow>> getFollowing(@PathVariable Long userId) {
+    public ResponseEntity<?> getFollowing(@PathVariable Long userId) {
         try {
             List<UserFollow> following = userFollowService.getFollowing(userId);
-            return ResponseEntity.ok(following);
+            
+            // Convertir a un formato más simple para evitar problemas de serialización
+            List<Map<String, Object>> result = following.stream()
+                .map(follow -> {
+                    Map<String, Object> userInfo = new HashMap<>();
+                    userInfo.put("id", follow.getFollowed().getId());
+                    userInfo.put("name", follow.getFollowed().getName());
+                    userInfo.put("email", follow.getFollowed().getEmail());
+                    userInfo.put("createdAt", follow.getCreatedAt());
+                    return userInfo;
+                })
+                .collect(Collectors.toList());
+                
+            return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }

@@ -1,5 +1,6 @@
 package com.eventbox.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -36,19 +37,19 @@ public class UserFollow {
     public Long getId() {
         return id;
     }
-    
-    public void setId(Long id) {
+      public void setId(Long id) {
         this.id = id;
     }
-    
+
+    @JsonIgnoreProperties({"password", "userFollowers", "userFollowing", "establishments", "events", "comments"})
     public User getFollower() {
         return follower;
     }
-    
-    public void setFollower(User follower) {
+      public void setFollower(User follower) {
         this.follower = follower;
     }
-    
+
+    @JsonIgnoreProperties({"password", "userFollowers", "userFollowing", "establishments", "events", "comments"})
     public User getFollowed() {
         return followed;
     }

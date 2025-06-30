@@ -24,6 +24,14 @@ public interface UserFollowRepository extends JpaRepository<UserFollow, Long> {
     // Obtener todos los usuarios que sigue un usuario
     List<UserFollow> findByFollowerOrderByCreatedAtDesc(User follower);
     
+    // Obtener seguidores con JOIN FETCH para evitar lazy loading
+    @Query("SELECT uf FROM UserFollow uf JOIN FETCH uf.follower WHERE uf.followed = :user ORDER BY uf.createdAt DESC")
+    List<UserFollow> findByFollowedWithFollowerOrderByCreatedAtDesc(User user);
+    
+    // Obtener usuarios seguidos con JOIN FETCH para evitar lazy loading
+    @Query("SELECT uf FROM UserFollow uf JOIN FETCH uf.followed WHERE uf.follower = :user ORDER BY uf.createdAt DESC")
+    List<UserFollow> findByFollowerWithFollowedOrderByCreatedAtDesc(User user);
+    
     // Contar seguidores de un usuario
     long countByFollowed(User followed);
     

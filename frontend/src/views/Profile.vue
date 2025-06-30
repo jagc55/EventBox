@@ -386,13 +386,12 @@
               class="flex items-center gap-3 p-3 bg-black-secundary rounded-lg"
             >
               <div class="flex-1">
-                <p class="text-white-bg font-medium">{{ follow.follower.name }}</p>
-                <p class="text-white-bg text-sm opacity-70">{{ follow.follower.email }}</p>
+                <p class="text-white-bg font-medium">{{ follow.name }}</p>
+                <p class="text-white-bg text-sm opacity-70">{{ follow.email }}</p>
                 <p class="text-white-bg text-xs opacity-50">Te sigue desde: {{ formatDate(follow.createdAt) }}</p>
               </div>
               <div class="text-white-bg text-sm opacity-60">
-                {{
-                  follow.follower.role.id === 1 ? "Usuario" : follow.follower.role.id === 2 ? "Organizador" : "Admin"
+                {{ follow.role?.id === 1 ? "Usuario" : follow.role?.id === 2 ? "Organizador" : "Admin" }}
                 }}
               </div>
             </div>
@@ -436,18 +435,16 @@
               class="flex items-center justify-between p-3 bg-black-secundary rounded-lg"
             >
               <div class="flex-1">
-                <p class="text-white-bg font-medium">{{ follow.followed.name }}</p>
-                <p class="text-white-bg text-sm opacity-70">{{ follow.followed.email }}</p>
+                <p class="text-white-bg font-medium">{{ follow.name }}</p>
+                <p class="text-white-bg text-sm opacity-70">{{ follow.email }}</p>
                 <p class="text-white-bg text-xs opacity-50">Siguiendo desde: {{ formatDate(follow.createdAt) }}</p>
               </div>
               <div class="flex items-center gap-3">
                 <div class="text-white-bg text-sm opacity-60">
-                  {{
-                    follow.followed.role.id === 1 ? "Usuario" : follow.followed.role.id === 2 ? "Organizador" : "Admin"
-                  }}
+                  {{ follow.role?.id === 1 ? "Usuario" : follow.role?.id === 2 ? "Organizador" : "Admin" }}
                 </div>
                 <button
-                  @click="unfollowUser(follow.followed.id)"
+                  @click="unfollowUser(follow.id)"
                   class="bg-red-primary hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
                 >
                   Dejar de seguir
@@ -496,12 +493,15 @@
               class="flex items-center justify-between p-4 bg-black-secundary rounded-lg"
             >
               <div class="flex-1">
-                <h3 class="text-white-bg font-bold text-lg">{{ establishmentFollow.establishment.name }}</h3>
+                <h3 class="text-white-bg font-bold text-lg">{{ establishmentFollow.name }}</h3>
                 <p class="text-white-bg text-sm opacity-70 mt-1">
-                  <span class="font-medium">Organizador:</span> {{ establishmentFollow.establishment.user.name }}
+                  <span class="font-medium">Dirección:</span> {{ establishmentFollow.address }}
                 </p>
                 <p class="text-white-bg text-sm opacity-70">
-                  <span class="font-medium">Dirección:</span> {{ establishmentFollow.establishment.address }}
+                  <span class="font-medium">Teléfono:</span> {{ establishmentFollow.phone }}
+                </p>
+                <p class="text-white-bg text-sm opacity-70">
+                  <span class="font-medium">Email:</span> {{ establishmentFollow.email }}
                 </p>
                 <p class="text-white-bg text-xs opacity-50 mt-2">
                   Siguiendo desde: {{ formatDate(establishmentFollow.createdAt) }}
@@ -509,7 +509,7 @@
               </div>
               <div class="flex items-center gap-3 ml-4">
                 <button
-                  @click="unfollowEstablishment(establishmentFollow.establishment.id)"
+                  @click="unfollowEstablishment(establishmentFollow.id)"
                   class="bg-red-primary hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors duration-200"
                 >
                   Dejar de seguir
@@ -1106,6 +1106,7 @@ const loadFollowingData = async () => {
 
   loadingFollowData.value = true;
   try {
+    // Usar el endpoint correcto para obtener usuarios que sigue
     const response = await fetch(`http://localhost:8080/api/user-follows/${session.value.userId}/following`, {
       headers: {
         Authorization: `Bearer ${session.value.token}`,
@@ -1113,10 +1114,17 @@ const loadFollowingData = async () => {
     });
 
     if (response.ok) {
-      myFollowing.value = await response.json();
+      const followData = await response.json();
+
+      // Los datos ahora vienen directamente como objetos usuario
+      myFollowing.value = Array.isArray(followData) ? followData : [];
+    } else {
+      console.warn(`Following API returned ${response.status}`);
+      myFollowing.value = [];
     }
   } catch (error) {
     console.error("Error loading following:", error);
+    myFollowing.value = [];
   } finally {
     loadingFollowData.value = false;
   }
@@ -1127,6 +1135,7 @@ const loadEstablishmentsData = async () => {
 
   loadingFollowData.value = true;
   try {
+    // Usar el endpoint que funciona para obtener establishment follows
     const response = await fetch(
       `http://localhost:8080/api/establishment-follows/user/${session.value.userId}/establishments`,
       {
@@ -1137,10 +1146,17 @@ const loadEstablishmentsData = async () => {
     );
 
     if (response.ok) {
-      myEstablishments.value = await response.json();
+      const followData = await response.json();
+
+      // Los datos ahora vienen directamente como objetos establecimiento
+      myEstablishments.value = Array.isArray(followData) ? followData : [];
+    } else {
+      console.warn(`Establishments API returned ${response.status}`);
+      myEstablishments.value = [];
     }
   } catch (error) {
     console.error("Error loading establishments:", error);
+    myEstablishments.value = [];
   } finally {
     loadingFollowData.value = false;
   }

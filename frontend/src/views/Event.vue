@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-black-secundary py-5 pt-[88px]">
+  <div class="bg-black-secundary py-5 pt-[88px]" :class="$attrs.class">
     <!-- Loading indicator -->
     <div v-if="loading" class="text-center py-8">
       <p class="text-white-bg text-lg">Cargando evento...</p>
@@ -32,9 +32,25 @@
         </h1>
         <p class="text-xl font-semibold text-white-bg">{{ formatDateTime(event.date, event.time) }}</p>
         <hr class="my-3 border border-white-bg" />
-        <p class="text-lg text-white-bg"><span class="font-bold">Organizador:</span> {{ event.user.name }}</p>
+        <p class="text-lg text-white-bg">
+          <span class="font-bold">Organizador: </span>
+          <button
+            @click="openOrganizerModal(event.user)"
+            class="text-white-bg hover:text-gray-300 underline cursor-pointer"
+          >
+            {{ event.user.name }}
+          </button>
+        </p>
         <p class="text-lg text-white-bg"><span class="font-bold">Tipo:</span> {{ event.eventType.name }}</p>
-        <p class="text-lg text-white-bg"><span class="font-bold">Local:</span> {{ event.establishment.name }}</p>
+        <p class="text-lg text-white-bg">
+          <span class="font-bold">Establecimiento: </span>
+          <button
+            @click="openEstablishmentModal(event.establishment)"
+            class="text-white-bg hover:text-gray-300 underline cursor-pointer"
+          >
+            {{ event.establishment.name }}
+          </button>
+        </p>
         <p class="text-lg text-white-bg">
           <span class="font-bold">Dirección:</span>
           {{ event.establishment.address }}
@@ -164,9 +180,119 @@
       </div>
     </div>
   </div>
+
+  <!-- Organizer Modal -->
+  <div
+    v-if="showOrganizerModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    @click="closeOrganizerModal"
+  >
+    <div class="bg-dark-primary border border-white-bg rounded-xl p-6 max-w-md w-full mx-4" @click.stop>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-white-bg">Información del Organizador</h3>
+        <button @click="closeOrganizerModal" class="text-white-bg hover:text-gray-300 text-2xl">×</button>
+      </div>
+
+      <div v-if="selectedOrganizer" class="space-y-4">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <p class="text-white-bg text-lg font-semibold">{{ selectedOrganizer.name }}</p>
+            <p class="text-gray-300 text-sm" v-if="organizerEstablishments !== null">
+              {{ organizerEstablishments }} establecimiento{{ organizerEstablishments !== 1 ? "s" : "" }}
+            </p>
+          </div>
+
+          <div v-if="isLoggedIn && currentUser && selectedOrganizer.id !== currentUser.id" class="ml-4">
+            <button
+              @click="handleFollowToggle"
+              :disabled="followLoading"
+              :class="[
+                'px-4 py-2 rounded font-medium transition-colors duration-200 whitespace-nowrap',
+                isFollowingOrganizer
+                  ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                  : 'bg-purple-primary hover:bg-purple-600 text-white',
+              ]"
+            >
+              {{ followLoading ? "Cargando..." : isFollowingOrganizer ? "Dejar de seguir" : "Seguir" }}
+            </button>
+          </div>
+        </div>
+
+        <div v-if="followCounts" class="text-sm text-gray-300 flex gap-6">
+          <p>Seguidores: {{ followCounts.followersCount }}</p>
+          <p>Siguiendo: {{ followCounts.followingCount }}</p>
+        </div>
+
+        <div v-if="!isLoggedIn" class="text-sm text-gray-400">Inicia sesión para seguir organizadores</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Establishment Modal -->
+  <div
+    v-if="showEstablishmentModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    @click="closeEstablishmentModal"
+  >
+    <div class="bg-dark-primary border border-white-bg rounded-xl p-6 max-w-md w-full mx-4" @click.stop>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-white-bg">Información del Establecimiento</h3>
+        <button @click="closeEstablishmentModal" class="text-white-bg hover:text-gray-300 text-2xl">×</button>
+      </div>
+
+      <div v-if="selectedEstablishment" class="space-y-4">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <p class="text-white-bg text-lg font-semibold">{{ selectedEstablishment.name }}</p>
+            <p class="text-gray-300 text-sm">{{ selectedEstablishment.address }}</p>
+            <p class="text-gray-300 text-sm">
+              {{ selectedEstablishment.locality?.name }}, {{ selectedEstablishment.locality?.province?.name }}
+            </p>
+            <p class="text-gray-300 text-sm" v-if="establishmentEvents !== null">
+              {{ establishmentEvents }} eventos organizados
+            </p>
+          </div>
+
+          <div v-if="isLoggedIn && currentUser && selectedEstablishment.user?.id !== currentUser.id" class="ml-4">
+            <button
+              @click="handleEstablishmentFollowToggle"
+              :disabled="establishmentFollowLoading"
+              :class="[
+                'px-4 py-2 rounded font-medium transition-colors duration-200 whitespace-nowrap',
+                isFollowingEstablishment
+                  ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                  : 'bg-purple-primary hover:bg-purple-600 text-white',
+              ]"
+            >
+              {{ establishmentFollowLoading ? "Cargando..." : isFollowingEstablishment ? "Dejar de seguir" : "Seguir" }}
+            </button>
+          </div>
+        </div>
+
+        <div v-if="establishmentFollowCounts" class="text-sm text-gray-300">
+          <p>Seguidores: {{ establishmentFollowCounts.followersCount }}</p>
+        </div>
+
+        <div class="text-sm text-gray-300">
+          <p><span class="font-medium">Organizador:</span> {{ selectedEstablishment.user?.name }}</p>
+          <p><span class="font-medium">Teléfono:</span> {{ selectedEstablishment.phone }}</p>
+          <p><span class="font-medium">Email:</span> {{ selectedEstablishment.email }}</p>
+        </div>
+
+        <div v-if="!isLoggedIn" class="text-sm text-gray-400">Inicia sesión para seguir establecimientos</div>
+        <div v-else-if="currentUser && selectedEstablishment.user?.id === currentUser.id" class="text-sm text-gray-400">
+          No puedes seguir tu propio establecimiento
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+defineOptions({
+  inheritAttrs: false,
+});
+
 import { ref, onMounted, computed, watch } from "vue";
 import { useRoute } from "vue-router";
 import { Star, Trash2 } from "lucide-vue-next";
@@ -176,12 +302,29 @@ import { useAuth } from "@/composables/useAuth";
 import { useSession } from "@/composables/useSession";
 import { useFavorites } from "@/composables/useFavorites";
 import { formatDateTime } from "@/utils/dateFormat";
+import { ApiService } from "@/services/api";
 
 const route = useRoute();
 const newCommentText = ref("");
 const publishingComment = ref(false);
 const isEventFavorite = ref(false);
 const togglingFavorite = ref(false);
+
+// Modal state
+const showOrganizerModal = ref(false);
+const selectedOrganizer = ref<any>(null);
+const followCounts = ref<any>(null);
+const isFollowingOrganizer = ref(false);
+const followLoading = ref(false);
+const organizerEstablishments = ref<number | null>(null);
+
+// Establishment modal state
+const showEstablishmentModal = ref(false);
+const selectedEstablishment = ref<any>(null);
+const establishmentFollowCounts = ref<any>(null);
+const isFollowingEstablishment = ref(false);
+const establishmentFollowLoading = ref(false);
+const establishmentEvents = ref<number | null>(null);
 
 // Usar el composable para obtener el evento
 const { event, loading, error, loadEvent, getEventTags } = useEvent();
@@ -298,6 +441,185 @@ const handleToggleFavorite = async () => {
     console.error("Error toggling favorite:", error);
   } finally {
     togglingFavorite.value = false;
+  }
+};
+
+// Función para abrir el modal del organizador
+const openOrganizerModal = async (organizer: any) => {
+  selectedOrganizer.value = organizer;
+  showOrganizerModal.value = true;
+
+  // Cargar datos del organizador
+  try {
+    followCounts.value = await ApiService.getFollowCounts(organizer.id);
+
+    // Cargar número de establecimientos del organizador
+    const establishmentsResponse = await fetch(`http://localhost:8080/api/establishments/user/${organizer.id}`, {
+      headers: {
+        Authorization: `Bearer ${currentUser.value?.id ? localStorage.getItem("session") : ""}`,
+      },
+    });
+
+    if (establishmentsResponse.ok) {
+      const establishments = await establishmentsResponse.json();
+      organizerEstablishments.value = establishments.length;
+    } else {
+      organizerEstablishments.value = 0;
+    }
+
+    // Verificar si seguimos al organizador
+    if (isLoggedIn.value && currentUser.value && currentUser.value.id) {
+      const result = await ApiService.isFollowing(currentUser.value.id, organizer.id);
+      isFollowingOrganizer.value = result.isFollowing;
+    }
+  } catch (error) {
+    console.error("Error loading organizer data:", error);
+    organizerEstablishments.value = 0;
+  }
+};
+
+// Función para cerrar el modal
+const closeOrganizerModal = () => {
+  showOrganizerModal.value = false;
+  selectedOrganizer.value = null;
+  followCounts.value = null;
+  isFollowingOrganizer.value = false;
+  organizerEstablishments.value = null;
+};
+
+// Función para seguir/dejar de seguir
+const handleFollowToggle = async () => {
+  if (!currentUser.value || !currentUser.value.id || !selectedOrganizer.value) return;
+
+  followLoading.value = true;
+
+  try {
+    if (isFollowingOrganizer.value) {
+      await ApiService.unfollowUser(currentUser.value.id, selectedOrganizer.value.id);
+      isFollowingOrganizer.value = false;
+    } else {
+      await ApiService.followUser(currentUser.value.id, selectedOrganizer.value.id);
+      isFollowingOrganizer.value = true;
+    }
+
+    // Actualizar contadores
+    followCounts.value = await ApiService.getFollowCounts(selectedOrganizer.value.id);
+  } catch (error) {
+    console.error("Error toggling follow:", error);
+  } finally {
+    followLoading.value = false;
+  }
+};
+
+// Función para abrir el modal del establecimiento
+const openEstablishmentModal = async (establishment: any) => {
+  selectedEstablishment.value = establishment;
+  showEstablishmentModal.value = true;
+
+  // Cargar datos del establecimiento
+  try {
+    // Cargar contadores de seguidores del establecimiento
+    try {
+      const followCountsResponse = await fetch(
+        `http://localhost:8080/api/establishment-follows/establishment/${establishment.id}/count`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("session") || ""}`,
+          },
+        }
+      );
+
+      if (followCountsResponse.ok) {
+        establishmentFollowCounts.value = await followCountsResponse.json();
+      }
+    } catch (error) {
+      console.warn("Error loading establishment followers:", error);
+    }
+
+    // Cargar número de eventos del establecimiento
+    establishmentEvents.value = 0; // Default value
+    try {
+      console.log(`Fetching events for establishment ID: ${establishment.id}`);
+      // Intentar primero con el endpoint general de eventos y filtrar
+      const eventsResponse = await fetch(`http://localhost:8080/api/events`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("session") || ""}`,
+        },
+      });
+
+      console.log(`Events API response status: ${eventsResponse.status}`);
+
+      if (eventsResponse.ok) {
+        const allEvents = await eventsResponse.json();
+        console.log(`All events received:`, allEvents);
+
+        // Filtrar eventos que pertenecen a este establecimiento
+        const establishmentEventsFiltered = Array.isArray(allEvents)
+          ? allEvents.filter((event) => event.establishment?.id === establishment.id)
+          : [];
+
+        establishmentEvents.value = establishmentEventsFiltered.length;
+        console.log(`Filtered events for establishment ${establishment.id}:`, establishmentEventsFiltered);
+        console.log(`Set establishmentEvents to: ${establishmentEvents.value}`);
+      } else {
+        console.log(`Events API returned ${eventsResponse.status}, setting to 0`);
+      }
+    } catch (error) {
+      console.warn("Network error loading events:", error);
+    }
+
+    // Verificar si seguimos al establecimiento
+    if (isLoggedIn.value && currentUser.value && currentUser.value.id) {
+      const result = await ApiService.isFollowingEstablishment(currentUser.value.id, establishment.id);
+      isFollowingEstablishment.value = result.isFollowing;
+    }
+  } catch (error) {
+    console.error("Error loading establishment data:", error);
+    establishmentEvents.value = 0;
+  }
+};
+
+// Función para cerrar el modal del establecimiento
+const closeEstablishmentModal = () => {
+  showEstablishmentModal.value = false;
+  selectedEstablishment.value = null;
+  establishmentFollowCounts.value = null;
+  isFollowingEstablishment.value = false;
+  establishmentEvents.value = null;
+};
+
+// Función para seguir/dejar de seguir establecimiento
+const handleEstablishmentFollowToggle = async () => {
+  if (!currentUser.value || !currentUser.value.id || !selectedEstablishment.value) return;
+
+  establishmentFollowLoading.value = true;
+
+  try {
+    if (isFollowingEstablishment.value) {
+      await ApiService.unfollowEstablishment(currentUser.value.id, selectedEstablishment.value.id);
+      isFollowingEstablishment.value = false;
+    } else {
+      await ApiService.followEstablishment(currentUser.value.id, selectedEstablishment.value.id);
+      isFollowingEstablishment.value = true;
+    }
+
+    // Actualizar contadores
+    const followCountsResponse = await fetch(
+      `http://localhost:8080/api/establishment-follows/establishment/${selectedEstablishment.value.id}/count`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("session") || ""}`,
+        },
+      }
+    );
+
+    if (followCountsResponse.ok) {
+      establishmentFollowCounts.value = await followCountsResponse.json();
+    }
+  } catch (error) {
+    console.error("Error toggling establishment follow:", error);
+  } finally {
+    establishmentFollowLoading.value = false;
   }
 };
 </script>

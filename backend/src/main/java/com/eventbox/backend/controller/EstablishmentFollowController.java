@@ -5,8 +5,10 @@ import com.eventbox.backend.service.EstablishmentFollowService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/establishment-follows")
@@ -56,10 +58,25 @@ public class EstablishmentFollowController {
     
     // Obtener establecimientos que sigue un usuario
     @GetMapping("/user/{userId}/establishments")
-    public ResponseEntity<List<EstablishmentFollow>> getFollowedEstablishments(@PathVariable Long userId) {
+    public ResponseEntity<?> getFollowedEstablishments(@PathVariable Long userId) {
         try {
             List<EstablishmentFollow> establishments = establishmentFollowService.getFollowedEstablishments(userId);
-            return ResponseEntity.ok(establishments);
+            
+            // Convertir a un formato más simple para evitar problemas de serialización
+            List<Map<String, Object>> result = establishments.stream()
+                .map(follow -> {
+                    Map<String, Object> establishmentInfo = new HashMap<>();
+                    establishmentInfo.put("id", follow.getEstablishment().getId());
+                    establishmentInfo.put("name", follow.getEstablishment().getName());
+                    establishmentInfo.put("address", follow.getEstablishment().getAddress());
+                    establishmentInfo.put("email", follow.getEstablishment().getEmail());
+                    establishmentInfo.put("phone", follow.getEstablishment().getPhone());
+                    establishmentInfo.put("createdAt", follow.getCreatedAt());
+                    return establishmentInfo;
+                })
+                .collect(Collectors.toList());
+                
+            return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
