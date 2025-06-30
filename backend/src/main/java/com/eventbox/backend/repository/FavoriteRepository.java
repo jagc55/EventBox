@@ -24,4 +24,9 @@ public interface FavoriteRepository extends JpaRepository<Favorite, FavoriteId> 
     @Transactional
     @Query("DELETE FROM Favorite f WHERE f.event.user.id = :organizerId")
     void deleteByEventOrganizerId(@Param("organizerId") Long organizerId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Favorite f WHERE f.event.id = :eventId")
+    void deleteByEventId(@Param("eventId") Long eventId);
 }

@@ -5,6 +5,7 @@ import com.eventbox.backend.model.Event;
 import com.eventbox.backend.model.Locality;
 import com.eventbox.backend.service.EstablishmentService;
 import com.eventbox.backend.service.EventService;
+import com.eventbox.backend.service.EstablishmentFollowService;
 import com.eventbox.backend.repository.LocalityRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +21,13 @@ public class EstablishmentController {
     private final EstablishmentService service;
     private final EventService eventService;
     private final LocalityRepository localityRepository;
+    private final EstablishmentFollowService establishmentFollowService;
 
-    public EstablishmentController(EstablishmentService service, EventService eventService, LocalityRepository localityRepository) {
+    public EstablishmentController(EstablishmentService service, EventService eventService, LocalityRepository localityRepository, EstablishmentFollowService establishmentFollowService) {
         this.service = service;
         this.eventService = eventService;
         this.localityRepository = localityRepository;
+        this.establishmentFollowService = establishmentFollowService;
     }
 
     @GetMapping
@@ -44,6 +47,8 @@ public class EstablishmentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
+        // Eliminar relaciones de seguidores del establecimiento
+        establishmentFollowService.deleteByEstablishmentId(id);
         // Eliminar todos los eventos asociados antes de eliminar el establecimiento
         List<Event> events = eventService.findByEstablishmentId(id);
         for (Event event : events) {

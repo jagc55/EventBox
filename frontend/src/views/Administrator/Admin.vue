@@ -47,6 +47,15 @@
             Usuarios
           </button>
           <button
+            @click="currentTab = 'establishments'"
+            :class="[
+              'flex-1 px-6 py-3 font-medium transition-colors duration-200',
+              currentTab === 'establishments' ? 'bg-purple-primary text-white' : 'text-white-bg hover:bg-gray-700',
+            ]"
+          >
+            Establecimientos
+          </button>
+          <button
             @click="currentTab = 'events'"
             :class="[
               'flex-1 px-6 py-3 font-medium transition-colors duration-200',
@@ -228,6 +237,53 @@
           </div>
         </div>
 
+        <!-- Establecimientos Tab -->
+        <div v-else-if="currentTab === 'establishments'" class="p-4 border border-white-bg bg-dark-primary rounded-xl">
+          <h2 class="text-xl font-bold text-white-bg mb-4">Gestión de Establecimientos</h2>
+          <div v-if="loadingEstablishments" class="text-center py-8">
+            <p class="text-white-bg">Cargando establecimientos...</p>
+          </div>
+          <div v-else-if="allEstablishments.length === 0" class="text-center py-8 text-white-bg opacity-70">
+            No hay establecimientos registrados
+          </div>
+          <div v-else class="max-h-96 overflow-y-auto space-y-3 pr-2">
+            <div
+              v-for="establishment in allEstablishments"
+              :key="establishment.id"
+              class="border border-white bg-white p-4 rounded-lg"
+            >
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3">
+                    <h3 class="text-lg font-semibold text-black">{{ establishment.name }}</h3>
+                  </div>
+                  <p class="text-black opacity-80">
+                    <strong>Dirección:</strong> {{ establishment.address || "No especificada" }}
+                  </p>
+                  <p class="text-black opacity-80">
+                    <strong>Organizador:</strong> {{ establishment.user?.name || "Desconocido" }}
+                  </p>
+                  <p class="text-black opacity-80">
+                    <strong>Teléfono:</strong> {{ establishment.phone || "No especificado" }}
+                  </p>
+                  <p class="text-black opacity-80">
+                    <strong>Email:</strong> {{ establishment.email || "No especificado" }}
+                  </p>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <button
+                    @click="deleteEstablishment(establishment)"
+                    :disabled="processing"
+                    class="bg-red-primary hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  >
+                    Eliminar establecimiento
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Eventos Tab -->
         <div v-else-if="currentTab === 'events'" class="p-4 border border-white-bg bg-dark-primary rounded-xl">
           <h2 class="text-xl font-bold text-white-bg mb-4">Gestión de Eventos</h2>
@@ -251,7 +307,7 @@
                     </span>
                   </div>
                   <p class="text-black opacity-80">
-                    <strong>Organizador:</strong> {{ event.organizer?.name || "Desconocido" }}
+                    <strong>Organizador:</strong> {{ event.user?.name || "Desconocido" }}
                   </p>
                   <p class="text-black opacity-80">
                     <strong>Establecimiento:</strong> {{ event.establishment?.name || "Sin establecimiento" }}
@@ -289,7 +345,7 @@ import { useSession } from "@/composables/useSession";
 const { session } = useSession();
 
 // Estado general
-const currentTab = ref<"requests" | "users" | "events">("requests");
+const currentTab = ref<"requests" | "users" | "events" | "establishments">("requests");
 const processing = ref(false);
 
 // Estado de solicitudes
@@ -304,6 +360,10 @@ const userFilter = ref<"all" | "users" | "organizers" | "admins">("all");
 // Estado de eventos
 const allEvents = ref<any[]>([]);
 const loadingEvents = ref(false);
+
+// Estado de establecimientos
+const allEstablishments = ref<any[]>([]);
+const loadingEstablishments = ref(false);
 
 // Computed properties
 const pendingRequestsCount = computed(() => requests.value.filter((r) => r.status === "PENDING").length);
@@ -335,6 +395,8 @@ watch(currentTab, (newTab) => {
     loadUsers();
   } else if (newTab === "events" && allEvents.value.length === 0) {
     loadEvents();
+  } else if (newTab === "establishments" && allEstablishments.value.length === 0) {
+    loadEstablishments();
   }
 });
 
@@ -582,6 +644,59 @@ const deleteEvent = async (event: any) => {
   }
 };
 
+// Funciones de establecimientos
+const loadEstablishments = async () => {
+  loadingEstablishments.value = true;
+  try {
+    const response = await fetch("http://localhost:8080/api/establishments", {
+      headers: {
+        Authorization: `Bearer ${session.value?.token}`,
+      },
+    });
+    if (response.ok) {
+      allEstablishments.value = await response.json();
+    } else {
+      console.error("Error loading establishments");
+      alert("Error al cargar establecimientos");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error de conexión al cargar establecimientos");
+  } finally {
+    loadingEstablishments.value = false;
+  }
+};
+
+const deleteEstablishment = async (establishment: any) => {
+  if (!establishment) return;
+  if (
+    !confirm(`¿Estás seguro de eliminar el establecimiento "${establishment.name}"?\nEsta acción no se puede deshacer.`)
+  ) {
+    return;
+  }
+  processing.value = true;
+  try {
+    const response = await fetch(`http://localhost:8080/api/establishments/${establishment.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session.value?.token}`,
+      },
+    });
+    if (response.ok) {
+      alert("Establecimiento eliminado correctamente");
+      loadEstablishments();
+    } else {
+      const errorData = await response.json();
+      alert("Error: " + (errorData.error || "Error al eliminar establecimiento"));
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error de conexión");
+  } finally {
+    processing.value = false;
+  }
+};
+
 // Función para refrescar la pestaña actual
 const refreshCurrentTab = () => {
   if (currentTab.value === "requests") {
@@ -590,6 +705,8 @@ const refreshCurrentTab = () => {
     loadUsers();
   } else if (currentTab.value === "events") {
     loadEvents();
+  } else if (currentTab.value === "establishments") {
+    loadEstablishments();
   }
 };
 

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EstablishmentFollowRepository extends JpaRepository<EstablishmentFollow, Long> {
+public interface EstablishmentFollowRepository extends JpaRepository<EstablishmentFollow, Long>, EstablishmentFollowRepositoryCustom {
     
     // Verificar si un usuario sigue a un establecimiento
     boolean existsByFollowerAndEstablishment(User follower, Establishment establishment);

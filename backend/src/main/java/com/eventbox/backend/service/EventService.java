@@ -1,8 +1,11 @@
 package com.eventbox.backend.service;
 
 import com.eventbox.backend.model.Event;
+import com.eventbox.backend.repository.CommentRepository;
 import com.eventbox.backend.repository.EventRepository;
+import com.eventbox.backend.repository.FavoriteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,14 +14,20 @@ import java.util.Optional;
 public class EventService {
 
     private final EventRepository repo;
+    private final FavoriteRepository favoriteRepository;
+    private final CommentRepository commentRepository;
 
-    public EventService(EventRepository repo) {
+    public EventService(EventRepository repo, FavoriteRepository favoriteRepository, CommentRepository commentRepository) {
         this.repo = repo;
+        this.favoriteRepository = favoriteRepository;
+        this.commentRepository = commentRepository;
     }
 
     public List<Event> getAll() {
         return repo.findAll();
-    }    public List<Event> getAllOrderedByDate() {
+    }
+
+    public List<Event> getAllOrderedByDate() {
         return repo.findAllByOrderByDateAscTimeAsc();
     }
 
@@ -30,7 +39,10 @@ public class EventService {
         return repo.save(event);
     }
 
+    @Transactional
     public void delete(Long id) {
+        favoriteRepository.deleteByEventId(id);
+        commentRepository.deleteByEventId(id);
         repo.deleteById(id);
     }
 

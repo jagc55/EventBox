@@ -23,4 +23,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Transactional
     @Query("DELETE FROM Comment c WHERE c.event.user.id = :organizerId")
     void deleteByEventOrganizerId(@Param("organizerId") Long organizerId);
+
+    // Eliminar todos los comentarios de un evento
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Comment c WHERE c.event.id = :eventId")
+    void deleteByEventId(@Param("eventId") Long eventId);
 }

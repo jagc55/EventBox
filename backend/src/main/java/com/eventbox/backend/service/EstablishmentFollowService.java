@@ -130,4 +130,9 @@ public class EstablishmentFollowService {
     public List<Object[]> getMostFollowedEstablishments() {
         return establishmentFollowRepository.findMostFollowedEstablishments();
     }
+    
+    // Eliminar todos los follows de un establecimiento
+    public void deleteByEstablishmentId(Long establishmentId) {
+        establishmentFollowRepository.deleteByEstablishmentId(establishmentId);
+    }
 }
