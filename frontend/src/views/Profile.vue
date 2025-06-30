@@ -320,9 +320,9 @@
           <span class="font-bold text-5xl">{{ totalFavorites }}</span>
           <span>Eventos favoritos</span>
         </div>
-        <div class="flex flex-col gap-2 text-center text-white-bg text-3xl max-w-[200px]">
-          <span class="font-bold text-4xl">{{ favoriteEventType }}</span>
-          <span>Tipo de evento favorito</span>
+        <div class="flex flex-col items-center gap-2 text-white-bg text-3xl max-w-[200px]">
+          <span class="font-bold text-4xl text-center leading-tight">{{ favoriteEventType }}</span>
+          <span class="text-center">Tipo de evento favorito</span>
         </div>
         <div class="flex flex-col gap-2 text-center text-white-bg text-3xl max-w-[200px]">
           <span class="font-bold text-5xl">{{ favoriteEventTypePercentage }}</span>
