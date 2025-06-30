@@ -76,4 +76,9 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("error", "Error al actualizar la contraseña"));
         }
     }
+
+    @PatchMapping("/{id}/demote")
+    public ResponseEntity<Map<String, String>> demoteOrganizer(@PathVariable Long id) {
+        return userService.demoteOrganizer(id);
+    }
 }

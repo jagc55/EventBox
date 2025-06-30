@@ -4,8 +4,11 @@ import com.eventbox.backend.model.Establishment;
 import com.eventbox.backend.model.EstablishmentFollow;
 import com.eventbox.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,4 +48,16 @@ public interface EstablishmentFollowRepository extends JpaRepository<Establishme
            "GROUP BY ef.establishment " +
            "ORDER BY followCount DESC")
     List<Object[]> findMostFollowedEstablishments();
+    
+    // Eliminar todos los establecimientos seguidos por un usuario
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM EstablishmentFollow ef WHERE ef.follower.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
+    
+    // Eliminar todos los follows de establecimientos cuyo propietario es el usuario
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM EstablishmentFollow ef WHERE ef.establishment.user.id = :ownerId")
+    void deleteByEstablishmentOwnerId(@Param("ownerId") Long ownerId);
 }

@@ -4,6 +4,10 @@ import com.eventbox.backend.model.OrganizerRequest;
 import com.eventbox.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +29,10 @@ public interface OrganizerRequestRepository extends JpaRepository<OrganizerReque
     
     // Contar solicitudes pendientes
     long countByStatus(OrganizerRequest.RequestStatus status);
+    
+    // Eliminar todas las solicitudes de organizador de un usuario
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM OrganizerRequest o WHERE o.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 }

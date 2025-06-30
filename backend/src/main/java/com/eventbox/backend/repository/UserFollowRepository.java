@@ -3,8 +3,11 @@ package com.eventbox.backend.repository;
 import com.eventbox.backend.model.User;
 import com.eventbox.backend.model.UserFollow;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,4 +50,16 @@ public interface UserFollowRepository extends JpaRepository<UserFollow, Long> {
     
     // Eliminar relación de seguimiento
     void deleteByFollowerAndFollowed(User follower, User followed);
+
+    // Eliminar todos los seguimientos donde el usuario es seguidor o seguido
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM UserFollow uf WHERE uf.follower.id = :userId OR uf.followed.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
+
+    // Eliminar todos los seguidores de un usuario (donde él es seguido)
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM UserFollow uf WHERE uf.followed.id = :userId")
+    void deleteByFollowedId(@Param("userId") Long userId);
 }

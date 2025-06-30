@@ -6,9 +6,17 @@
         <div class="flex justify-between items-center">
           <h1 class="text-2xl font-bold text-white-bg">Panel de Administración</h1>
           <div class="flex items-center gap-4">
-            <span class="text-white-bg"> {{ pendingRequestsCount }} solicitudes pendientes </span>
+            <span v-if="currentTab === 'requests'" class="text-white-bg">
+              {{ pendingRequestsCount }} solicitudes pendientes
+            </span>
+            <span v-else-if="currentTab === 'users'" class="text-white-bg">
+              {{ totalUsers }} usuarios registrados
+            </span>
+            <span v-else-if="currentTab === 'events'" class="text-white-bg">
+              {{ totalEvents }} eventos registrados
+            </span>
             <button
-              @click="loadRequests"
+              @click="refreshCurrentTab"
               class="bg-purple-primary hover:bg-purple-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200"
             >
               Actualizar
@@ -17,47 +25,254 @@
         </div>
       </div>
 
-      <!-- Solicitudes pendientes -->
-      <div class="mt-4 p-4 border border-white-bg bg-dark-primary rounded-xl">
-        <h2 class="text-xl font-bold text-white-bg mb-4">Solicitudes de Organizador</h2>
-
-        <div v-if="loading" class="text-center py-8">
-          <p class="text-white-bg">Cargando solicitudes...</p>
+      <!-- Tabs Navigation -->
+      <div class="mt-4 border border-white-bg bg-dark-primary rounded-xl overflow-hidden">
+        <div class="flex">
+          <button
+            @click="currentTab = 'requests'"
+            :class="[
+              'flex-1 px-6 py-3 font-medium transition-colors duration-200',
+              currentTab === 'requests' ? 'bg-purple-primary text-white' : 'text-white-bg hover:bg-gray-700',
+            ]"
+          >
+            Solicitudes
+          </button>
+          <button
+            @click="currentTab = 'users'"
+            :class="[
+              'flex-1 px-6 py-3 font-medium transition-colors duration-200',
+              currentTab === 'users' ? 'bg-purple-primary text-white' : 'text-white-bg hover:bg-gray-700',
+            ]"
+          >
+            Usuarios
+          </button>
+          <button
+            @click="currentTab = 'events'"
+            :class="[
+              'flex-1 px-6 py-3 font-medium transition-colors duration-200',
+              currentTab === 'events' ? 'bg-purple-primary text-white' : 'text-white-bg hover:bg-gray-700',
+            ]"
+          >
+            Eventos
+          </button>
         </div>
+      </div>
 
-        <div v-else-if="requests.length === 0" class="text-center py-8">
-          <p class="text-white-bg opacity-70">No hay solicitudes pendientes</p>
-        </div>
+      <!-- Tab Content -->
+      <div class="mt-4">
+        <!-- Solicitudes Tab -->
+        <div v-if="currentTab === 'requests'" class="p-4 border border-white-bg bg-dark-primary rounded-xl">
+          <h2 class="text-xl font-bold text-white-bg mb-4">Solicitudes de Organizador</h2>
 
-        <div v-else class="space-y-4">
-          <div v-for="request in requests" :key="request.id" class="border border-white bg-white p-4 rounded-lg">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div class="flex-1">
-                <div class="flex items-center gap-3">
-                  <h3 class="text-lg font-semibold text-black">
-                    {{ request.user.name }}
-                  </h3>
+          <div v-if="loading" class="text-center py-8">
+            <p class="text-white-bg">Cargando solicitudes...</p>
+          </div>
+
+          <div v-else-if="requests.length === 0" class="text-center py-8">
+            <p class="text-white-bg opacity-70">No hay solicitudes pendientes</p>
+          </div>
+
+          <div v-else class="max-h-96 overflow-y-auto space-y-4 pr-2">
+            <div v-for="request in requests" :key="request.id" class="border border-white bg-white p-4 rounded-lg">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3">
+                    <h3 class="text-lg font-semibold text-black">
+                      {{ request.user.name }}
+                    </h3>
+                  </div>
+                  <p class="text-black opacity-80">{{ request.user.email }}</p>
+                  <p class="text-black opacity-60 text-sm">Solicitado: {{ formatDate(request.requestedAt) }}</p>
+                  <div v-if="request.comments" class="mt-2">
+                    <p class="text-black text-sm"><strong>Comentarios:</strong> {{ request.comments }}</p>
+                  </div>
                 </div>
-                <p class="text-black opacity-80">{{ request.user.email }}</p>
-                <p class="text-black opacity-60 text-sm">Solicitado: {{ formatDate(request.requestedAt) }}</p>
-                <div v-if="request.comments" class="mt-2">
-                  <p class="text-black text-sm"><strong>Comentarios:</strong> {{ request.comments }}</p>
+
+                <div v-if="request.status === 'PENDING'" class="flex flex-col gap-2">
+                  <button
+                    @click="approveRequest(request)"
+                    :disabled="processing"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  >
+                    Aprobar
+                  </button>
+                  <button
+                    @click="rejectRequest(request)"
+                    :disabled="processing"
+                    class="bg-red-primary hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  >
+                    Rechazar
+                  </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <div v-if="request.status === 'PENDING'" class="flex flex-col gap-2">
-                <button
-                  @click="approveRequest(request)"
-                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-                >
-                  Aprobar
-                </button>
-                <button
-                  @click="rejectRequest(request)"
-                  class="bg-red-primary hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-                >
-                  Rechazar
-                </button>
+        <!-- Usuarios Tab -->
+        <div v-else-if="currentTab === 'users'" class="space-y-4">
+          <!-- Filter buttons -->
+          <div class="p-4 border border-white-bg bg-dark-primary rounded-xl">
+            <div class="flex flex-wrap gap-2">
+              <button
+                @click="userFilter = 'all'"
+                :class="[
+                  'px-4 py-2 rounded-lg font-medium transition-colors duration-200',
+                  userFilter === 'all' ? 'bg-purple-primary text-white' : 'bg-gray-600 text-white hover:bg-gray-700',
+                ]"
+              >
+                Todos ({{ allUsers.length }})
+              </button>
+              <button
+                @click="userFilter = 'users'"
+                :class="[
+                  'px-4 py-2 rounded-lg font-medium transition-colors duration-200',
+                  userFilter === 'users' ? 'bg-purple-primary text-white' : 'bg-gray-600 text-white hover:bg-gray-700',
+                ]"
+              >
+                Usuarios ({{ filteredUsers.users.length }})
+              </button>
+              <button
+                @click="userFilter = 'organizers'"
+                :class="[
+                  'px-4 py-2 rounded-lg font-medium transition-colors duration-200',
+                  userFilter === 'organizers'
+                    ? 'bg-purple-primary text-white'
+                    : 'bg-gray-600 text-white hover:bg-gray-700',
+                ]"
+              >
+                Organizadores ({{ filteredUsers.organizers.length }})
+              </button>
+              <button
+                @click="userFilter = 'admins'"
+                :class="[
+                  'px-4 py-2 rounded-lg font-medium transition-colors duration-200',
+                  userFilter === 'admins' ? 'bg-purple-primary text-white' : 'bg-gray-600 text-white hover:bg-gray-700',
+                ]"
+              >
+                Administradores ({{ filteredUsers.admins.length }})
+              </button>
+            </div>
+          </div>
+
+          <!-- Users list -->
+          <div class="p-4 border border-white-bg bg-dark-primary rounded-xl">
+            <h2 class="text-xl font-bold text-white-bg mb-4">
+              Gestión de Usuarios
+              <span v-if="userFilter !== 'all'" class="text-lg font-normal">
+                -
+                {{
+                  userFilter === "users"
+                    ? "Usuarios"
+                    : userFilter === "organizers"
+                    ? "Organizadores"
+                    : "Administradores"
+                }}
+              </span>
+            </h2>
+
+            <div v-if="loadingUsers" class="text-center py-8">
+              <p class="text-white-bg">Cargando usuarios...</p>
+            </div>
+
+            <div v-else-if="displayedUsers.length === 0" class="text-center py-8">
+              <p class="text-white-bg opacity-70">No hay usuarios en esta categoría</p>
+            </div>
+
+            <div v-else class="max-h-96 overflow-y-auto space-y-3 pr-2">
+              <div v-for="user in displayedUsers" :key="user.id" class="border border-white bg-white p-4 rounded-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                      <h3 class="text-lg font-semibold text-black">{{ user.name }}</h3>
+                      <span
+                        :class="[
+                          'px-2 py-1 rounded text-xs font-medium',
+                          user.role.id === 1
+                            ? 'bg-blue-100 text-blue-800'
+                            : user.role.id === 2
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-purple-100 text-purple-800',
+                        ]"
+                      >
+                        {{ user.role.id === 1 ? "Usuario" : user.role.id === 2 ? "Organizador" : "Administrador" }}
+                      </span>
+                    </div>
+                    <p class="text-black opacity-80">{{ user.email }}</p>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <!-- Demote organizer button -->
+                    <button
+                      v-if="user.role.id === 2"
+                      @click="demoteOrganizer(user)"
+                      :disabled="processing"
+                      class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 text-sm"
+                    >
+                      Quitar rol organizador
+                    </button>
+
+                    <!-- Delete user button (no self-delete and no delete other admins) -->
+                    <button
+                      v-if="user.id !== session?.userId && user.role.id !== 3"
+                      @click="deleteUser(user)"
+                      :disabled="processing"
+                      class="bg-red-primary hover:bg-red-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 text-sm"
+                    >
+                      Eliminar usuario
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Eventos Tab -->
+        <div v-else-if="currentTab === 'events'" class="p-4 border border-white-bg bg-dark-primary rounded-xl">
+          <h2 class="text-xl font-bold text-white-bg mb-4">Gestión de Eventos</h2>
+
+          <div v-if="loadingEvents" class="text-center py-8">
+            <p class="text-white-bg">Cargando eventos...</p>
+          </div>
+
+          <div v-else-if="allEvents.length === 0" class="text-center py-8">
+            <p class="text-white-bg opacity-70">No hay eventos registrados</p>
+          </div>
+
+          <div v-else class="max-h-96 overflow-y-auto space-y-3 pr-2">
+            <div v-for="event in allEvents" :key="event.id" class="border border-white bg-white p-4 rounded-lg">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3">
+                    <h3 class="text-lg font-semibold text-black">{{ event.title }}</h3>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                      {{ event.eventType?.name || "Sin categoría" }}
+                    </span>
+                  </div>
+                  <p class="text-black opacity-80">
+                    <strong>Organizador:</strong> {{ event.organizer?.name || "Desconocido" }}
+                  </p>
+                  <p class="text-black opacity-80">
+                    <strong>Establecimiento:</strong> {{ event.establishment?.name || "Sin establecimiento" }}
+                  </p>
+                  <p class="text-black opacity-60 text-sm">
+                    <strong>Fecha:</strong> {{ formatEventDate(event.date, event.time) }}
+                  </p>
+                  <p class="text-black opacity-60 text-sm">
+                    <strong>Ubicación:</strong> {{ event.establishment?.address || "No especificada" }}
+                  </p>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <button
+                    @click="deleteEvent(event)"
+                    :disabled="processing"
+                    class="bg-red-primary hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                  >
+                    Eliminar evento
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -68,20 +283,62 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useSession } from "@/composables/useSession";
 
 const { session } = useSession();
 
-// Estado
-const requests = ref<any[]>([]);
-const loading = ref(false);
+// Estado general
+const currentTab = ref<"requests" | "users" | "events">("requests");
 const processing = ref(false);
 
-// Computed
+// Estado de solicitudes
+const requests = ref<any[]>([]);
+const loading = ref(false);
+
+// Estado de usuarios
+const allUsers = ref<any[]>([]);
+const loadingUsers = ref(false);
+const userFilter = ref<"all" | "users" | "organizers" | "admins">("all");
+
+// Estado de eventos
+const allEvents = ref<any[]>([]);
+const loadingEvents = ref(false);
+
+// Computed properties
 const pendingRequestsCount = computed(() => requests.value.filter((r) => r.status === "PENDING").length);
 
-// Funciones
+const totalUsers = computed(() => allUsers.value.length);
+const totalEvents = computed(() => allEvents.value.length);
+
+const filteredUsers = computed(() => {
+  return {
+    users: allUsers.value.filter((user) => user.role.id === 1),
+    organizers: allUsers.value.filter((user) => user.role.id === 2),
+    admins: allUsers.value.filter((user) => user.role.id === 3),
+  };
+});
+
+const displayedUsers = computed(() => {
+  if (userFilter.value === "all") return allUsers.value;
+  if (userFilter.value === "users") return filteredUsers.value.users;
+  if (userFilter.value === "organizers") return filteredUsers.value.organizers;
+  if (userFilter.value === "admins") return filteredUsers.value.admins;
+  return [];
+});
+
+// Watch for tab changes to load data
+watch(currentTab, (newTab) => {
+  if (newTab === "requests" && requests.value.length === 0) {
+    loadRequests();
+  } else if (newTab === "users" && allUsers.value.length === 0) {
+    loadUsers();
+  } else if (newTab === "events" && allEvents.value.length === 0) {
+    loadEvents();
+  }
+});
+
+// Funciones de solicitudes
 const loadRequests = async () => {
   loading.value = true;
   try {
@@ -175,6 +432,168 @@ const rejectRequest = async (request: any) => {
   }
 };
 
+// Funciones de usuarios
+const loadUsers = async () => {
+  loadingUsers.value = true;
+  try {
+    const response = await fetch("http://localhost:8080/api/users", {
+      headers: {
+        Authorization: `Bearer ${session.value?.token}`,
+      },
+    });
+
+    if (response.ok) {
+      allUsers.value = await response.json();
+    } else {
+      console.error("Error loading users");
+      alert("Error al cargar usuarios");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error de conexión al cargar usuarios");
+  } finally {
+    loadingUsers.value = false;
+  }
+};
+
+const deleteUser = async (user: any) => {
+  if (!user) return;
+
+  const confirmMessage = `¿Estás seguro de eliminar al ${user.role.id === 2 ? "organizador" : "usuario"} ${user.name}?
+${user.role.id === 2 ? "\nEsto eliminará todos sus establecimientos y eventos." : ""}
+Esta acción no se puede deshacer.`;
+
+  if (!confirm(confirmMessage)) {
+    return;
+  }
+
+  processing.value = true;
+  try {
+    const response = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session.value?.token}`,
+      },
+    });
+
+    if (response.ok) {
+      alert(`${user.role.id === 2 ? "Organizador" : "Usuario"} eliminado correctamente`);
+      loadUsers();
+    } else {
+      const errorData = await response.json();
+      alert("Error: " + (errorData.error || "Error al eliminar usuario"));
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error de conexión");
+  } finally {
+    processing.value = false;
+  }
+};
+
+const demoteOrganizer = async (user: any) => {
+  if (!user || user.role.id !== 2) return;
+
+  const confirmMessage = `¿Estás seguro de quitar el rol de organizador a ${user.name}?
+Esto eliminará todos sus establecimientos y eventos.
+Esta acción no se puede deshacer.`;
+
+  if (!confirm(confirmMessage)) {
+    return;
+  }
+
+  processing.value = true;
+  try {
+    const response = await fetch(`http://localhost:8080/api/users/${user.id}/demote`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.value?.token}`,
+      },
+    });
+
+    if (response.ok) {
+      alert("Rol de organizador removido correctamente");
+      loadUsers();
+    } else {
+      const errorData = await response.json();
+      alert("Error: " + (errorData.error || "Error al quitar rol de organizador"));
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error de conexión");
+  } finally {
+    processing.value = false;
+  }
+};
+
+// Funciones de eventos
+const loadEvents = async () => {
+  loadingEvents.value = true;
+  try {
+    const response = await fetch("http://localhost:8080/api/events", {
+      headers: {
+        Authorization: `Bearer ${session.value?.token}`,
+      },
+    });
+
+    if (response.ok) {
+      allEvents.value = await response.json();
+    } else {
+      console.error("Error loading events");
+      alert("Error al cargar eventos");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error de conexión al cargar eventos");
+  } finally {
+    loadingEvents.value = false;
+  }
+};
+
+const deleteEvent = async (event: any) => {
+  if (!event) return;
+
+  if (!confirm(`¿Estás seguro de eliminar el evento "${event.title}"?\nEsta acción no se puede deshacer.`)) {
+    return;
+  }
+
+  processing.value = true;
+  try {
+    const response = await fetch(`http://localhost:8080/api/events/${event.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session.value?.token}`,
+      },
+    });
+
+    if (response.ok) {
+      alert("Evento eliminado correctamente");
+      loadEvents();
+    } else {
+      const errorData = await response.json();
+      alert("Error: " + (errorData.error || "Error al eliminar evento"));
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error de conexión");
+  } finally {
+    processing.value = false;
+  }
+};
+
+// Función para refrescar la pestaña actual
+const refreshCurrentTab = () => {
+  if (currentTab.value === "requests") {
+    loadRequests();
+  } else if (currentTab.value === "users") {
+    loadUsers();
+  } else if (currentTab.value === "events") {
+    loadEvents();
+  }
+};
+
+// Funciones de utilidad
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("es-ES", {
     year: "numeric",
@@ -185,7 +604,18 @@ const formatDate = (dateString: string) => {
   });
 };
 
-// Cargar solicitudes al montar el componente
+const formatEventDate = (date: string, time: string) => {
+  const eventDate = new Date(`${date}T${time}`);
+  return eventDate.toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+// Cargar datos iniciales
 onMounted(() => {
   loadRequests();
 });
