@@ -1,69 +1,77 @@
 <template>
   <div class="bg-black-secundary pt-[68px] min-h-screen">
     <div class="mx-4 sm:mx-12 md:mx-24 lg:mx-36 xl:mx-52">
-      <!-- Header -->
-      <div class="mt-4 p-4 border border-white-bg bg-dark-primary rounded-xl">
-        <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-bold text-white-bg">Panel de Administración</h1>
-          <div class="flex items-center gap-4">
-            <span v-if="currentTab === 'requests'" class="text-white-bg">
-              {{ pendingRequestsCount }} solicitudes pendientes
-            </span>
-            <span v-else-if="currentTab === 'users'" class="text-white-bg">
-              {{ totalUsers }} usuarios registrados
-            </span>
-            <span v-else-if="currentTab === 'events'" class="text-white-bg">
-              {{ totalEvents }} eventos registrados
-            </span>
-            <button
-              @click="refreshCurrentTab"
-              class="bg-purple-primary hover:bg-purple-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200"
-            >
-              Actualizar
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Tabs Navigation -->
       <div class="mt-4 border border-white-bg bg-dark-primary rounded-xl overflow-hidden">
-        <div class="flex">
+        <div
+          class="flex sm:flex-row flex-nowrap sm:overflow-visible overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent"
+        >
           <button
             @click="currentTab = 'requests'"
             :class="[
-              'flex-1 px-6 py-3 font-medium transition-colors duration-200',
+              'flex-shrink-0 sm:flex-1 px-6 py-3 font-medium transition-colors duration-200',
               currentTab === 'requests' ? 'bg-purple-primary text-white' : 'text-white-bg hover:bg-gray-700',
             ]"
+            style="min-width: 140px"
           >
             Solicitudes
           </button>
           <button
             @click="currentTab = 'users'"
             :class="[
-              'flex-1 px-6 py-3 font-medium transition-colors duration-200',
+              'flex-shrink-0 sm:flex-1 px-6 py-3 font-medium transition-colors duration-200',
               currentTab === 'users' ? 'bg-purple-primary text-white' : 'text-white-bg hover:bg-gray-700',
             ]"
+            style="min-width: 140px"
           >
             Usuarios
           </button>
           <button
             @click="currentTab = 'establishments'"
             :class="[
-              'flex-1 px-6 py-3 font-medium transition-colors duration-200',
+              'flex-shrink-0 sm:flex-1 px-6 py-3 font-medium transition-colors duration-200',
               currentTab === 'establishments' ? 'bg-purple-primary text-white' : 'text-white-bg hover:bg-gray-700',
             ]"
+            style="min-width: 140px"
           >
             Establecimientos
           </button>
           <button
             @click="currentTab = 'events'"
             :class="[
-              'flex-1 px-6 py-3 font-medium transition-colors duration-200',
+              'flex-shrink-0 sm:flex-1 px-6 py-3 font-medium transition-colors duration-200',
               currentTab === 'events' ? 'bg-purple-primary text-white' : 'text-white-bg hover:bg-gray-700',
             ]"
+            style="min-width: 140px"
           >
             Eventos
           </button>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="mt-4 p-4 border border-white-bg bg-dark-primary rounded-xl">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+          <h1 class="text-2xl font-bold text-white-bg">Panel de Administración</h1>
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <div class="flex-1 flex justify-between sm:justify-end items-center gap-2 sm:gap-4">
+              <span v-if="currentTab === 'requests'" class="text-white-bg">
+                {{ pendingRequestsCount }} solicitudes pendientes
+              </span>
+              <span v-else-if="currentTab === 'users'" class="text-white-bg">
+                {{ totalUsers }} usuarios registrados
+              </span>
+              <span v-else-if="currentTab === 'events'" class="text-white-bg">
+                {{ totalEvents }} eventos registrados
+              </span>
+              <button
+                @click="refreshCurrentTab"
+                class="bg-purple-primary hover:bg-purple-600 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200"
+              >
+                Actualizar
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -81,7 +89,7 @@
             <p class="text-white-bg opacity-70">No hay solicitudes pendientes</p>
           </div>
 
-          <div v-else class="max-h-96 overflow-y-auto space-y-4 pr-2">
+          <div v-else class="max-h-[calc(100vh-420px)] overflow-y-auto space-y-3 pr-2">
             <div v-for="request in requests" :key="request.id" class="border border-white bg-white p-4 rounded-lg">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex-1">
@@ -188,7 +196,7 @@
               <p class="text-white-bg opacity-70">No hay usuarios en esta categoría</p>
             </div>
 
-            <div v-else class="max-h-96 overflow-y-auto space-y-3 pr-2">
+            <div v-else class="max-h-[calc(100vh-436px)] overflow-y-auto space-y-3 pr-2">
               <div v-for="user in displayedUsers" :key="user.id" class="border border-white bg-white p-4 rounded-lg">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div class="flex-1">
@@ -246,7 +254,7 @@
           <div v-else-if="allEstablishments.length === 0" class="text-center py-8 text-white-bg opacity-70">
             No hay establecimientos registrados
           </div>
-          <div v-else class="max-h-96 overflow-y-auto space-y-3 pr-2">
+          <div v-else class="max-h-[calc(100vh-340px)] overflow-y-auto space-y-3 pr-2">
             <div
               v-for="establishment in allEstablishments"
               :key="establishment.id"
@@ -296,7 +304,7 @@
             <p class="text-white-bg opacity-70">No hay eventos registrados</p>
           </div>
 
-          <div v-else class="max-h-96 overflow-y-auto space-y-3 pr-2">
+          <div v-else class="max-h-[calc(100vh-340px)] overflow-y-auto space-y-3 pr-2">
             <div v-for="event in allEvents" :key="event.id" class="border border-white bg-white p-4 rounded-lg">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex-1">
