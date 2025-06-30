@@ -8,10 +8,11 @@ export function useEvents() {
   const events = ref<Event[]>([]);
   const favoriteEvents = ref<Event[]>([]);
   const followingEvents = ref<Event[]>([]);
+  const followingEstablishmentsEvents = ref<Event[]>([]);
   const finishedEvents = ref<Event[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
-  const activeTab = ref("upcoming"); // "upcoming", "finished", "favorites", "following"
+  const activeTab = ref("upcoming"); // "upcoming", "finished", "favorites", "following", "followingEstablishments"
 
   // Filtros
   const searchQuery = ref("");
@@ -114,6 +115,23 @@ export function useEvents() {
     }
   };
 
+  // Función para cargar eventos de establecimientos seguidos
+  const loadFollowingEstablishmentsEvents = async () => {
+    if (!isLoggedIn.value || !currentUser.value?.id) return;
+
+    loading.value = true;
+    error.value = null;
+
+    try {
+      followingEstablishmentsEvents.value = await ApiService.getEventsByFollowedEstablishments(currentUser.value.id);
+    } catch (err) {
+      error.value = "Error al cargar los eventos de establecimientos seguidos.";
+      console.error("Error loading following establishments events:", err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
   // Función para cambiar de pestaña
   const setActiveTab = (tab: string) => {
     activeTab.value = tab;
@@ -130,6 +148,9 @@ export function useEvents() {
         break;
       case "following":
         loadFollowingEvents();
+        break;
+      case "followingEstablishments":
+        loadFollowingEstablishmentsEvents();
         break;
       default:
         loadUpcomingEvents();
@@ -160,6 +181,9 @@ export function useEvents() {
         break;
       case "following":
         sourceEvents = followingEvents.value;
+        break;
+      case "followingEstablishments":
+        sourceEvents = followingEstablishmentsEvents.value;
         break;
       default:
         sourceEvents = events.value;
@@ -206,6 +230,7 @@ export function useEvents() {
     events,
     favoriteEvents,
     followingEvents,
+    followingEstablishmentsEvents,
     finishedEvents,
     filteredEvents,
     loading,
@@ -218,6 +243,7 @@ export function useEvents() {
     loadFinishedEvents,
     loadFavoriteEvents,
     loadFollowingEvents,
+    loadFollowingEstablishmentsEvents,
     setActiveTab,
     getEventTags,
   };

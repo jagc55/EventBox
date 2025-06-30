@@ -387,12 +387,10 @@
             >
               <div class="flex-1">
                 <p class="text-white-bg font-medium">{{ follow.name }}</p>
-                <p class="text-white-bg text-sm opacity-70">{{ follow.email }}</p>
                 <p class="text-white-bg text-xs opacity-50">Te sigue desde: {{ formatDate(follow.createdAt) }}</p>
               </div>
               <div class="text-white-bg text-sm opacity-60">
                 {{ follow.role?.id === 1 ? "Usuario" : follow.role?.id === 2 ? "Organizador" : "Admin" }}
-                }}
               </div>
             </div>
           </div>
@@ -436,7 +434,6 @@
             >
               <div class="flex-1">
                 <p class="text-white-bg font-medium">{{ follow.name }}</p>
-                <p class="text-white-bg text-sm opacity-70">{{ follow.email }}</p>
                 <p class="text-white-bg text-xs opacity-50">Siguiendo desde: {{ formatDate(follow.createdAt) }}</p>
               </div>
               <div class="flex items-center gap-3">

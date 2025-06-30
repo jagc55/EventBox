@@ -539,7 +539,6 @@ const openEstablishmentModal = async (establishment: any) => {
     // Cargar número de eventos del establecimiento
     establishmentEvents.value = 0; // Default value
     try {
-      console.log(`Fetching events for establishment ID: ${establishment.id}`);
       // Intentar primero con el endpoint general de eventos y filtrar
       const eventsResponse = await fetch(`http://localhost:8080/api/events`, {
         headers: {
@@ -547,11 +546,8 @@ const openEstablishmentModal = async (establishment: any) => {
         },
       });
 
-      console.log(`Events API response status: ${eventsResponse.status}`);
-
       if (eventsResponse.ok) {
         const allEvents = await eventsResponse.json();
-        console.log(`All events received:`, allEvents);
 
         // Filtrar eventos que pertenecen a este establecimiento
         const establishmentEventsFiltered = Array.isArray(allEvents)
@@ -559,10 +555,6 @@ const openEstablishmentModal = async (establishment: any) => {
           : [];
 
         establishmentEvents.value = establishmentEventsFiltered.length;
-        console.log(`Filtered events for establishment ${establishment.id}:`, establishmentEventsFiltered);
-        console.log(`Set establishmentEvents to: ${establishmentEvents.value}`);
-      } else {
-        console.log(`Events API returned ${eventsResponse.status}, setting to 0`);
       }
     } catch (error) {
       console.warn("Network error loading events:", error);

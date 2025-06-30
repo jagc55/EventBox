@@ -111,6 +111,26 @@ export class ApiService {
     return this.makeRequest<Event[]>(`/events/following/${userId}`);
   }
 
+  static async getEventsByFollowedEstablishments(userId: number): Promise<Event[]> {
+    // Implementación usando endpoints existentes
+    const [allEvents, followedEstablishments] = await Promise.all([
+      this.getAllEvents(),
+      this.getFollowedEstablishments(userId),
+    ]);
+
+    // Extraer los IDs de los establecimientos seguidos
+    const followedEstablishmentIds = followedEstablishments.map((est) => est.id);
+
+    // Filtrar eventos que pertenecen a establecimientos seguidos
+    return allEvents
+      .filter((event) => followedEstablishmentIds.includes(event.establishment.id))
+      .sort((a, b) => {
+        const dateTimeA = new Date(`${a.date}T${a.time}`);
+        const dateTimeB = new Date(`${b.date}T${b.time}`);
+        return dateTimeA.getTime() - dateTimeB.getTime();
+      });
+  }
+
   // Event Types endpoints
   static async getAllEventTypes(): Promise<EventType[]> {
     return this.makeRequest<EventType[]>("/event-types");

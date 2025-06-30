@@ -11,9 +11,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByOrderByDateAscTimeAsc();
     
     @Query("SELECT e FROM Event e " +
-           "JOIN UserFollow uf ON e.user.id = uf.followed.id " +
-           "WHERE uf.follower.id = :userId " +
-           "AND (e.date > CURRENT_DATE OR (e.date = CURRENT_DATE AND e.time > CURRENT_TIME)) " +
+           "WHERE e.user.id IN (SELECT uf.followed.id FROM UserFollow uf WHERE uf.follower.id = :userId) " +
            "ORDER BY e.date ASC, e.time ASC")
     List<Event> findEventsByFollowedUsersNotStarted(@Param("userId") Long userId);
 }

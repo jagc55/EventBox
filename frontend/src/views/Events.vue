@@ -49,43 +49,106 @@
         class="border border-white-bg rounded-xl bg-dark-primary shadow-xl overflow-hidden mb-8"
       >
         <!-- Pestañas -->
-        <div class="flex border-b border-white-bg">
-          <button
-            :class="[
-              'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
-              activeTab === 'upcoming' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
-            ]"
-            @click="setActiveTab('upcoming')"
-          >
-            Próximos eventos
-          </button>
-          <button
-            :class="[
-              'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
-              activeTab === 'finished' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
-            ]"
-            @click="setActiveTab('finished')"
-          >
-            Eventos finalizados
-          </button>
-          <button
-            :class="[
-              'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
-              activeTab === 'favorites' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
-            ]"
-            @click="setActiveTab('favorites')"
-          >
-            Eventos favoritos
-          </button>
-          <button
-            :class="[
-              'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg hover:bg-purple-600 transition-colors',
-              activeTab === 'following' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
-            ]"
-            @click="setActiveTab('following')"
-          >
-            Siguiendo
-          </button>
+        <div class="border-b border-white-bg">
+          <!-- Versión móvil con scroll (hasta sm) -->
+          <div class="sm:hidden overflow-x-auto">
+            <div class="flex min-w-max">
+              <button
+                :class="[
+                  'flex-shrink-0 px-3 py-3 text-xs text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors whitespace-nowrap',
+                  activeTab === 'upcoming' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+                ]"
+                @click="setActiveTab('upcoming')"
+              >
+                Próximos eventos
+              </button>
+              <button
+                :class="[
+                  'flex-shrink-0 px-3 py-3 text-xs text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors whitespace-nowrap',
+                  activeTab === 'finished' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+                ]"
+                @click="setActiveTab('finished')"
+              >
+                Eventos finalizados
+              </button>
+              <button
+                :class="[
+                  'flex-shrink-0 px-3 py-3 text-xs text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors whitespace-nowrap',
+                  activeTab === 'favorites' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+                ]"
+                @click="setActiveTab('favorites')"
+              >
+                Eventos favoritos
+              </button>
+              <button
+                :class="[
+                  'flex-shrink-0 px-3 py-3 text-xs text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors whitespace-nowrap',
+                  activeTab === 'following' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+                ]"
+                @click="setActiveTab('following')"
+              >
+                Organizadores seguidos
+              </button>
+              <button
+                :class="[
+                  'flex-shrink-0 px-3 py-3 text-xs text-white-bg hover:bg-purple-600 transition-colors whitespace-nowrap',
+                  activeTab === 'followingEstablishments' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+                ]"
+                @click="setActiveTab('followingEstablishments')"
+              >
+                Establecimientos seguidos
+              </button>
+            </div>
+          </div>
+
+          <!-- Versión con distribución igual (desde sm) -->
+          <div class="hidden sm:flex">
+            <button
+              :class="[
+                'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
+                activeTab === 'upcoming' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+              ]"
+              @click="setActiveTab('upcoming')"
+            >
+              Próximos eventos
+            </button>
+            <button
+              :class="[
+                'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
+                activeTab === 'finished' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+              ]"
+              @click="setActiveTab('finished')"
+            >
+              Eventos finalizados
+            </button>
+            <button
+              :class="[
+                'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
+                activeTab === 'favorites' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+              ]"
+              @click="setActiveTab('favorites')"
+            >
+              Eventos favoritos
+            </button>
+            <button
+              :class="[
+                'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg border-r border-white-bg hover:bg-purple-600 transition-colors',
+                activeTab === 'following' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+              ]"
+              @click="setActiveTab('following')"
+            >
+              Organizadores seguidos
+            </button>
+            <button
+              :class="[
+                'flex-1 px-1 xs:px-2 sm:px-4 py-3 text-xs sm:text-sm text-white-bg hover:bg-purple-600 transition-colors',
+                activeTab === 'followingEstablishments' ? 'bg-purple-primary' : 'hover:bg-purple-primary',
+              ]"
+              @click="setActiveTab('followingEstablishments')"
+            >
+              Establecimientos seguidos
+            </button>
+          </div>
         </div>
 
         <!-- Contenido de eventos -->
