@@ -61,6 +61,9 @@
               <span v-else-if="currentTab === 'users'" class="text-white-bg">
                 {{ totalUsers }} usuarios registrados
               </span>
+              <span v-else-if="currentTab === 'establishments'" class="text-white-bg">
+                {{ totalEstablishments }} establecimientos registrados
+              </span>
               <span v-else-if="currentTab === 'events'" class="text-white-bg">
                 {{ totalEvents }} eventos registrados
               </span>
@@ -378,6 +381,7 @@ const pendingRequestsCount = computed(() => requests.value.filter((r) => r.statu
 
 const totalUsers = computed(() => allUsers.value.length);
 const totalEvents = computed(() => allEvents.value.length);
+const totalEstablishments = computed(() => allEstablishments.value.length);
 
 const filteredUsers = computed(() => {
   return {

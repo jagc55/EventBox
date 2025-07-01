@@ -8,6 +8,7 @@ import Admin from "./views/Administrator/Admin.vue";
 import Establishments from "./views/organiser/Establishments.vue";
 import Establishment from "./views/organiser/Establishment.vue";
 import OrganiserEvent from "./views/organiser/Event.vue";
+import Social from "./views/Social.vue";
 
 const routes = [
   {
@@ -24,6 +25,7 @@ const routes = [
   { path: "/login", name: "login", component: Login },
   { path: "/register", name: "register", component: Register },
   { path: "/admin", name: "admin", component: Admin },
+  { path: "/social", name: "social", component: Social },
 
   // Organiser
   {

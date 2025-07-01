@@ -17,6 +17,8 @@
         <template v-else>
           <RouterLink :to="{ name: 'profile' }" class="hover:underline"> Mi perfil </RouterLink>
           <hr class="h-5 border-r border-white-bg" />
+          <RouterLink to="/social" class="hover:underline">Social</RouterLink>
+          <hr class="h-5 border-r border-white-bg" />
           <RouterLink v-if="session?.roleId === 3" :to="{ name: 'admin' }" class="hover:underline">
             Administrador
           </RouterLink>
@@ -35,6 +37,8 @@
         <RouterLink :to="{ name: 'register' }" class="block hover:underline"> Registrarse </RouterLink>
       </template>
       <template v-else>
+        <RouterLink to="/social" class="block hover:underline">Social</RouterLink>
+        <hr class="w-full border-t border-white-bg" />
         <RouterLink :to="{ name: 'profile' }" class="block hover:underline"> Mi perfil </RouterLink>
         <hr class="w-full border-t border-white-bg" />
         <RouterLink v-if="session?.roleId === 3" :to="{ name: 'admin' }" class="block hover:underline">

@@ -29,6 +29,7 @@ interface User {
   id: number;
   name: string;
   email: string;
+  role?: { id: number; name?: string }; // Cambiado para reflejar la estructura real de la API
 }
 
 export interface Event {
@@ -264,5 +265,12 @@ export class ApiService {
 
   static async getMostFollowedEstablishments(): Promise<any[]> {
     return this.makeRequest<any[]>("/establishment-follows/most-followed");
+  }
+
+  public static async getAllUsers(): Promise<User[]> {
+    return this.makeRequest<User[]>("/users");
+  }
+  public static async getAllEstablishments(): Promise<Establishment[]> {
+    return this.makeRequest<Establishment[]>("/establishments");
   }
 }
