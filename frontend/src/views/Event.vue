@@ -78,7 +78,7 @@
         <hr class="my-3 border border-white-bg" />
         <p class="text-lg text-white-bg">{{ event.description }}</p>
         <hr class="my-3 border border-white-bg" />
-        <div class="flex gap-3 mb-3">
+        <div class="flex flex-wrap gap-3 mb-3 items-center">
           <span
             v-for="(tag, index) in getEventTags(event)"
             :key="index"

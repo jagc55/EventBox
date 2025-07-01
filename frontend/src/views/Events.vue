@@ -18,29 +18,204 @@
         </button>
       </div>
 
-      <!-- Buscador con el mismo ancho que el contenedor de eventos -->
+      <!-- Buscador avanzado con mejor estructura y diseño -->
+      <!-- Botón para mostrar/ocultar filtros en móvil -->
+      <div class="sm:hidden mb-4">
+        <button
+          @click="showFilters = !showFilters"
+          class="w-full flex items-center justify-center gap-2 bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded transition-colors border border-purple-primary"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          {{ showFilters ? "Ocultar buscador" : "Mostrar buscador" }}
+        </button>
+      </div>
+      <!-- Buscador: acordeón en móvil, siempre visible en sm+ -->
       <div
-        v-if="!loading && !error"
-        class="border border-white-bg rounded-xl mb-5 p-4 bg-dark-primary flex flex-wrap gap-4 justify-center items-center shadow-xl"
+        class="border border-white-bg rounded-xl mb-5 p-6 bg-dark-primary flex flex-col gap-4 shadow-xl"
+        v-if="!loading && !error && (showFilters || $screensm)"
+        :class="{ 'hidden sm:flex': !showFilters, flex: showFilters, 'sm:flex': true }"
       >
-        <!-- Input de búsqueda -->
-        <input
-          type="text"
-          placeholder="Buscador por título o palabras clave"
-          class="border p-2 w-64"
-          v-model="searchQuery"
-        />
-
-        <!-- Selector de fechas -->
-        <input type="date" class="border p-2" v-model="selectedDate" />
-
-        <!-- Selector de provincia -->
-        <select class="border p-2" v-model="selectedProvince">
-          <option disabled value="">Selector Provincia</option>
-          <option v-for="prov in provinces" :key="prov" :value="prov">
-            {{ prov }}
-          </option>
-        </select>
+        <div class="flex items-center gap-3 mb-2">
+          <svg
+            class="w-6 h-6 text-purple-primary"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <h2 class="text-lg font-semibold text-white-bg">Buscador de eventos</h2>
+        </div>
+        <!-- Primera fila: búsqueda, fechas, provincia, localidad, limpiar -->
+        <div
+          class="flex flex-col md:flex-row gap-4 items-end justify-between w-full md:space-x-4 md:space-y-0 space-y-4"
+        >
+          <!-- Input de búsqueda avanzado -->
+          <div class="flex flex-col w-full md:w-1/5">
+            <label class="text-white-bg text-sm mb-1" for="searchQuery"
+              >Título, tipo o tags (separa por coma o espacio)</label
+            >
+            <input
+              id="searchQuery"
+              type="text"
+              placeholder="Ej: rock, gratis, fiesta..."
+              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
+              v-model="searchQuery"
+            />
+          </div>
+          <!-- Rango de fechas -->
+          <div class="flex flex-col w-full md:w-1/5">
+            <label class="text-white-bg text-sm mb-1" for="startDate">Desde</label>
+            <input
+              id="startDate"
+              type="date"
+              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
+              v-model="startDate"
+            />
+          </div>
+          <div class="flex flex-col w-full md:w-1/5">
+            <label class="text-white-bg text-sm mb-1" for="endDate">Hasta</label>
+            <input
+              id="endDate"
+              type="date"
+              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
+              v-model="endDate"
+            />
+          </div>
+          <!-- Selector de provincia -->
+          <div class="flex flex-col w-full md:w-1/5">
+            <label class="text-white-bg text-sm mb-1" for="selectedProvince">Provincia</label>
+            <select
+              id="selectedProvince"
+              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
+              v-model="selectedProvince"
+            >
+              <option disabled value="">Selecciona provincia</option>
+              <option v-for="prov in provinces" :key="prov.id || prov" :value="prov.name || prov">
+                {{ prov.name || prov }}
+              </option>
+            </select>
+          </div>
+          <!-- Selector de localidad -->
+          <div class="flex flex-col w-full md:w-1/5">
+            <label class="text-white-bg text-sm mb-1" for="selectedLocality">Localidad</label>
+            <select
+              id="selectedLocality"
+              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
+              v-model="selectedLocality"
+              :disabled="!selectedProvince || localities.length === 0"
+            >
+              <option disabled value="">Selecciona localidad</option>
+              <option v-for="loc in localities" :key="loc.id || loc" :value="loc.name || loc">
+                {{ loc.name || loc }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <!-- Segunda fila: sliders de precio y edad, botón limpiar -->
+        <div
+          class="flex flex-col md:flex-row gap-4 items-start justify-between w-full md:space-x-4 md:space-y-0 space-y-4 mt-4"
+        >
+          <!-- Rango de precio con slider -->
+          <div class="flex flex-col w-full md:w-1/5">
+            <label class="text-white-bg text-sm mb-1">Precio (€)</label>
+            <div class="flex flex-col gap-2">
+              <div class="flex gap-2 mt-1">
+                <div class="flex flex-col">
+                  <label class="text-white-bg text-xs mb-1">Mín:</label>
+                  <input
+                    type="number"
+                    :min="0"
+                    :max="priceRange[1]"
+                    :value="priceRange[0]"
+                    @input="updatePriceFromInput($event, 0)"
+                    class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black w-16"
+                  />
+                </div>
+                <div class="flex flex-col">
+                  <label class="text-white-bg text-xs mb-1">Máx:</label>
+                  <input
+                    type="number"
+                    :min="priceRange[0]"
+                    :max="1000"
+                    :value="priceRange[1]"
+                    @input="updatePriceFromInput($event, 1)"
+                    class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black w-16"
+                  />
+                </div>
+              </div>
+              <div class="flex items-center mt-2 h-6">
+                <input type="checkbox" id="freeOnly" v-model="freeOnly" class="mr-2 accent-purple-500 scale-110" />
+                <label for="freeOnly" class="text-white-bg text-xs">Solo gratuitos</label>
+              </div>
+            </div>
+          </div>
+          <!-- Rango de edad con slider -->
+          <div class="flex flex-col w-full md:w-1/5">
+            <label class="text-white-bg text-sm mb-1">Edad</label>
+            <div class="flex flex-col gap-2">
+              <div class="flex gap-2 mt-1">
+                <div class="flex flex-col">
+                  <label class="text-white-bg text-xs mb-1">Mín:</label>
+                  <input
+                    type="number"
+                    :min="0"
+                    :max="ageRange[1]"
+                    :value="ageRange[0]"
+                    @input="updateAgeFromInput($event, 0)"
+                    class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black w-16"
+                  />
+                </div>
+                <div class="flex flex-col">
+                  <label class="text-white-bg text-xs mb-1">Máx:</label>
+                  <input
+                    type="number"
+                    :min="ageRange[0]"
+                    :max="99"
+                    :value="ageRange[1]"
+                    @input="updateAgeFromInput($event, 1)"
+                    class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black w-16"
+                  />
+                </div>
+              </div>
+              <!-- Espaciado para igualar altura con el slider de precio -->
+              <div class="h-6 mt-2"></div>
+            </div>
+          </div>
+          <!-- Espacios vacíos para mantener alineación -->
+          <div class="flex flex-col w-full md:w-1/5">
+            <div class="invisible h-6"></div>
+          </div>
+          <div class="flex flex-col w-full md:w-1/5">
+            <div class="invisible h-6"></div>
+          </div>
+          <!-- Botón limpiar filtros -->
+          <div class="flex flex-col w-full md:w-1/5">
+            <label class="text-white-bg text-sm mb-1 invisible">Limpiar</label>
+            <button
+              type="button"
+              class="bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded transition-colors border border-purple-primary w-full"
+              @click="clearFilters"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Contenedor con pestañas y eventos -->
@@ -332,7 +507,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useEvents } from "@/composables/useEvents";
 import { formatDate, formatTime } from "@/utils/dateFormat";
@@ -347,8 +522,15 @@ const {
   loading,
   error,
   searchQuery,
-  selectedDate,
   selectedProvince,
+  selectedLocality,
+  minPrice,
+  maxPrice,
+  minAge,
+  maxAge,
+  freeOnly,
+  startDate,
+  endDate,
   activeTab,
   loadUpcomingEvents,
   setActiveTab,
@@ -373,6 +555,135 @@ const establishmentFollowCounts = ref<any>(null);
 const isFollowingEstablishment = ref(false);
 const establishmentFollowLoading = ref(false);
 const establishmentEvents = ref<number | null>(null);
+
+// Provincias y localidades reactivas
+const provinces = ref<any[]>([]);
+const localities = ref<any[]>([]);
+
+// Estado para mostrar/ocultar el buscador en móvil
+const showFilters = ref(false);
+const $screensm = window.matchMedia("(min-width: 640px)").matches;
+
+// Variables reactivas para inputs de rango
+const priceRange = ref<[number, number]>([0, 1000]);
+const ageRange = ref<[number, number]>([0, 99]);
+
+// (Eliminados métodos de sliders, solo quedan los inputs numéricos)
+
+// Métodos para actualizar rangos desde inputs de texto
+const updatePriceFromInput = (event: Event, index: number) => {
+  const target = event.target as HTMLInputElement;
+  const value = parseInt(target.value) || 0;
+
+  if (index === 0) {
+    // Input mínimo
+    if (value <= priceRange.value[1] && value >= 0) {
+      priceRange.value = [value, priceRange.value[1]];
+      minPrice.value = value.toString();
+    }
+  } else {
+    // Input máximo
+    if (value >= priceRange.value[0] && value <= 1000) {
+      priceRange.value = [priceRange.value[0], value];
+      maxPrice.value = value.toString();
+    }
+  }
+};
+
+const updateAgeFromInput = (event: Event, index: number) => {
+  const target = event.target as HTMLInputElement;
+  const value = parseInt(target.value) || 0;
+
+  if (index === 0) {
+    // Input mínimo
+    if (value <= ageRange.value[1] && value >= 0) {
+      ageRange.value = [value, ageRange.value[1]];
+      minAge.value = value.toString();
+    }
+  } else {
+    // Input máximo
+    if (value >= ageRange.value[0] && value <= 99) {
+      ageRange.value = [ageRange.value[0], value];
+      maxAge.value = value.toString();
+    }
+  }
+};
+
+// Sincronizar rangos con filtros cuando estos cambian externamente
+watch([minPrice, maxPrice], ([newMinPrice, newMaxPrice]) => {
+  const min = parseInt(newMinPrice) || 0;
+  const max = parseInt(newMaxPrice) || 1000;
+  priceRange.value = [min, max];
+});
+
+watch([minAge, maxAge], ([newMinAge, newMaxAge]) => {
+  const min = parseInt(newMinAge) || 0;
+  const max = parseInt(newMaxAge) || 99;
+  ageRange.value = [min, max];
+});
+
+// Cargar provincias desde la BD
+const loadProvinces = async () => {
+  try {
+    const res = await fetch("http://localhost:8080/api/provinces");
+    if (res.ok) {
+      provinces.value = await res.json();
+    }
+  } catch (e) {
+    provinces.value = [];
+  }
+};
+
+// Cargar localidades según provincia seleccionada
+const loadLocalities = async (provinceName: string) => {
+  if (!provinceName) {
+    localities.value = [];
+    return;
+  }
+  try {
+    const res = await fetch(`http://localhost:8080/api/localities?province=${encodeURIComponent(provinceName)}`);
+    if (res.ok) {
+      const allLocalities = await res.json();
+      // Filtrar en frontend por si el backend no filtra bien
+      localities.value = Array.isArray(allLocalities)
+        ? allLocalities.filter((l) => l.province?.name === provinceName)
+        : [];
+    }
+  } catch (e) {
+    localities.value = [];
+  }
+};
+
+// Watch para cargar localidades cuando cambia la provincia
+watch(selectedProvince, (newProv) => {
+  loadLocalities(newProv);
+  selectedLocality.value = "";
+});
+
+// Watch para limpiar localidad si se selecciona una que no pertenece a la provincia
+watch([localities, selectedLocality], ([locs, selLoc]) => {
+  if (selLoc && !locs.some((l) => (l.name || l) === selLoc)) {
+    selectedLocality.value = "";
+  }
+});
+
+// Sincronizar sliders de precio y edad para evitar valores inconsistentes
+watch([minPrice, maxPrice], ([min, max]) => {
+  if (Number(min) > Number(max)) {
+    maxPrice.value = min;
+  }
+  if (Number(max) < Number(min)) {
+    minPrice.value = max;
+  }
+});
+watch([minAge, maxAge], ([min, max]) => {
+  if (Number(min) > Number(max)) {
+    maxAge.value = min;
+  }
+  if (Number(max) < Number(min)) {
+    minAge.value = max;
+  }
+});
 
 // Función para abrir el modal del organizador
 const openOrganizerModal = async (organizer: any) => {
@@ -558,61 +869,30 @@ const navigateToEvent = (eventId: number) => {
   router.push({ name: "event", params: { eventId: eventId.toString() } });
 };
 
+// Función para limpiar todos los filtros del buscador
+const clearFilters = () => {
+  searchQuery.value = "";
+  selectedProvince.value = "";
+  selectedLocality.value = "";
+  minPrice.value = "";
+  maxPrice.value = "";
+  minAge.value = "";
+  maxAge.value = "";
+  freeOnly.value = false;
+  startDate.value = "";
+  endDate.value = "";
+  // Resetear también los rangos de los inputs
+  priceRange.value = [0, 1000];
+  ageRange.value = [0, 99];
+};
+
 // Cargar eventos al montar el componente
 onMounted(() => {
-  setActiveTab("upcoming"); // Esto cargará los próximos eventos
+  setActiveTab("upcoming");
+  loadProvinces();
 });
-
-const provinces = [
-  "Álava",
-  "Albacete",
-  "Alicante",
-  "Almería",
-  "Asturias",
-  "Ávila",
-  "Badajoz",
-  "Barcelona",
-  "Burgos",
-  "Cáceres",
-  "Cádiz",
-  "Cantabria",
-  "Castellón",
-  "Ciudad Real",
-  "Córdoba",
-  "Cuenca",
-  "Gerona",
-  "Granada",
-  "Guadalajara",
-  "Guipúzcoa",
-  "Huelva",
-  "Huesca",
-  "Islas Baleares",
-  "Jaén",
-  "La Coruña",
-  "La Rioja",
-  "Las Palmas",
-  "León",
-  "Lérida",
-  "Lugo",
-  "Madrid",
-  "Málaga",
-  "Murcia",
-  "Navarra",
-  "Orense",
-  "Palencia",
-  "Pontevedra",
-  "Salamanca",
-  "Santa Cruz de Tenerife",
-  "Segovia",
-  "Sevilla",
-  "Soria",
-  "Tarragona",
-  "Teruel",
-  "Toledo",
-  "Valencia",
-  "Valladolid",
-  "Vizcaya",
-  "Zamora",
-  "Zaragoza",
-];
 </script>
+
+<style scoped>
+/* (Eliminados estilos de sliders) */
+</style>

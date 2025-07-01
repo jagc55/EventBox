@@ -18,6 +18,16 @@ export function useEvents() {
   const searchQuery = ref("");
   const selectedDate = ref("");
   const selectedProvince = ref("");
+  const selectedLocality = ref("");
+  // Nuevos filtros
+  const minPrice = ref("");
+  const maxPrice = ref("");
+  const minAge = ref("");
+  const maxAge = ref("");
+  const freeOnly = ref(false);
+  const startDate = ref("");
+  const endDate = ref("");
+
   // Función para cargar todos los eventos (ahora solo próximos)
   const loadUpcomingEvents = async () => {
     loading.value = true;
@@ -191,22 +201,41 @@ export function useEvents() {
 
     return sourceEvents
       .filter((event) => {
-        // Filtro por búsqueda (título o tags)
+        // Filtro por búsqueda avanzada: tags múltiples y coincidencia combinada
         if (searchQuery.value) {
-          const query = searchQuery.value.toLowerCase();
-          const titleMatch = event.title.toLowerCase().includes(query);
-          const tagsMatch = getEventTags(event).some((tag) => tag.toLowerCase().includes(query));
-          if (!titleMatch && !tagsMatch) return false;
+          const queries = searchQuery.value.toLowerCase().split(/[, ]+/).filter(Boolean);
+          // Coincidencia: si algún término está en título, tipo o tags, o si todos los términos están presentes en cualquier campo
+          const fields = [event.title, event.eventType?.name, ...getEventTags(event)].map((f) =>
+            (f || "").toLowerCase()
+          );
+          const anyMatch = queries.some((q) => fields.some((f) => f.includes(q)));
+          const allMatch = queries.every((q) => fields.some((f) => f.includes(q)));
+          if (!(anyMatch || allMatch)) return false;
         }
 
-        // Filtro por fecha
-        if (selectedDate.value) {
-          if (event.date !== selectedDate.value) return false;
-        }
+        // Filtro por rango de precio
+        if (minPrice.value && event.price < Number(minPrice.value)) return false;
+        if (maxPrice.value && event.price > Number(maxPrice.value)) return false;
+
+        // Filtro solo gratuitos
+        if (freeOnly.value && event.price !== 0) return false;
+
+        // Filtro por rango de edad
+        if (minAge.value && event.minimumAge < Number(minAge.value)) return false;
+        if (maxAge.value && event.minimumAge > Number(maxAge.value)) return false;
+
+        // Filtro por rango de fechas
+        if (startDate.value && event.date < startDate.value) return false;
+        if (endDate.value && event.date > endDate.value) return false;
 
         // Filtro por provincia
         if (selectedProvince.value) {
           if (event.establishment.locality.province.name !== selectedProvince.value) return false;
+        }
+
+        // Filtro por localidad
+        if (selectedLocality.value) {
+          if (event.establishment.locality.name !== selectedLocality.value) return false;
         }
 
         return true;
@@ -238,6 +267,14 @@ export function useEvents() {
     searchQuery,
     selectedDate,
     selectedProvince,
+    selectedLocality,
+    minPrice,
+    maxPrice,
+    minAge,
+    maxAge,
+    freeOnly,
+    startDate,
+    endDate,
     activeTab,
     loadUpcomingEvents,
     loadFinishedEvents,
