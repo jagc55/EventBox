@@ -83,8 +83,16 @@ const loginUser = async () => {
       name: data.name,
     });
 
-    alert("Inicio de sesión exitoso");
-    router.push({ name: "events" });
+    // Check if there's a redirect URL in query params
+    const redirectUrl = router.currentRoute.value.query.redirect as string | undefined;
+
+    if (redirectUrl) {
+      // Redirect to the original destination
+      router.push(redirectUrl);
+    } else {
+      // Default redirect to events page
+      router.push({ name: "events" });
+    }
   } catch (err: any) {
     alert("Error: " + err.message);
   }

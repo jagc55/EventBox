@@ -21,6 +21,11 @@ export function useAuth() {
     return isLoggedIn.value && session.value.roleId === 3;
   });
 
+  // Verificar si el usuario es organizador o administrador
+  const isOrganizer = computed(() => {
+    return isLoggedIn.value && (session.value.roleId === 2 || session.value.roleId === 3);
+  });
+
   // Obtener el usuario actual
   const currentUser = computed(() => {
     if (!isLoggedIn.value) return null;
@@ -37,6 +42,7 @@ export function useAuth() {
     isLoggedIn,
     canDeleteComment,
     isAdmin,
+    isOrganizer,
     currentUser,
   };
 }
