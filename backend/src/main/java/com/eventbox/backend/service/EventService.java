@@ -16,11 +16,16 @@ public class EventService {
     private final EventRepository repo;
     private final FavoriteRepository favoriteRepository;
     private final CommentRepository commentRepository;
+    private final EventSearchService eventSearchService;
 
-    public EventService(EventRepository repo, FavoriteRepository favoriteRepository, CommentRepository commentRepository) {
+    public EventService(EventRepository repo, 
+                       FavoriteRepository favoriteRepository, 
+                       CommentRepository commentRepository,
+                       EventSearchService eventSearchService) {
         this.repo = repo;
         this.favoriteRepository = favoriteRepository;
         this.commentRepository = commentRepository;
+        this.eventSearchService = eventSearchService;
     }
 
     public List<Event> getAll() {
@@ -36,13 +41,16 @@ public class EventService {
     }
 
     public Event save(Event event) {
-        return repo.save(event);
+        Event savedEvent = repo.save(event);
+        eventSearchService.indexEvent(savedEvent);
+        return savedEvent;
     }
 
     @Transactional
     public void delete(Long id) {
         favoriteRepository.deleteByEventId(id);
         commentRepository.deleteByEventId(id);
+        eventSearchService.deleteEventIndex(id.toString());
         repo.deleteById(id);
     }
 
@@ -52,7 +60,9 @@ public class EventService {
 
     public Event update(Event event) {
         // Se asume que el evento ya tiene el ID correcto
-        return repo.save(event);
+        Event updatedEvent = repo.save(event);
+        eventSearchService.indexEvent(updatedEvent);
+        return updatedEvent;
     }
 
     public List<Event> getEventsByFollowedUsers(Long userId) {
