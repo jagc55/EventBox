@@ -19,11 +19,7 @@
           <hr class="h-5 border-r border-white-bg" />
           <RouterLink to="/social" class="hover:underline">Social</RouterLink>
           <hr class="h-5 border-r border-white-bg" />
-          <RouterLink
-            v-if="session?.roleId === 2"
-            :to="{ name: 'establishments' }"
-            class="hover:underline"
-          >
+          <RouterLink v-if="session?.roleId === 2" :to="{ name: 'establishments' }" class="hover:underline">
             Organizador
           </RouterLink>
           <hr v-if="session?.roleId === 2" class="h-5 border-r border-white-bg" />
@@ -49,11 +45,7 @@
         <hr class="w-full border-t border-white-bg" />
         <RouterLink :to="{ name: 'profile' }" class="block hover:underline"> Mi perfil </RouterLink>
         <hr class="w-full border-t border-white-bg" />
-        <RouterLink
-          v-if="session?.roleId === 2"
-          :to="{ name: 'establishments' }"
-          class="block hover:underline"
-        >
+        <RouterLink v-if="session?.roleId === 2" :to="{ name: 'establishments' }" class="block hover:underline">
           Organizador
         </RouterLink>
         <hr v-if="session?.roleId === 2" class="w-full border-t border-white-bg" />
