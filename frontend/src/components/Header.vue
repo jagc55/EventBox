@@ -20,13 +20,13 @@
           <RouterLink to="/social" class="hover:underline">Social</RouterLink>
           <hr class="h-5 border-r border-white-bg" />
           <RouterLink
-            v-if="session?.roleId === 2 || session?.roleId === 3"
+            v-if="session?.roleId === 2"
             :to="{ name: 'establishments' }"
             class="hover:underline"
           >
             Organizador
           </RouterLink>
-          <hr v-if="session?.roleId === 2 || session?.roleId === 3" class="h-5 border-r border-white-bg" />
+          <hr v-if="session?.roleId === 2" class="h-5 border-r border-white-bg" />
           <RouterLink v-if="session?.roleId === 3" :to="{ name: 'admin' }" class="hover:underline">
             Administrador
           </RouterLink>
@@ -50,13 +50,13 @@
         <RouterLink :to="{ name: 'profile' }" class="block hover:underline"> Mi perfil </RouterLink>
         <hr class="w-full border-t border-white-bg" />
         <RouterLink
-          v-if="session?.roleId === 2 || session?.roleId === 3"
+          v-if="session?.roleId === 2"
           :to="{ name: 'establishments' }"
           class="block hover:underline"
         >
           Organizador
         </RouterLink>
-        <hr v-if="session?.roleId === 2 || session?.roleId === 3" class="w-full border-t border-white-bg" />
+        <hr v-if="session?.roleId === 2" class="w-full border-t border-white-bg" />
         <RouterLink v-if="session?.roleId === 3" :to="{ name: 'admin' }" class="block hover:underline">
           Administrador
         </RouterLink>
