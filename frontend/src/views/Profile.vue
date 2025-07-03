@@ -872,7 +872,7 @@ const requestOrganizer = async () => {
 
   try {
     // NUEVO: Crear solicitud en lugar de cambiar rol directamente
-    const res = await fetch(`http://localhost:8080/api/organizer-requests`, {
+    const res = await fetch(`http://144.24.204.95:8080/api/organizer-requests`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -966,7 +966,7 @@ const changePassword = async () => {
   passwordSuccess.value = "";
 
   try {
-    const response = await fetch(`http://localhost:8080/api/users/${session.value.userId}/password`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/users/${session.value.userId}/password`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -1007,7 +1007,7 @@ const loadFollowData = async () => {
 
   try {
     // Cargar contadores de usuarios
-    const countsResponse = await fetch(`http://localhost:8080/api/user-follows/${session.value.userId}/counts`, {
+    const countsResponse = await fetch(`http://144.24.204.95:8080/api/user-follows/${session.value.userId}/counts`, {
       headers: {
         Authorization: `Bearer ${session.value.token}`,
       },
@@ -1021,7 +1021,7 @@ const loadFollowData = async () => {
 
     // Cargar contador de establecimientos seguidos
     const establishmentCountResponse = await fetch(
-      `http://localhost:8080/api/establishment-follows/user/${session.value.userId}/count`,
+      `http://144.24.204.95:8080/api/establishment-follows/user/${session.value.userId}/count`,
       {
         headers: {
           Authorization: `Bearer ${session.value.token}`,
@@ -1048,9 +1048,12 @@ const checkPendingRequest = async () => {
 
   loadingPendingRequest.value = true;
   try {
-    const response = await fetch(`http://localhost:8080/api/organizer-requests/user/${session.value.userId}/pending`, {
-      headers: { Authorization: `Bearer ${session.value.token}` },
-    });
+    const response = await fetch(
+      `http://144.24.204.95:8080/api/organizer-requests/user/${session.value.userId}/pending`,
+      {
+        headers: { Authorization: `Bearer ${session.value.token}` },
+      }
+    );
 
     if (response.ok) {
       const data = await response.json();
@@ -1082,7 +1085,7 @@ const loadFollowersData = async () => {
 
   loadingFollowData.value = true;
   try {
-    const response = await fetch(`http://localhost:8080/api/user-follows/${session.value.userId}/followers`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/user-follows/${session.value.userId}/followers`, {
       headers: {
         Authorization: `Bearer ${session.value.token}`,
       },
@@ -1104,7 +1107,7 @@ const loadFollowingData = async () => {
   loadingFollowData.value = true;
   try {
     // Usar el endpoint correcto para obtener usuarios que sigue
-    const response = await fetch(`http://localhost:8080/api/user-follows/${session.value.userId}/following`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/user-follows/${session.value.userId}/following`, {
       headers: {
         Authorization: `Bearer ${session.value.token}`,
       },
@@ -1134,7 +1137,7 @@ const loadEstablishmentsData = async () => {
   try {
     // Usar el endpoint que funciona para obtener establishment follows
     const response = await fetch(
-      `http://localhost:8080/api/establishment-follows/user/${session.value.userId}/establishments`,
+      `http://144.24.204.95:8080/api/establishment-follows/user/${session.value.userId}/establishments`,
       {
         headers: {
           Authorization: `Bearer ${session.value.token}`,
@@ -1193,7 +1196,7 @@ const unfollowUser = async (userId: number) => {
   if (!session.value?.userId) return;
 
   try {
-    const response = await fetch("http://localhost:8080/api/user-follows", {
+    const response = await fetch("http://144.24.204.95:8080/api/user-follows", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -1223,7 +1226,7 @@ const unfollowEstablishment = async (establishmentId: number) => {
   if (!session.value?.userId) return;
 
   try {
-    const response = await fetch("http://localhost:8080/api/establishment-follows", {
+    const response = await fetch("http://144.24.204.95:8080/api/establishment-follows", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

@@ -454,7 +454,7 @@ const openOrganizerModal = async (organizer: any) => {
     followCounts.value = await ApiService.getFollowCounts(organizer.id);
 
     // Cargar número de establecimientos del organizador
-    const establishmentsResponse = await fetch(`http://localhost:8080/api/establishments/user/${organizer.id}`, {
+    const establishmentsResponse = await fetch(`http://144.24.204.95:8080/api/establishments/user/${organizer.id}`, {
       headers: {
         Authorization: `Bearer ${currentUser.value?.id ? localStorage.getItem("session") : ""}`,
       },
@@ -521,7 +521,7 @@ const openEstablishmentModal = async (establishment: any) => {
     // Cargar contadores de seguidores del establecimiento
     try {
       const followCountsResponse = await fetch(
-        `http://localhost:8080/api/establishment-follows/establishment/${establishment.id}/count`,
+        `http://144.24.204.95:8080/api/establishment-follows/establishment/${establishment.id}/count`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("session") || ""}`,
@@ -540,7 +540,7 @@ const openEstablishmentModal = async (establishment: any) => {
     establishmentEvents.value = 0; // Default value
     try {
       // Intentar primero con el endpoint general de eventos y filtrar
-      const eventsResponse = await fetch(`http://localhost:8080/api/events`, {
+      const eventsResponse = await fetch(`http://144.24.204.95:8080/api/events`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("session") || ""}`,
         },
@@ -597,7 +597,7 @@ const handleEstablishmentFollowToggle = async () => {
 
     // Actualizar contadores
     const followCountsResponse = await fetch(
-      `http://localhost:8080/api/establishment-follows/establishment/${selectedEstablishment.value.id}/count`,
+      `http://144.24.204.95:8080/api/establishment-follows/establishment/${selectedEstablishment.value.id}/count`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("session") || ""}`,

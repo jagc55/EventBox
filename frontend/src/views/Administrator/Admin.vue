@@ -416,7 +416,7 @@ watch(currentTab, (newTab) => {
 const loadRequests = async () => {
   loading.value = true;
   try {
-    const response = await fetch("http://localhost:8080/api/organizer-requests/pending", {
+    const response = await fetch("http://144.24.204.95:8080/api/organizer-requests/pending", {
       headers: {
         Authorization: `Bearer ${session.value?.token}`,
       },
@@ -443,7 +443,7 @@ const approveRequest = async (request: any) => {
 
   processing.value = true;
   try {
-    const response = await fetch(`http://localhost:8080/api/organizer-requests/${request.id}/approve`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/organizer-requests/${request.id}/approve`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -479,7 +479,7 @@ const rejectRequest = async (request: any) => {
 
   processing.value = true;
   try {
-    const response = await fetch(`http://localhost:8080/api/organizer-requests/${request.id}/reject`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/organizer-requests/${request.id}/reject`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -510,7 +510,7 @@ const rejectRequest = async (request: any) => {
 const loadUsers = async () => {
   loadingUsers.value = true;
   try {
-    const response = await fetch("http://localhost:8080/api/users", {
+    const response = await fetch("http://144.24.204.95:8080/api/users", {
       headers: {
         Authorization: `Bearer ${session.value?.token}`,
       },
@@ -543,7 +543,7 @@ Esta acción no se puede deshacer.`;
 
   processing.value = true;
   try {
-    const response = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/users/${user.id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${session.value?.token}`,
@@ -578,7 +578,7 @@ Esta acción no se puede deshacer.`;
 
   processing.value = true;
   try {
-    const response = await fetch(`http://localhost:8080/api/users/${user.id}/demote`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/users/${user.id}/demote`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -605,7 +605,7 @@ Esta acción no se puede deshacer.`;
 const loadEvents = async () => {
   loadingEvents.value = true;
   try {
-    const response = await fetch("http://localhost:8080/api/events", {
+    const response = await fetch("http://144.24.204.95:8080/api/events", {
       headers: {
         Authorization: `Bearer ${session.value?.token}`,
       },
@@ -634,7 +634,7 @@ const deleteEvent = async (event: any) => {
 
   processing.value = true;
   try {
-    const response = await fetch(`http://localhost:8080/api/events/${event.id}`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/events/${event.id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${session.value?.token}`,
@@ -660,7 +660,7 @@ const deleteEvent = async (event: any) => {
 const loadEstablishments = async () => {
   loadingEstablishments.value = true;
   try {
-    const response = await fetch("http://localhost:8080/api/establishments", {
+    const response = await fetch("http://144.24.204.95:8080/api/establishments", {
       headers: {
         Authorization: `Bearer ${session.value?.token}`,
       },
@@ -688,7 +688,7 @@ const deleteEstablishment = async (establishment: any) => {
   }
   processing.value = true;
   try {
-    const response = await fetch(`http://localhost:8080/api/establishments/${establishment.id}`, {
+    const response = await fetch(`http://144.24.204.95:8080/api/establishments/${establishment.id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${session.value?.token}`,

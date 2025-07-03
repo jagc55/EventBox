@@ -167,7 +167,9 @@ const checkUserExists = async () => {
     let hasErrors = false;
 
     // Verificar si el email ya existe
-    const emailRes = await fetch(`http://localhost:8080/api/auth/check-email?email=${encodeURIComponent(email.value)}`);
+    const emailRes = await fetch(
+      `http://144.24.204.95:8080/api/auth/check-email?email=${encodeURIComponent(email.value)}`
+    );
 
     if (emailRes.ok) {
       const emailData = await emailRes.json();
@@ -179,7 +181,7 @@ const checkUserExists = async () => {
 
     // Verificar si el nombre de usuario ya existe
     const usernameRes = await fetch(
-      `http://localhost:8080/api/auth/check-username?username=${encodeURIComponent(username.value)}`
+      `http://144.24.204.95:8080/api/auth/check-username?username=${encodeURIComponent(username.value)}`
     );
 
     if (usernameRes.ok) {
@@ -212,7 +214,7 @@ const onSubmit = async () => {
   }
 
   try {
-    const res = await fetch("http://localhost:8080/api/auth/register", {
+    const res = await fetch("http://144.24.204.95:8080/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

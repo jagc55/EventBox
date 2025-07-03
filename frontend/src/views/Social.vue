@@ -234,7 +234,7 @@ async function fetchEstablishmentStats(estId: number) {
   // Seguidores
   let followersCount = 0;
   try {
-    const res = await fetch(`http://localhost:8080/api/establishment-follows/establishment/${estId}/count`, {
+    const res = await fetch(`http://144.24.204.95:8080/api/establishment-follows/establishment/${estId}/count`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("session") || ""}` },
     });
     if (res.ok) {
@@ -245,7 +245,7 @@ async function fetchEstablishmentStats(estId: number) {
   // Eventos
   let eventsCount = 0;
   try {
-    const res = await fetch(`http://localhost:8080/api/events`, {
+    const res = await fetch(`http://144.24.204.95:8080/api/events`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("session") || ""}` },
     });
     if (res.ok) {
