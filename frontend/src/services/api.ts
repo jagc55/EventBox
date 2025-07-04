@@ -302,4 +302,40 @@ export class ApiService {
       body: JSON.stringify(establishment),
     });
   }
+
+  // Update establishment endpoint
+  public static async updateEstablishment(id: number, establishment: any): Promise<Establishment> {
+    return this.makeRequest<Establishment>(`/establishments/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(establishment),
+    });
+  }
+
+  // Delete establishment endpoint
+  public static async deleteEstablishment(id: number): Promise<void> {
+    return this.makeRequest<void>(`/establishments/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Events CRUD endpoints
+  public static async createEvent(event: any): Promise<Event> {
+    return this.makeRequest<Event>("/events", {
+      method: "POST",
+      body: JSON.stringify(event),
+    });
+  }
+
+  public static async updateEvent(id: number, event: any): Promise<Event> {
+    return this.makeRequest<Event>(`/events/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(event),
+    });
+  }
+
+  public static async deleteEvent(id: number): Promise<void> {
+    return this.makeRequest<void>(`/events/${id}`, {
+      method: "DELETE",
+    });
+  }
 }

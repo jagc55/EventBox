@@ -299,6 +299,7 @@ import { ref, watch, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Pencil, Trash2, X } from "lucide-vue-next";
 import { useSession } from "@/composables/useSession";
+import { ApiService } from "@/services/api";
 
 const showModal = ref(false);
 const editingEventId = ref<string | null>(null);
@@ -330,30 +331,20 @@ const eventCategoriesList = ref<{ id: number; name: string }[]>([]);
 onMounted(async () => {
   const id = route.params.establishmentId;
   try {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-    // Cargar provincias
-    const resProvinces = await fetch("/api/provinces", { headers });
-    if (resProvinces.ok) {
-      provinces.value = await resProvinces.json();
-    } else {
-      provinces.value = [];
-    }
-    // Cargar tipos de evento desde la API
-    const resEventTypes = await fetch("/api/event-types", { headers });
-    if (resEventTypes.ok) {
-      eventCategoriesList.value = await resEventTypes.json();
-    } else {
-      eventCategoriesList.value = [];
-    }
-    // Cargar datos del establecimiento
-    const resEst = await fetch(`/api/establishments/${id}`, { headers });
-    if (!resEst.ok) {
-      const errorText = await resEst.text();
-      console.error("Error al cargar establecimiento:", errorText);
+    // Cargar provincias usando ApiService
+    provinces.value = await ApiService.getAllProvinces();
+
+    // Cargar tipos de evento desde la API usando ApiService
+    eventCategoriesList.value = await ApiService.getAllEventTypes();
+
+    // Cargar datos del establecimiento usando ApiService
+    const allEstablishments = await ApiService.getAllEstablishments();
+    establishment.value = allEstablishments.find((est: any) => est.id === Number(id));
+
+    if (!establishment.value) {
       throw new Error("No se pudo cargar el establecimiento");
     }
-    establishment.value = await resEst.json();
+
     establishmentForm.value = {
       name: establishment.value.name || "",
       address: establishment.value.address || "",
@@ -363,14 +354,14 @@ onMounted(async () => {
       province: establishment.value.locality?.province?.name || "",
       tfn: establishment.value.phone || "",
     };
+
     // Si hay provincia, cargar localidades
     if (establishmentForm.value.province) {
       await fetchLocalities(establishmentForm.value.province);
     }
-    // Cargar eventos del establecimiento
-    const resEvents = await fetch(`/api/establishments/${id}/events`, { headers });
-    if (!resEvents.ok) throw new Error("No se pudieron cargar los eventos");
-    events.value = await resEvents.json();
+
+    // Cargar eventos del establecimiento usando ApiService
+    events.value = await ApiService.getEventsByEstablishment(Number(id));
   } catch (e) {
     establishment.value = null;
     events.value = [];
@@ -384,9 +375,7 @@ async function fetchLocalities(provinceName: string) {
     return;
   }
   try {
-    const res = await fetch(`/api/localities/province/${encodeURIComponent(provinceName)}`);
-    if (!res.ok) throw new Error("Error al obtener localidades");
-    localities.value = await res.json();
+    localities.value = await ApiService.getLocalitiesByProvince(provinceName);
     // Si la ciudad actual no está en la lista, resetear
     if (!localities.value.some((l) => l.name === establishmentForm.value.city)) {
       establishmentForm.value.city = "";
@@ -515,37 +504,14 @@ async function handleSubmit() {
   console.log("Payload enviado a /api/events:", eventPayload);
 
   try {
-    let res;
     if (editingEventId.value) {
-      res = await fetch(`/api/events/${editingEventId.value}`, {
-        method: "PUT",
-        headers,
-        body: JSON.stringify(eventPayload),
-      });
+      await ApiService.updateEvent(Number(editingEventId.value), eventPayload);
     } else {
-      res = await fetch(`/api/events`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(eventPayload),
-      });
+      await ApiService.createEvent(eventPayload);
     }
-    if (!res.ok) {
-      let errorMsg = "Error al guardar el evento.";
-      try {
-        const errorJson = await res.json();
-        if (errorJson && errorJson.message) errorMsg = errorJson.message;
-        else if (typeof errorJson === "string") errorMsg = errorJson;
-      } catch {
-        const errorText = await res.text();
-        if (errorText) errorMsg = errorText;
-      }
-      errors.value.form = errorMsg;
-      return;
-    }
-    const resEvents = await fetch(`/api/establishments/${establishment.value.id}/events`, { headers });
-    if (resEvents.ok) {
-      events.value = await resEvents.json();
-    }
+
+    // Recargar eventos del establecimiento
+    events.value = await ApiService.getEventsByEstablishment(establishment.value.id);
     showModal.value = false;
     resetForm();
   } catch (e: any) {
@@ -601,7 +567,7 @@ watch(showModal, (visible) => {
   }
 });
 
-function submitEstablishmentForm() {
+async function submitEstablishmentForm() {
   establishmentErrors.value = {};
 
   if (!establishmentForm.value.name) establishmentErrors.value.name = "El nombre es obligatorio";
@@ -618,12 +584,7 @@ function submitEstablishmentForm() {
   }
 
   if (Object.keys(establishmentErrors.value).length === 0) {
-    // Enviar datos al backend para modificar el establecimiento
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    const headers = {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
+    // Enviar datos al backend para modificar el establecimiento usando ApiService
     const payload = {
       name: establishmentForm.value.name,
       address: establishmentForm.value.address,
@@ -634,111 +595,54 @@ function submitEstablishmentForm() {
         province: { name: establishmentForm.value.province },
       },
     };
-    fetch(`/api/establishments/${establishment.value.id}`, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify(payload),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          let errorMsg = "Error al guardar los cambios.";
-          try {
-            const errorJson = await res.json();
-            if (errorJson && errorJson.message) errorMsg = errorJson.message;
-            else if (typeof errorJson === "string") errorMsg = errorJson;
-          } catch {
-            const errorText = await res.text();
-            if (errorText) errorMsg = errorText;
-          }
-          alert(errorMsg);
-          return;
-        }
-        // Actualizar datos locales
-        establishment.value = await res.json();
-        establishmentForm.value = {
-          name: establishment.value.name || "",
-          address: establishment.value.address || "",
-          phone: establishment.value.phone || "",
-          email: establishment.value.email || "",
-          city: establishment.value.locality?.name || "",
-          province: establishment.value.locality?.province?.name || "",
-          tfn: establishment.value.phone || "",
-        };
-        alert("Cambios guardados correctamente");
-      })
-      .catch((e) => {
-        alert(e.message || e);
-      });
+
+    try {
+      // Actualizar establecimiento usando ApiService
+      establishment.value = await ApiService.updateEstablishment(establishment.value.id, payload);
+
+      // Actualizar datos locales
+      establishmentForm.value = {
+        name: establishment.value.name || "",
+        address: establishment.value.address || "",
+        phone: establishment.value.phone || "",
+        email: establishment.value.email || "",
+        city: establishment.value.locality?.name || "",
+        province: establishment.value.locality?.province?.name || "",
+        tfn: establishment.value.phone || "",
+      };
+      alert("Cambios guardados correctamente");
+    } catch (e: any) {
+      alert(e.message || "Error al guardar los cambios");
+    }
   }
 }
 
-function deleteEstablishment() {
+async function deleteEstablishment() {
   if (!establishment.value) return;
   if (
     confirm(
       "¿Estás seguro de que quieres eliminar el establecimiento? Esto eliminará también todos los eventos asociados."
     )
   ) {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-    fetch(`/api/establishments/${establishment.value.id}`, {
-      method: "DELETE",
-      headers,
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          let errorMsg = "Error al eliminar el establecimiento.";
-          try {
-            const errorJson = await res.json();
-            if (errorJson && errorJson.message) errorMsg = errorJson.message;
-            else if (typeof errorJson === "string") errorMsg = errorJson;
-          } catch {
-            const errorText = await res.text();
-            if (errorText) errorMsg = errorText;
-          }
-          alert(errorMsg);
-          return;
-        }
-        alert("Establecimiento y eventos asociados eliminados correctamente.");
-        router.push({ name: "establishments" });
-      })
-      .catch((e) => {
-        alert(e.message || e);
-      });
+    try {
+      await ApiService.deleteEstablishment(establishment.value.id);
+      alert("Establecimiento y eventos asociados eliminados correctamente.");
+      router.push({ name: "establishments" });
+    } catch (e: any) {
+      alert(e.message || "Error al eliminar el establecimiento");
+    }
   }
 }
 
 async function deleteEvent(id: string) {
   if (confirm("¿Quieres eliminar este evento?")) {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
     try {
-      const res = await fetch(`/api/events/${id}`, {
-        method: "DELETE",
-        headers,
-      });
-      if (!res.ok) {
-        let errorMsg = "Error al eliminar el evento.";
-        try {
-          const errorJson = await res.json();
-          if (errorJson && errorJson.message) errorMsg = errorJson.message;
-          else if (typeof errorJson === "string") errorMsg = errorJson;
-        } catch {
-          const errorText = await res.text();
-          if (errorText) errorMsg = errorText;
-        }
-        alert(errorMsg);
-        return;
-      }
+      await ApiService.deleteEvent(Number(id));
       // Recargar eventos tras eliminar
-      const resEvents = await fetch(`/api/establishments/${establishment.value.id}/events`, { headers });
-      if (resEvents.ok) {
-        events.value = await resEvents.json();
-      } else {
-        events.value = events.value.filter((event) => event.id !== id);
-      }
+      events.value = await ApiService.getEventsByEstablishment(establishment.value.id);
+      alert("Evento eliminado correctamente.");
     } catch (e: any) {
-      alert(e.message || e);
+      alert(e.message || "Error al eliminar el evento");
     }
   }
 }
