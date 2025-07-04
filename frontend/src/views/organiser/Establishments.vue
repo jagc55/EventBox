@@ -144,6 +144,7 @@ import { ref, watch, onMounted } from "vue";
 import { X } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import { useSession } from "../../composables/useSession";
+import { ApiService } from "../../services/api";
 
 const showModal = ref(false);
 
@@ -194,22 +195,16 @@ async function fetchEstablishments() {
   if (!session.value.userId) return;
   loading.value = true;
   try {
-    const res = await fetch(`/api/establishments/user/${session.value.userId}`, {
-      headers: { Authorization: `Bearer ${session.value.token}` },
-    });
-    if (!res.ok) throw new Error("Error al obtener establecimientos");
-    const ests = await res.json();
+    // Usar ApiService en lugar de fetch directo
+    const ests = await ApiService.getAllEstablishments();
+    // Filtrar solo los establecimientos del usuario actual
+    const userEstablishments = ests.filter((est: any) => est.user?.id === session.value.userId);
+
     const withEvents = await Promise.all(
-      ests.map(async (est: any) => {
+      userEstablishments.map(async (est: any) => {
         try {
-          const resEvents = await fetch(`/api/establishments/${est.id}/events`, {
-            headers: { Authorization: `Bearer ${session.value.token}` },
-          });
-          if (resEvents.ok) {
-            est.events = await resEvents.json();
-          } else {
-            est.events = [];
-          }
+          const events = await ApiService.getEventsByEstablishment(est.id);
+          est.events = events;
         } catch {
           est.events = [];
         }
@@ -226,9 +221,7 @@ async function fetchEstablishments() {
 
 async function fetchLocalities() {
   try {
-    const res = await fetch("/api/localities");
-    if (!res.ok) throw new Error("Error al obtener localidades");
-    localities.value = await res.json();
+    localities.value = await ApiService.getAllLocalities();
   } catch (e) {
     localities.value = [];
   }
@@ -236,9 +229,7 @@ async function fetchLocalities() {
 
 async function fetchProvinces() {
   try {
-    const res = await fetch("/api/provinces");
-    if (!res.ok) throw new Error("Error al obtener provincias");
-    provinces.value = await res.json();
+    provinces.value = await ApiService.getAllProvinces();
   } catch (e) {
     provinces.value = [];
   }
@@ -259,9 +250,7 @@ watch(
       return;
     }
     try {
-      const res = await fetch(`/api/localities/province/${encodeURIComponent(selectedProvince.name)}`);
-      if (!res.ok) throw new Error("Error al obtener localidades");
-      localities.value = await res.json();
+      localities.value = await ApiService.getLocalitiesByProvince(selectedProvince.name);
       form.value.locality = "";
     } catch (e) {
       localities.value = [];
@@ -304,24 +293,15 @@ async function submitForm() {
 
   try {
     const payload = {
-      ...form.value,
-      user: { id: session.value.userId },
-      locality: { id: form.value.locality },
+      name: form.value.name,
+      address: form.value.address,
+      phone: form.value.phone,
+      email: form.value.email,
+      user: { id: session.value.userId! },
+      locality: { id: Number(form.value.locality) },
     };
     console.log("Enviando datos:", payload);
-    const res = await fetch("/api/establishments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.value.token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Error al crear establecimiento:", errorText);
-      throw new Error("Error al crear establecimiento");
-    }
+    await ApiService.createEstablishment(payload);
     await fetchEstablishments();
     showModal.value = false;
   } catch (e: any) {

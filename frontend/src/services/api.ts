@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://144.24.204.95:8080/api";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string) || "http://localhost:8080/api";
 
 interface EventType {
   id: number;
@@ -270,7 +270,36 @@ export class ApiService {
   public static async getAllUsers(): Promise<User[]> {
     return this.makeRequest<User[]>("/users");
   }
+
   public static async getAllEstablishments(): Promise<Establishment[]> {
     return this.makeRequest<Establishment[]>("/establishments");
+  }
+
+  // Provinces and Localities endpoints
+  public static async getAllProvinces(): Promise<Province[]> {
+    return this.makeRequest<Province[]>("/provinces");
+  }
+
+  public static async getAllLocalities(): Promise<Locality[]> {
+    return this.makeRequest<Locality[]>("/localities");
+  }
+
+  public static async getLocalitiesByProvince(provinceName: string): Promise<Locality[]> {
+    return this.makeRequest<Locality[]>(`/localities/province/${encodeURIComponent(provinceName)}`);
+  }
+
+  // Create establishment endpoint
+  public static async createEstablishment(establishment: {
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    user: { id: number };
+    locality: { id: number };
+  }): Promise<Establishment> {
+    return this.makeRequest<Establishment>("/establishments", {
+      method: "POST",
+      body: JSON.stringify(establishment),
+    });
   }
 }
