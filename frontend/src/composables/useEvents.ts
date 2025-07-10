@@ -278,7 +278,7 @@ export function useEvents() {
 
         // Orden según la pestaña activa
         if (activeTab.value === "finished") {
-          // Para eventos finalizados: orden descendente (más recientes primero)
+          // Para eventos finalizados orden descendente (más recientes primero)
           return dateTimeB.getTime() - dateTimeA.getTime();
         } else {
           // Para el resto: orden ascendente (más próximos primero)

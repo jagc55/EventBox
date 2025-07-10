@@ -574,7 +574,6 @@ import { ApiService } from "@/services/api";
 
 const router = useRouter();
 
-// Usar el composable de eventos
 const {
   filteredEvents,
   loading,
