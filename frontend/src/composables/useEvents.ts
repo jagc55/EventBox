@@ -19,6 +19,7 @@ export function useEvents() {
   const selectedDate = ref("");
   const selectedProvince = ref("");
   const selectedLocality = ref("");
+  const selectedCategory = ref("");
   // Nuevos filtros
   const minPrice = ref("");
   const maxPrice = ref("");
@@ -146,6 +147,18 @@ export function useEvents() {
   const setActiveTab = (tab: string) => {
     activeTab.value = tab;
 
+    // Para pestañas que requieren autenticación
+    if ((tab === "favorites" || tab === "following" || tab === "followingEstablishments") && !isLoggedIn.value) {
+      error.value = getLoginRequiredMessage(tab);
+      loading.value = false;
+      return;
+    }
+
+    // Limpiar error si es una pestaña pública
+    if (tab === "upcoming" || tab === "finished") {
+      error.value = null;
+    }
+
     switch (tab) {
       case "upcoming":
         loadUpcomingEvents();
@@ -164,6 +177,20 @@ export function useEvents() {
         break;
       default:
         loadUpcomingEvents();
+    }
+  };
+
+  // Función para obtener el mensaje de login requerido según la pestaña
+  const getLoginRequiredMessage = (tab: string): string => {
+    switch (tab) {
+      case "favorites":
+        return "Inicia sesión para ver los eventos favoritos";
+      case "following":
+        return "Inicia sesión para ver los eventos de organizadores seguidos";
+      case "followingEstablishments":
+        return "Inicia sesión para ver los eventos de establecimientos seguidos";
+      default:
+        return "Inicia sesión para acceder a esta función";
     }
   };
 
@@ -238,6 +265,11 @@ export function useEvents() {
           if (event.establishment.locality.name !== selectedLocality.value) return false;
         }
 
+        // Filtro por categoría/tipo de evento
+        if (selectedCategory.value) {
+          if (event.eventType.name !== selectedCategory.value) return false;
+        }
+
         return true;
       })
       .sort((a, b) => {
@@ -268,6 +300,7 @@ export function useEvents() {
     selectedDate,
     selectedProvince,
     selectedLocality,
+    selectedCategory,
     minPrice,
     maxPrice,
     minAge,

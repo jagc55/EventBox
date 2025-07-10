@@ -7,8 +7,8 @@
         <p class="text-white-bg text-lg">Cargando eventos...</p>
       </div>
 
-      <!-- Error message -->
-      <div v-if="error" class="text-center py-8">
+      <!-- Error message (only for non-login errors) -->
+      <div v-if="error && !error.includes('Inicia sesión')" class="text-center py-8">
         <p class="text-red-500 text-lg">{{ error }}</p>
         <button
           @click="setActiveTab(activeTab)"
@@ -18,15 +18,34 @@
         </button>
       </div>
 
-      <!-- Buscador avanzado con mejor estructura y diseño -->
-      <!-- Botón para mostrar/ocultar filtros en móvil -->
-      <div class="sm:hidden mb-4">
+      <!-- Buscador avanzado desplegable -->
+      <div
+        v-if="!loading && (!error || error.includes('Inicia sesión'))"
+        class="border border-white-bg rounded-xl mb-5 bg-dark-primary shadow-xl"
+      >
+        <!-- Header del buscador (siempre visible) -->
         <button
           @click="showFilters = !showFilters"
-          class="w-full flex items-center justify-center gap-2 bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded transition-colors border border-purple-primary"
+          class="w-full flex items-center justify-between p-6 hover:bg-purple-600/10 transition-colors rounded-xl"
         >
+          <div class="flex items-center gap-3">
+            <svg
+              class="w-6 h-6 text-purple-primary"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <h2 class="text-lg font-semibold text-white-bg">Buscador de eventos</h2>
+          </div>
           <svg
-            class="w-5 h-5"
+            class="w-5 h-5 text-white-bg transition-transform duration-200"
+            :class="{ 'rotate-180': showFilters }"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
@@ -34,193 +53,174 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <polyline points="6,9 12,15 18,9" />
           </svg>
-          {{ showFilters ? "Ocultar buscador" : "Mostrar buscador" }}
         </button>
-      </div>
-      <!-- Buscador: acordeón en móvil, siempre visible en sm+ -->
-      <div
-        class="border border-white-bg rounded-xl mb-5 p-6 bg-dark-primary flex flex-col gap-4 shadow-xl"
-        v-if="!loading && !error && (showFilters || $screensm)"
-        :class="{ 'hidden sm:flex': !showFilters, flex: showFilters, 'sm:flex': true }"
-      >
-        <div class="flex items-center gap-3 mb-2">
-          <svg
-            class="w-6 h-6 text-purple-primary"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+
+        <!-- Contenido de filtros (desplegable) -->
+        <div v-if="showFilters" class="px-6 pb-6 border-t border-white-bg/20">
+          <!-- Grid responsivo para todos los filtros -->
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 items-center pt-4"
           >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <h2 class="text-lg font-semibold text-white-bg">Buscador de eventos</h2>
-        </div>
-        <!-- Primera fila: búsqueda, fechas, provincia, localidad, limpiar -->
-        <div
-          class="flex flex-col md:flex-row gap-4 items-end justify-between w-full md:space-x-4 md:space-y-0 space-y-4"
-        >
-          <!-- Input de búsqueda avanzado -->
-          <div class="flex flex-col w-full md:w-1/5">
-            <label class="text-white-bg text-sm mb-1" for="searchQuery"
-              >Título, tipo o tags (separa por coma o espacio)</label
-            >
-            <input
-              id="searchQuery"
-              type="text"
-              placeholder="Ej: rock, gratis, fiesta..."
-              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
-              v-model="searchQuery"
-            />
-          </div>
-          <!-- Rango de fechas -->
-          <div class="flex flex-col w-full md:w-1/5">
-            <label class="text-white-bg text-sm mb-1" for="startDate">Desde</label>
-            <input
-              id="startDate"
-              type="date"
-              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
-              v-model="startDate"
-            />
-          </div>
-          <div class="flex flex-col w-full md:w-1/5">
-            <label class="text-white-bg text-sm mb-1" for="endDate">Hasta</label>
-            <input
-              id="endDate"
-              type="date"
-              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
-              v-model="endDate"
-            />
-          </div>
-          <!-- Selector de provincia -->
-          <div class="flex flex-col w-full md:w-1/5">
-            <label class="text-white-bg text-sm mb-1" for="selectedProvince">Provincia</label>
-            <select
-              id="selectedProvince"
-              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
-              v-model="selectedProvince"
-            >
-              <option disabled value="">Selecciona provincia</option>
-              <option v-for="prov in provinces" :key="prov.id || prov" :value="prov.name || prov">
-                {{ prov.name || prov }}
-              </option>
-            </select>
-          </div>
-          <!-- Selector de localidad -->
-          <div class="flex flex-col w-full md:w-1/5">
-            <label class="text-white-bg text-sm mb-1" for="selectedLocality">Localidad</label>
-            <select
-              id="selectedLocality"
-              class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black"
-              v-model="selectedLocality"
-              :disabled="!selectedProvince || localities.length === 0"
-            >
-              <option disabled value="">Selecciona localidad</option>
-              <option v-for="loc in localities" :key="loc.id || loc" :value="loc.name || loc">
-                {{ loc.name || loc }}
-              </option>
-            </select>
-          </div>
-        </div>
-        <!-- Segunda fila: sliders de precio y edad, botón limpiar -->
-        <div
-          class="flex flex-col md:flex-row gap-4 items-start justify-between w-full md:space-x-4 md:space-y-0 space-y-4 mt-4"
-        >
-          <!-- Rango de precio con slider -->
-          <div class="flex flex-col w-full md:w-1/5">
-            <label class="text-white-bg text-sm mb-1">Precio (€)</label>
-            <div class="flex flex-col gap-2">
-              <div class="flex gap-2 mt-1">
-                <div class="flex flex-col">
-                  <label class="text-white-bg text-xs mb-1">Mín:</label>
-                  <input
-                    type="number"
-                    :min="0"
-                    :max="priceRange[1]"
-                    :value="priceRange[0]"
-                    @input="updatePriceFromInput($event, 0)"
-                    class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black w-16"
-                  />
+            <!-- Input de búsqueda avanzado -->
+            <div class="flex flex-col">
+              <label class="text-white-bg text-sm mb-1" for="searchQuery">Título, tipo o tags</label>
+              <input
+                id="searchQuery"
+                type="text"
+                placeholder="Ej: rock, gratis, fiesta..."
+                class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black min-w-0"
+                v-model="searchQuery"
+              />
+            </div>
+            <!-- Rango de fechas -->
+            <div class="flex flex-col">
+              <label class="text-white-bg text-sm mb-1" for="startDate">Desde</label>
+              <input
+                id="startDate"
+                type="date"
+                class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black min-w-0"
+                v-model="startDate"
+              />
+            </div>
+            <div class="flex flex-col">
+              <label class="text-white-bg text-sm mb-1" for="endDate">Hasta</label>
+              <input
+                id="endDate"
+                type="date"
+                class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black min-w-0"
+                v-model="endDate"
+              />
+            </div>
+            <!-- Selector de provincia -->
+            <div class="flex flex-col">
+              <label class="text-white-bg text-sm mb-1" for="selectedProvince">Provincia</label>
+              <select
+                id="selectedProvince"
+                class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black min-w-0"
+                v-model="selectedProvince"
+              >
+                <option value="">Cualquier provincia</option>
+                <option v-for="prov in provinces" :key="prov.id || prov" :value="prov.name || prov">
+                  {{ prov.name || prov }}
+                </option>
+              </select>
+            </div>
+            <!-- Selector de localidad -->
+            <div class="flex flex-col">
+              <label class="text-white-bg text-sm mb-1" for="selectedLocality">Localidad</label>
+              <select
+                id="selectedLocality"
+                class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black min-w-0"
+                v-model="selectedLocality"
+                :disabled="!selectedProvince || localities.length === 0"
+              >
+                <option value="">Cualquier localidad</option>
+                <option v-for="loc in localities" :key="loc.id || loc" :value="loc.name || loc">
+                  {{ loc.name || loc }}
+                </option>
+              </select>
+            </div>
+            <!-- Selector de categoría -->
+            <div class="flex flex-col">
+              <label class="text-white-bg text-sm mb-1" for="selectedCategory">Categoría</label>
+              <select
+                id="selectedCategory"
+                class="border border-purple-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white text-black min-w-0"
+                v-model="selectedCategory"
+              >
+                <option value="">Cualquier categoría</option>
+                <option v-for="category in categories" :key="category.id" :value="category.name">
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+            <!-- Rango de precio -->
+            <div class="flex flex-col">
+              <label class="text-white-bg text-sm mb-1">Precio (€)</label>
+              <div class="flex flex-col gap-2 min-h-[82px]">
+                <div class="flex gap-2">
+                  <div class="flex flex-col flex-1">
+                    <label class="text-white-bg text-xs mb-1">Mín:</label>
+                    <input
+                      type="number"
+                      :min="0"
+                      :max="priceRange[1]"
+                      :value="priceRange[0]"
+                      @input="updatePriceFromInput($event, 0)"
+                      class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black min-w-0"
+                    />
+                  </div>
+                  <div class="flex flex-col flex-1">
+                    <label class="text-white-bg text-xs mb-1">Máx:</label>
+                    <input
+                      type="number"
+                      :min="priceRange[0]"
+                      :max="1000"
+                      :value="priceRange[1]"
+                      @input="updatePriceFromInput($event, 1)"
+                      class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black min-w-0"
+                    />
+                  </div>
                 </div>
-                <div class="flex flex-col">
-                  <label class="text-white-bg text-xs mb-1">Máx:</label>
-                  <input
-                    type="number"
-                    :min="priceRange[0]"
-                    :max="1000"
-                    :value="priceRange[1]"
-                    @input="updatePriceFromInput($event, 1)"
-                    class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black w-16"
-                  />
+                <div class="flex items-center">
+                  <input type="checkbox" id="freeOnly" v-model="freeOnly" class="mr-2 accent-purple-500 scale-110" />
+                  <label for="freeOnly" class="text-white-bg text-xs">Solo gratuitos</label>
                 </div>
-              </div>
-              <div class="flex items-center mt-2 h-6">
-                <input type="checkbox" id="freeOnly" v-model="freeOnly" class="mr-2 accent-purple-500 scale-110" />
-                <label for="freeOnly" class="text-white-bg text-xs">Solo gratuitos</label>
               </div>
             </div>
-          </div>
-          <!-- Rango de edad con slider -->
-          <div class="flex flex-col w-full md:w-1/5">
-            <label class="text-white-bg text-sm mb-1">Edad</label>
-            <div class="flex flex-col gap-2">
-              <div class="flex gap-2 mt-1">
-                <div class="flex flex-col">
-                  <label class="text-white-bg text-xs mb-1">Mín:</label>
-                  <input
-                    type="number"
-                    :min="0"
-                    :max="ageRange[1]"
-                    :value="ageRange[0]"
-                    @input="updateAgeFromInput($event, 0)"
-                    class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black w-16"
-                  />
-                </div>
-                <div class="flex flex-col">
-                  <label class="text-white-bg text-xs mb-1">Máx:</label>
-                  <input
-                    type="number"
-                    :min="ageRange[0]"
-                    :max="99"
-                    :value="ageRange[1]"
-                    @input="updateAgeFromInput($event, 1)"
-                    class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black w-16"
-                  />
+            <!-- Rango de edad -->
+            <div class="flex flex-col">
+              <label class="text-white-bg text-sm mb-1">Edad</label>
+              <div class="flex flex-col gap-2 min-h-[82px]">
+                <div class="flex gap-2">
+                  <div class="flex flex-col flex-1">
+                    <label class="text-white-bg text-xs mb-1">Mín:</label>
+                    <input
+                      type="number"
+                      :min="0"
+                      :max="ageRange[1]"
+                      :value="ageRange[0]"
+                      @input="updateAgeFromInput($event, 0)"
+                      class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black min-w-0"
+                    />
+                  </div>
+                  <div class="flex flex-col flex-1">
+                    <label class="text-white-bg text-xs mb-1">Máx:</label>
+                    <input
+                      type="number"
+                      :min="ageRange[0]"
+                      :max="99"
+                      :value="ageRange[1]"
+                      @input="updateAgeFromInput($event, 1)"
+                      class="border border-gray-400 rounded px-1 py-1 text-xs bg-white text-black min-w-0"
+                    />
+                  </div>
                 </div>
               </div>
-              <!-- Espaciado para igualar altura con el slider de precio -->
-              <div class="h-6 mt-2"></div>
             </div>
-          </div>
-          <!-- Espacios vacíos para mantener alineación -->
-          <div class="flex flex-col w-full md:w-1/5">
-            <div class="invisible h-6"></div>
-          </div>
-          <div class="flex flex-col w-full md:w-1/5">
-            <div class="invisible h-6"></div>
-          </div>
-          <!-- Botón limpiar filtros -->
-          <div class="flex flex-col w-full md:w-1/5">
-            <label class="text-white-bg text-sm mb-1 invisible">Limpiar</label>
-            <button
-              type="button"
-              class="bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded transition-colors border border-purple-primary w-full"
-              @click="clearFilters"
-            >
-              Limpiar filtros
-            </button>
+            <!-- Espacios vacíos para mover el botón 3 columnas a la derecha en xl -->
+            <div class="hidden xl:block"></div>
+            <div class="hidden xl:block"></div>
+            <div class="hidden xl:block"></div>
+            <!-- Botón limpiar filtros -->
+            <div class="flex flex-col justify-center">
+              <button
+                type="button"
+                class="bg-purple-primary hover:bg-purple-600 text-white px-4 py-2 rounded transition-colors border border-purple-primary w-full min-w-0"
+                @click="clearFilters"
+              >
+                Limpiar filtros
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Contenedor con pestañas y eventos -->
       <div
-        v-if="!loading && !error"
+        v-if="!loading && (!error || error.includes('Inicia sesión'))"
         class="border border-white-bg rounded-xl bg-dark-primary shadow-xl overflow-hidden mb-8"
       >
         <!-- Pestañas -->
@@ -328,14 +328,25 @@
 
         <!-- Contenido de eventos -->
         <div class="p-6">
-          <!-- Grid de eventos -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Mensaje de error (para casos de login requerido) -->
+          <div v-if="error" class="text-center py-8">
+            <p class="text-white-bg text-lg mb-4">{{ error }}</p>
+            <button
+              v-if="error.includes('Inicia sesión')"
+              @click="router.push('/login')"
+              class="bg-purple-primary text-white px-6 py-3 rounded hover:bg-purple-600 transition-colors"
+            >
+              Iniciar Sesión
+            </button>
+          </div>
+          <!-- Grid de eventos (solo cuando no hay error) -->
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Mensaje cuando no hay eventos -->
             <div v-if="filteredEvents.length === 0" class="col-span-full text-center py-8">
               <p class="text-white-bg text-lg">No se encontraron eventos</p>
             </div>
             <div
-              v-for="event in filteredEvents"
+              v-for="event in displayedEvents"
               :key="event.id"
               class="bg-dark-primary border border-white-bg rounded shadow-xl flex flex-col transition duration-300 hover:scale-105 cursor-pointer"
               @click="navigateToEvent(event.id)"
@@ -389,6 +400,53 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Botones de navegación -->
+          <div v-if="filteredEvents.length > 0" class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+            <!-- Botón volver al inicio -->
+            <button
+              @click="scrollToTop"
+              class="flex items-center justify-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded transition-colors w-full sm:w-auto sm:min-w-[200px]"
+            >
+              <svg
+                class="w-5 h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m18 15-6-6-6 6" />
+              </svg>
+              <span class="whitespace-nowrap">Volver al inicio</span>
+            </button>
+
+            <!-- Botón cargar más eventos -->
+            <button
+              v-if="hasMoreEvents"
+              @click="loadMoreEvents"
+              class="flex items-center justify-center gap-2 bg-purple-primary hover:bg-purple-600 text-white px-6 py-3 rounded transition-colors w-full sm:w-auto sm:min-w-[200px]"
+            >
+              <svg
+                class="w-5 h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 5v14m-7-7l7 7 7-7" />
+              </svg>
+              <span class="whitespace-nowrap text-center">
+                Cargar más eventos
+                <span class="block sm:inline text-sm">
+                  ({{ filteredEvents.length - displayedEventsCount }} restantes)
+                </span>
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -507,7 +565,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useEvents } from "@/composables/useEvents";
 import { formatDate, formatTime } from "@/utils/dateFormat";
@@ -524,6 +582,7 @@ const {
   searchQuery,
   selectedProvince,
   selectedLocality,
+  selectedCategory,
   minPrice,
   maxPrice,
   minAge,
@@ -559,10 +618,24 @@ const establishmentEvents = ref<number | null>(null);
 // Provincias y localidades reactivas
 const provinces = ref<any[]>([]);
 const localities = ref<any[]>([]);
+const categories = ref<any[]>([]);
 
-// Estado para mostrar/ocultar el buscador en móvil
+// Estado para mostrar/ocultar el buscador desplegable
 const showFilters = ref(false);
-const $screensm = window.matchMedia("(min-width: 640px)").matches;
+
+// Variables para control de eventos mostrados
+const eventsPerPage = 6;
+const displayedEventsCount = ref(6);
+
+// Computed property para mostrar solo los eventos limitados
+const displayedEvents = computed(() => {
+  return filteredEvents.value.slice(0, displayedEventsCount.value);
+});
+
+// Computed property para verificar si hay más eventos disponibles
+const hasMoreEvents = computed(() => {
+  return filteredEvents.value.length > displayedEventsCount.value;
+});
 
 // Variables reactivas para inputs de rango
 const priceRange = ref<[number, number]>([0, 1000]);
@@ -631,6 +704,15 @@ const loadProvinces = async () => {
     }
   } catch (e) {
     provinces.value = [];
+  }
+};
+
+// Cargar categorías/tipos de evento desde la BD
+const loadCategories = async () => {
+  try {
+    categories.value = await ApiService.getAllEventTypes();
+  } catch (e) {
+    categories.value = [];
   }
 };
 
@@ -869,11 +951,25 @@ const navigateToEvent = (eventId: number) => {
   router.push({ name: "event", params: { eventId: eventId.toString() } });
 };
 
+// Función para cargar más eventos
+const loadMoreEvents = () => {
+  displayedEventsCount.value += eventsPerPage;
+};
+
+// Función para volver al inicio de la página
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
 // Función para limpiar todos los filtros del buscador
 const clearFilters = () => {
   searchQuery.value = "";
   selectedProvince.value = "";
   selectedLocality.value = "";
+  selectedCategory.value = "";
   minPrice.value = "";
   maxPrice.value = "";
   minAge.value = "";
@@ -884,12 +980,36 @@ const clearFilters = () => {
   // Resetear también los rangos de los inputs
   priceRange.value = [0, 1000];
   ageRange.value = [0, 99];
+  // Resetear el contador de eventos mostrados
+  displayedEventsCount.value = eventsPerPage;
 };
+
+// Watcher para resetear el contador cuando cambien los filtros o la pestaña activa
+watch(
+  [
+    searchQuery,
+    selectedProvince,
+    selectedLocality,
+    selectedCategory,
+    minPrice,
+    maxPrice,
+    minAge,
+    maxAge,
+    freeOnly,
+    startDate,
+    endDate,
+    activeTab,
+  ],
+  () => {
+    displayedEventsCount.value = eventsPerPage;
+  }
+);
 
 // Cargar eventos al montar el componente
 onMounted(() => {
   setActiveTab("upcoming");
   loadProvinces();
+  loadCategories();
 });
 </script>
 
