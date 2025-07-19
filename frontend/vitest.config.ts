@@ -8,6 +8,7 @@ const vitestExcludedFiles = [
   "**/__stubs__/**",
   "**/__tests__/**",
   "**/assets/**",
+  "**/cypress/**",
 ];
 
 export default mergeConfig(
@@ -22,6 +23,11 @@ export default mergeConfig(
         exclude: vitestExcludedFiles,
       },
       root: fileURLToPath(new URL("./", import.meta.url)),
+      // Include integration tests in the test patterns
+      include: [
+        "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+        "tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+      ],
     },
   })
 );

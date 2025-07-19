@@ -58,6 +58,6 @@ public interface EstablishmentFollowRepository extends JpaRepository<Establishme
     // Eliminar todos los follows de establecimientos cuyo propietario es el usuario
     @Modifying
     @Transactional
-    @Query("DELETE FROM EstablishmentFollow ef WHERE ef.establishment.user.id = :ownerId")
+    @Query("DELETE FROM EstablishmentFollow ef WHERE ef.establishment.id IN (SELECT e.id FROM Establishment e WHERE e.user.id = :ownerId)")
     void deleteByEstablishmentOwnerId(@Param("ownerId") Long ownerId);
 }

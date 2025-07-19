@@ -68,6 +68,12 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
+        // Verificar que el usuario existe antes de proceder
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return;
+        }
+        
         // Eliminar favoritos del usuario
         favoriteRepository.deleteByUserId(id);
         // Eliminar favoritos de eventos organizados por el usuario
@@ -88,8 +94,8 @@ public class UserService {
         eventRepository.deleteByOrganizerId(id);
         // Eliminar establecimientos si es organizador
         establishmentRepository.deleteByUserId(id);
-        // Finalmente eliminar el usuario
-        userRepository.deleteById(id);
+        // Finalmente eliminar el usuario - usar query personalizada
+        userRepository.deleteUserById(id);
     }
 
     public ResponseEntity<String> updateUserRole(Long userId, Integer roleId) {

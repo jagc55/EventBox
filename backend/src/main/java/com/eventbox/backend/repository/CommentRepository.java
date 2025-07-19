@@ -21,7 +21,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     // Eliminar todos los comentarios de eventos organizados por un usuario
     @Modifying
     @Transactional
-    @Query("DELETE FROM Comment c WHERE c.event.user.id = :organizerId")
+    @Query("DELETE FROM Comment c WHERE c.event.id IN (SELECT e.id FROM Event e WHERE e.user.id = :organizerId)")
     void deleteByEventOrganizerId(@Param("organizerId") Long organizerId);
 
     // Eliminar todos los comentarios de un evento
