@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "Concierto de Rock",
+    "description": "Un increíble concierto de rock",
+    "date": "2024-12-20T20:00:00",
+    "location": "Madrid",
+    "organizer": "Rock Events",
+    "attendees": 150,
+    "maxAttendees": 200,
+    "price": 25.0,
+    "category": "Música"
+  },
+  {
+    "id": 2,
+    "title": "Festival de Jazz",
+    "description": "Disfruta del mejor jazz en vivo",
+    "date": "2024-12-22T19:30:00",
+    "location": "Barcelona",
+    "organizer": "Jazz Club",
+    "attendees": 80,
+    "maxAttendees": 100,
+    "price": 30.0,
+    "category": "Música"
+  },
+  {
+    "id": 3,
+    "title": "Feria Gastronómica",
+    "description": "Los mejores sabores de la región",
+    "date": "2024-12-25T12:00:00",
+    "location": "Valencia",
+    "organizer": "Food Events",
+    "attendees": 200,
+    "maxAttendees": 300,
+    "price": 0.0,
+    "category": "Gastronomía"
+  }
+]

@@ -11,7 +11,11 @@
     "test:unit": "vitest --run",
     "test:integration": "vitest tests/integration --run",
     "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run",
+    "test:e2e:dev": "cypress open"
   },
   "dependencies": {
     "async-validator": "4.2.5",
@@ -20,6 +24,7 @@
     "vue-router": "4.5.0"
   },
   "devDependencies": {
+    "@testing-library/cypress": "^10.0.3",
     "@tsconfig/node22": "22.0.1",
     "@types/jsdom": "21.1.7",
     "@types/node": "22.15.2",
@@ -28,6 +33,7 @@
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "0.7.0",
     "autoprefixer": "10.4.21",
+    "cypress": "^14.5.2",
     "jsdom": "26.1.0",
     "lint-staged": "15.5.1",
     "postcss": "8.5.3",

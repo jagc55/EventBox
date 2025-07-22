@@ -1,0 +1,41 @@
+{
+  "users": {
+    "regularUser": {
+      "email": "testuser@example.com",
+      "name": "Test User",
+      "password": "password123",
+      "roleId": 1
+    },
+    "organizer": {
+      "email": "organizer@example.com",
+      "name": "Test Organizer",
+      "password": "password123",
+      "roleId": 2
+    },
+    "admin": {
+      "email": "admin@example.com",
+      "name": "Test Admin",
+      "password": "password123",
+      "roleId": 3
+    }
+  },
+  "establishments": {
+    "testEstablishment": {
+      "name": "Test Venue",
+      "address": "123 Test Street",
+      "phone": "123456789",
+      "email": "venue@example.com"
+    }
+  },
+  "events": {
+    "testEvent": {
+      "name": "Test Event",
+      "description": "This is a test event for E2E testing",
+      "date": "2025-08-15",
+      "time": "20:00",
+      "price": 25.0,
+      "capacity": 100,
+      "minimumAge": 18
+    }
+  }
+}
